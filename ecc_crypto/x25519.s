@@ -35,18 +35,10 @@ x25519_calculation:
 x25519:
     LD r10, ca_ecdh_u_coordinate
     LD r28, ca_ecdh_scalar
-    
-    ANDI R28, r28, 0xF7F
-    ORI R28, r28, 0x040
-    SWE r28, r28
     ANDI r28, r28, 0xFF8
     
     LD r31, ca_eddsa_8q
     LD r3, random
-    SCB r28, r28, r3
-
-    SWE r10, r10        ; r10 = x1
-    MOVI r11, 1         ; r11 = x2
     MOVI r12, 0         ; r12 = z2
     MOV r13, r10        ; r13 = x3
     MOVI r14, 1         ; r14 = z3
