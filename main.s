@@ -1,5 +1,3 @@
-.include data/const_rom_leyout.s
-.include data/data_ram_in_leyout.s
 _start:
     LD r0, ca_command
 
@@ -17,7 +15,6 @@ next_cmd_2:
     BRNZ next_cmd_3
     CALL x25519
     END
-<<<<<<< HEAD
 
 next_cmd_3:
     END
