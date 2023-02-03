@@ -1,0 +1,21 @@
+HOW TO stream message and comunicate with external system
+    . by 256 bit blocks
+    . special signals triggered from FW with special instructions?
+            (maybe state registers)
+    . how to do pedding?
+        .. if pedding is a job for SPECT, it needs to know message length in bits
+
+HOW TO fail
+    . new instruction FAIL
+    . cause interrupt and set some state register?
+
+HOW IS IT with endianity of results? 
+
+NEW INSTRUCTIONS
+    ROL8
+    ROR8
+    CSWAP
+    IS0
+    IS1
+    SWE
+    FAIL
