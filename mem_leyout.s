@@ -1,0 +1,11 @@
+c_u_in                  .eq 0x0000
+c_key                   .eq 0x0020
+c_p25519_addr           .eq 0x0040
+c_a24_addr              .eq 0x0060
+c_q25519_8_addr         .eq 0x0080
+c_rng                   .eq 0x00a0
+c_u_out                 .eq 0x1000
+c_p256_addr             .eq 0x00c0
+c_q256_addr             .eq 0x00e0
+c_q256_exp_addr         .eq 0x0100
+c_num                   .eq 0x0120
