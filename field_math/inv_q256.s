@@ -70,11 +70,7 @@ inv_q256_loop_lowpart:
     MULP r4, r4, r4
     MULP r4, r4, r4
     ; check first bit
-    LSL r5, r5
     BRC inv_q256_loop_x1
-
-inv_q256_loop_x0:
-    ; check second bit
     LSL r5, r5
     BRNC inv_q256_loop_lowpart_back
 inv_q256_loop_x01:
