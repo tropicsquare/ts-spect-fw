@@ -1,12 +1,11 @@
 ; Inversion modulo q256
-; input Z in register r1
-; output z^(-1) mod q256 in register r1
+; input Z in register r26
+; output z^(-1) mod q256 in register r26
 ; used registers : r1-x
 
 inv_q256:
-    LD r31, c_q256_addr
-    MULP r2, r1, r1   ; e = 2
-    MULP r3, r2, r1   ; e = 3
+    MULP r2, r26, r26   ; e = 2
+    MULP r3, r2, r26   ; e = 3
 
     MULP r4, r3, r3
     MULP r4, r4, r4
@@ -64,7 +63,7 @@ inv_q256_loop_32:
 
     MULP r4, r4, r6   ; e = ffffffff 00000000 ffffffff ffffffff
 
-    LD r5, c_q256_exp_addr
+    LD r5, c_p256_exp_low_addr
     MOVI r30, 128
 inv_q256_loop_lowpart:
     ; make 00 space
@@ -80,7 +79,7 @@ inv_q256_loop_x0:
     BRNC inv_q256_loop_lowpart_back
 inv_q256_loop_x01:
     ; chunk = 01
-    MULP r4, r4, r1
+    MULP r4, r4, r26
     JMP inv_q256_loop_lowpart_back
 
 inv_q256_loop_x1:
@@ -99,6 +98,6 @@ inv_q256_loop_lowpart_back:
     SUBI r30, r30, 2
     BRNZ inv_q256_loop_lowpart
 
-    MOV r1, r4
+    MOV r26, r4
     RET
     
