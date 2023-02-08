@@ -1,13 +1,15 @@
-.include mem_leyout.s
+.include const_rom_leyout.s
 _start:
-    ;CALL x25519
-    LD r1, c_num
-    CALL inv_q256
-    ST r1, 0x1000
+    CALL ecdsa_key_setup
     END
 
 ;.include    field_math/inv_p25519.s
-;.include    field_math/inv_p256.s
-.include    field_math/inv_q256.s
+;.include    field_math/inv_q256.s
+
+.include    field_math/inv_p256.s
+.include    ecc_math/point_add_p256.s
+.include    ecc_math/point_dub_p256.s
+.include    ecc_math/spm_p256.s
+.include    ecc_crypto/ecdsa_key_setup.s
 
 ;.include    ecc_crypto/x25519.s
