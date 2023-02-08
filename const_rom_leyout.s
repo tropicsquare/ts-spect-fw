@@ -1,0 +1,13 @@
+c_p256_addr .eq 0x3000
+c_p256_q_addr .eq 0x3020
+c_p256_exp_low_addr .eq 0x3040
+c_p256_b_addr .eq 0x3060
+c_p256_xG_addr .eq 0x3080
+c_p256_yG_addr .eq 0x30A0
+c_p25519_addr .eq 0x30C0
+c_q25519_addr .eq 0x30E0
+c_q25519_8_addr .eq 0x3100
+c_ed25519_xG_addr .eq 0x3120
+c_ed25519_yG_addr .eq 0x3140
+c_x25519_a24_addr .eq 0x3160
+c_key_addr .eq 0x3180
