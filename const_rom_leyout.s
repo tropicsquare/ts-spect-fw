@@ -11,3 +11,5 @@ c_ed25519_xG_addr .eq 0x3120
 c_ed25519_yG_addr .eq 0x3140
 c_x25519_a24_addr .eq 0x3160
 c_key_addr .eq 0x3180
+c_msg_digest_addr .eq 0x31A0
+c_scalar_addr .eq 0x31C0
