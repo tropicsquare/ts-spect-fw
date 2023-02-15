@@ -17,11 +17,11 @@ next_cmd_2:
     BRNZ next_cmd_3
     CALL x25519
     END
+<<<<<<< HEAD
 
 next_cmd_3:
     END
 
-.include    src/field_math/inv_q256.s
 .include    src/field_math/inv_p256.s
 .include    src/field_math/inv_p25519.s
 
@@ -32,3 +32,8 @@ next_cmd_3:
 .include    src/ecc_crypto/ecdsa_key_setup.s
 .include    src/ecc_crypto/ecdsa_sign.s
 .include    src/ecc_crypto/x25519.s
+=======
+
+next_cmd_3:
+    END
+
