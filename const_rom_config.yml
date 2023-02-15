@@ -1,0 +1,28 @@
+name: const_rom
+start_addr: 0x3000
+end_addr:   0x37FF
+data:
+  - name : ca_ecdsa_p
+    value : 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
+  - name : ca_ecdsa_q
+    value : 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551
+  - name : ca_ecdsa_exp_low
+    value : 0xbce6faada7179e84f3b9cac2fc63254f00000000000000000000000000000000
+  - name : ca_ecdsa_b
+    value : 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b
+  - name : ca_ecdsa_xG
+    value : 0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296
+  - name : ca_ecdsa_yG
+    value : 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5
+  - name : ca_eddsa_p
+    value : 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed
+  - name : ca_eddsa_q
+    value : 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed
+  - name : ca_eddsa_8q
+    value : 0x80000000000000000000000000000000a6f7cef517bce6b2c09318d2e7ae9f68
+  - name : ca_ed25519_xG
+    value : 0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a
+  - name : ca_ed25519_yG
+    value : 0x6666666666666666666666666666666666666666666666666666666666666658
+  - name : ca_x25519_a24
+    value : 121665
