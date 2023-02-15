@@ -22,7 +22,7 @@ x25519_calculation:
     MUL25519    r14, r14, r14
     MUL25519    r14, r10, r14
     MUL25519    r11, r2,  r4
-    LD          r1, c_a24_addr
+    LD          r1, ca_x25519_a24
     MUL25519    r12, r1,  r5
     ADDP        r12, r2,  r12
     MUL25519    r12, r5,  r12
@@ -33,16 +33,16 @@ x25519_calculation:
     RET
 
 x25519:
-    LD r10, c_u_in
-    LD r28, c_key
+    LD r10, ca_ecdh_u_coordinate
+    LD r28, ca_ecdh_scalar
     
     ANDI R28, r28, 0xF7F
     ORI R28, r28, 0x040
     SWE r28, r28
     ANDI r28, r28, 0xFF8
     
-    LD r31, c_q25519_8_addr
-    LD r3, c_rng
+    LD r31, ca_eddsa_8q
+    LD r3, random
     SCB r28, r28, r3
 
     SWE r10, r10        ; r10 = x1
@@ -51,7 +51,7 @@ x25519:
     MOV r13, r10        ; r13 = x3
     MOVI r14, 1         ; r14 = z3
 
-    LD r31, c_p25519_addr
+    LD r31, ca_eddsa_p
 
     MOVI r30, 256
 x25519_loop_512_256:
@@ -72,5 +72,5 @@ x25519_loop_255_0:
     
     MUL25519 r10, r11, r1
     SWE r10, r10
-    ST r10, c_u_out
+    ST r10, 0x1000
     RET

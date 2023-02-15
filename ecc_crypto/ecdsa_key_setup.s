@@ -8,18 +8,18 @@
 ;
 
 ecdsa_key_setup:
-    LD r28, c_key_addr
+    LD r28, ca_ecdsa_key
     ST r28, 0x1040
 
-    LD r31, c_p256_q_addr
-    LD r27, c_ed25519_xG_addr
+    LD r31, ca_ecdsa_q
+    LD r27, random
     SCB r28, r28, r27
 
-    LD r31, c_p256_addr
-    LD r8, c_p256_b_addr
+    LD r31, ca_ecdsa_p
+    LD r8, ca_ecdsa_b
 
-    LD r12, c_p256_xG_addr
-    LD r13, c_p256_yG_addr
+    LD r12, ca_ecdsa_xG
+    LD r13, ca_ecdsa_yG
     MOVI r14, 1
 
     CALL spm_p256
