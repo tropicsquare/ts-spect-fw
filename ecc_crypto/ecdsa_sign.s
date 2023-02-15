@@ -10,20 +10,20 @@
 ;   Status = 0x1040
 
 ecdsa_sign:
-    LD r26, c_scalar_addr
+    LD r26, ca_ecdsa_k
 
-    LD r31, c_p256_q_addr
-    LD r27, c_ed25519_xG_addr
+    LD r31, ca_ecdsa_q
+    LD r27, random
 
     SCB r28, r26, r27
 
     CALL inv_q256
 
-    LD r31, c_p256_addr
-    LD r8, c_p256_b_addr
+    LD r31, ca_ecdsa_p
+    LD r8, ca_ecdsa_b
 
-    LD r12, c_p256_xG_addr
-    LD r13, c_p256_yG_addr
+    LD r12, ca_ecdsa_xG
+    LD r13, ca_ecdsa_yG
     MOVI r14, 1
 
     CALL spm_p256
@@ -37,19 +37,30 @@ ecdsa_sign:
     CMPA r9, 0
     BRZ ecdsa_fail
 
+    LD r1, ca_ecdsa_r
+    SUBP r1, r1, r9
+    CMPA r1, 0
+    BRNZ ecdsa_fail_r
+
     ST r9, 0x1000
 
-    LD r31, c_p256_q_addr
-    LD r24, c_key_addr
-    LD r25, c_msg_digest_addr
+    LD r31, ca_ecdsa_q
+    LD r24, ca_ecdsa_key
+    LD r25, ca_ecdsa_msg_digest
 
 
     MULP r0, r24, r9
     ADDP r0, r0, r25
     MULP r0, r0, r26
 
-    CMPA r26, 0
+    CMPA r0, 0
     BRZ ecdsa_fail
+
+    LD r31, ca_ecdsa_p
+    LD r1, ca_ecdsa_s
+    SUBP r1, r1, r0
+    CMPA r1, 0
+    BRNZ ecdsa_fail_s
 
     ST r0, 0x1020
     MOVI r0, 1
@@ -58,5 +69,15 @@ ecdsa_sign:
 
 ecdsa_fail:
     MOVI r0, 2
+    ST r0, 0x1040
+    RET
+
+ecdsa_fail_r:
+    MOVI r0, 3
+    ST r0, 0x1040
+    RET
+
+ecdsa_fail_s:
+    MOVI r0, 4
     ST r0, 0x1040
     RET
