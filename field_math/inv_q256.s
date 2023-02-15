@@ -63,7 +63,7 @@ inv_q256_loop_32:
 
     MULP r4, r4, r6   ; e = ffffffff 00000000 ffffffff ffffffff
 
-    LD r5, c_p256_exp_low_addr
+    LD r5, ca_ecdsa_exp_low
     MOVI r30, 128
 inv_q256_loop_lowpart:
     ; make 00 space
