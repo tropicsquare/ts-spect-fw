@@ -1,5 +1,5 @@
-.include const_rom_leyout.s
-.include data_ram_in_leyout.s
+.include data/const_rom_leyout.s
+.include data/data_ram_in_leyout.s
 _start:
     LD r0, ca_command
 
@@ -21,14 +21,14 @@ next_cmd_2:
 next_cmd_3:
     END
 
-.include    field_math/inv_q256.s
-.include    field_math/inv_p256.s
-.include    field_math/inv_p25519.s
+.include    src/field_math/inv_q256.s
+.include    src/field_math/inv_p256.s
+.include    src/field_math/inv_p25519.s
 
-.include    ecc_math/point_add_p256.s
-.include    ecc_math/point_dub_p256.s
-.include    ecc_math/spm_p256.s
+.include    src/ecc_math/point_add_p256.s
+.include    src/ecc_math/point_dub_p256.s
+.include    src/ecc_math/spm_p256.s
 
-.include    ecc_crypto/ecdsa_key_setup.s
-.include    ecc_crypto/ecdsa_sign.s
-.include    ecc_crypto/x25519.s
+.include    src/ecc_crypto/ecdsa_key_setup.s
+.include    src/ecc_crypto/ecdsa_sign.s
+.include    src/ecc_crypto/x25519.s

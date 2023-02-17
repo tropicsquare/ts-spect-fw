@@ -7,6 +7,7 @@ ca_ecdsa_yG .eq 0x30A0
 ca_eddsa_p .eq 0x30C0
 ca_eddsa_q .eq 0x30E0
 ca_eddsa_8q .eq 0x3100
-ca_ed25519_xG .eq 0x3120
-ca_ed25519_yG .eq 0x3140
-ca_x25519_a24 .eq 0x3160
+ca_eddsa_d .eq 0x3120
+ca_eddsa_xG .eq 0x3140
+ca_eddsa_yG .eq 0x3160
+ca_x25519_a24 .eq 0x3180

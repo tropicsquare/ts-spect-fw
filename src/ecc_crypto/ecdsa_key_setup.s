@@ -12,7 +12,7 @@ ecdsa_key_setup:
     ST r28, 0x1040
 
     LD r31, ca_ecdsa_q
-    LD r27, random
+    GRV r27
     SCB r28, r28, r27
 
     LD r31, ca_ecdsa_p
