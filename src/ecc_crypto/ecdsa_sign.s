@@ -37,14 +37,11 @@ ecdsa_sign:
     CMPA r9, 0
     BRZ ecdsa_fail
 
-<<<<<<< HEAD
-=======
     LD r1, ca_ecdsa_r
     SUBP r1, r1, r9
     CMPA r1, 0
     BRNZ ecdsa_fail_r
 
->>>>>>> 9bbc909 (spect fw: add random data, directory reorganization)
     ST r9, 0x1000
 
     LD r31, ca_ecdsa_q
@@ -59,15 +56,12 @@ ecdsa_sign:
     CMPA r0, 0
     BRZ ecdsa_fail
 
-<<<<<<< HEAD
-=======
     LD r31, ca_ecdsa_p
     LD r1, ca_ecdsa_s
     SUBP r1, r1, r0
     CMPA r1, 0
     BRNZ ecdsa_fail_s
 
->>>>>>> 9bbc909 (spect fw: add random data, directory reorganization)
     ST r0, 0x1020
     MOVI r0, 1
     ST r0, 0x1040
@@ -77,8 +71,6 @@ ecdsa_fail:
     MOVI r0, 2
     ST r0, 0x1040
     RET
-<<<<<<< HEAD
-=======
 
 ecdsa_fail_r:
     MOVI r0, 3
@@ -89,4 +81,3 @@ ecdsa_fail_s:
     MOVI r0, 4
     ST r0, 0x1040
     RET
->>>>>>> 9bbc909 (spect fw: add random data, directory reorganization)
