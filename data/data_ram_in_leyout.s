@@ -7,4 +7,3 @@ ca_ecdsa_s .eq 0x00A0
 ca_ecdh_scalar .eq 0x00C0
 ca_ecdh_u_coordinate .eq 0x00E0
 ca_ecdh_res .eq 0x0100
-random .eq 0x0120

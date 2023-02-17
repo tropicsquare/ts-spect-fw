@@ -42,7 +42,7 @@ x25519:
     ANDI r28, r28, 0xFF8
     
     LD r31, ca_eddsa_8q
-    LD r3, random
+    GRV r3
     SCB r28, r28, r3
 
     SWE r10, r10        ; r10 = x1
