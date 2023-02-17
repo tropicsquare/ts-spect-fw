@@ -21,4 +21,3 @@ data:
     value : 0xe6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c
   - name : ca_ecdh_res
     value : 0xc3da55379de9c6908e94ea4df28d084f32eccf03491c71f754b4075577a28552
-  - name : random

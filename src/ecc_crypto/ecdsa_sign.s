@@ -13,7 +13,7 @@ ecdsa_sign:
     LD r26, ca_ecdsa_k
 
     LD r31, ca_ecdsa_q
-    LD r27, random
+    GRV r27
 
     SCB r28, r26, r27
 
