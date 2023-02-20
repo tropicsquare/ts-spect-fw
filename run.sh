@@ -20,5 +20,3 @@ $RUNDIR/main.s > $RUNDIR/log/compile.log
 --data-ram-in=$RUNDIR/data/data_ram_in.hex \
 --data-ram-out=$RUNDIR/data/out.hex \
 --grv-hex=$RUNDIR/data/grv.hex > $RUNDIR/log/iss.log
-
-
