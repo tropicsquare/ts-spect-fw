@@ -4,9 +4,15 @@ In order to sign a message od arbitrary length (max 4096 bytes) using EdDSA, the
 
 Let $M$ be a message and $n$ a length of the message in bytes. $M = "0, 1, ..., n-1"$.
 
-We define symbol $a||b$ as a concatenation of two strings:
+We define $a||b$ as a concatenation of two strings:
 
 $$"0_a, .., n_a-1" || "0_b, ..., n_b-1" = "0_a, .., n_a-1, b_0, ..., n_b-1"$$
+
+We define $a^j$ as concatenation of $a$ $j$ times. E.g. $"0x01"^3 = "0x01, 0x01, 0x01"$
+
+We define $to\_string(x)$ as big endian encoding of 16 bit unsigned integer x:
+
+$$to\_string(0x3456) = "0x34, 0x56"$$
 
 ## Registers
 
@@ -28,27 +34,32 @@ SPECT works with 256 bit (or 32 byte) registers. Data to the registers can be lo
 
 SPECT provides instruction for SHA-512 function. The instruction takes 4 32 byte registers (r0, r1, r2, r3), composes one 128 byte block of data as $r3 || r2 || r1 || r0$ and processes it with the SHA-512 function.
 
-Let $M$ be a 248 byte message. $M = "M_0, M_1, ..., M_{246}, M_{247}"$.
+Let $M$ be a 210 byte message. $M = "M_0, M_1, ..., M_{208}, M_{209}"$.
 
-After initialization of SHO-512 core, the message is then processed in two rounds of SHA-512 calculation. The first block is composed as:
+After initialization of SHA-512 core, the message is then processed in two rounds of SHA-512 calculation. The first block is composed as:
 
 $$r3 = "M_0, ..., M_{31}"$$
 $$r2 = "M_{32}, ..., M_{63}"$$
 $$r1 = "M_{64}, ..., M_{95}"$$
 $$r0 = "M_{96}, ..., M_{127}"$$
 
-The second block is then composed as:
+When processing a last block of a message, we compose a padding $pad$ as follows:
+
+$$j = 128 - byte\_len(last\_block) - 17$$
+$$s = to\_string(bit\_len(M))$$
+$$pad = "0x80" || "0x00"^{j+14} || s$$
+
+In case of message $M$, $pad = "0x08" || "0x00"^{43} || "0x06, 0x90$
+
+The second block is the composed as:
 
 $$r3 = "M_{128}, ..., M_{159}"$$
 $$r2 = "M_{160}, ..., M_{191}"$$
-$$r1 = "M_{192}, ..., M_{223}"$$
-$$r0 = "M_{224}, ..., M_{247}" || padding$$
+$$r1 = "M_{192}, ..., M_{209}" || "pad_0, ..., pad_{13}$$
+$$r0 = "pad_{14}, ..., pad_{45}"$$
 
-where
 
-$$padding = "0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0xC0"$$
-
-    NOTE: padding is composed as 64 bits, MSB = 1, the rest represents length of the message in bits.
+    NOTE: When j becomes negative, a new block is composed with j + 128.
 
 ## TMAC
 
