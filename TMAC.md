@@ -44,11 +44,16 @@ Message $M$ is than padded as follows:
 
 ## TMAC in ECDSA Key Setup
 
+In ECDSA Key Setup, TMAC is used to generate second private key $w$.
+
 - $K = d = k \pmod{q}$
 - $N = 0x0A$
 - $X = ""$
 
 Empty message $X$ shall be padded with $pad = (0x20)(0x00)^{16}(0x01)$
+
+1. $TMAC\_INIT(d, 0x0A)$
+2. $w = TMAC\_UPDATE(pad)$
 
 ## TMAC in ECDSA nonce generation
 
@@ -57,3 +62,6 @@ Empty message $X$ shall be padded with $pad = (0x20)(0x00)^{16}(0x01)$
 - $X = (SCh||SCn||z)$
 
 Size of $z$ is fixed to 32 bytes, thus $pad$ is also fixed to value $0x2001$.
+
+1. $TMAC\_INIT(w, 0x0B)$
+2. $TMAC\_UPDATE(z[])
