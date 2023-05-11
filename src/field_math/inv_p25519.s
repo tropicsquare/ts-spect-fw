@@ -2,7 +2,7 @@
 ; input Z in register r1
 ; output Z^-1 mod p25519 in register r1
 
-inv_p25519:
+inv_p25519_250:
     MUL25519 r2, r1, r1
     MUL25519 r4, r2, r1     ; r4 = x2
 
@@ -73,7 +73,10 @@ inv_p25519_loop_50_2:
     BRNZ inv_p25519_loop_50_2
 
     MUL25519 r2, r3, r5     ; r2 = x250
+    RET
 
+inv_p25519:
+    CALL inv_p25519_250
     MUL25519 r3, r2, r2
     MUL25519 r3, r3, r3
     MUL25519 r3, r3, r1
