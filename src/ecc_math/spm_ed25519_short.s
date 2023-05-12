@@ -32,8 +32,8 @@ spm_ed25519_short:
     CSWAP r10, r13
     CSWAP r11, r14
 
-    CALL point_add_p256
-    CALL point_dub_p256
+    CALL point_add_ed25519
+    CALL point_dub_ed25519
 
     CSWAP r9,  r12
     CSWAP r10, r13

@@ -4,7 +4,7 @@
 ;   Point Q1 = (r7,  r8,  r9,  r10)
 ;   Point Q2 = (r11, r12, r13, r14)
 ; Output:
-;   Q2 = Q1 + Q2
+;   Q2 = Q1 + Q2 = (r11, r12, r13, r14)
 ;
 ; Expects:
 ;   Ed25519 prime in r31

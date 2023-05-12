@@ -36,6 +36,8 @@
 ;                          (p+3)/8      3        (p-5)/8
 ;                 x = (u/v)        = u v  (u v^7)         (mod p)
 ;
+;                 (p-5)/8 = 2^252 - 3
+;
 ;   3.  Again, there are three cases:
 ;
 ;       1.  If v x^2 = u (mod p), x is a square root.
@@ -51,62 +53,115 @@
 ;       2, set x <-- p - x.  Return the decoded point (x,y).
 
 ; Expects:
-;   Ed25519 prime in e31
+;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
 
 ; Input:
-;   compressed point with Y coordinate
+;   compressed point with Y coordinate in r12
+; Output:
+;   decompresd point (X, Y) = (r11, r12)
+;
+; Used registers (other than IN/OUT):
+;   r0-5, r16-22
 
 point_decopress_ed25519:
-    ; r16 = y * y
-    ; r20 = r16 - 1
-    ; r16 = r16 * r6
-    ; r16 = r16 + 1
+    LSL r16, r16
+    BRC point_decopress_ed25519_x0_1
+; point_decopress_ed25519_x0_0
+    MOVI r22, 0     ; X0 = r22
+    JMP point_decopress_ed25519_sqr:
+point_decopress_ed25519_x0_1:
+    MOVI r22, 1
+    JMP point_decopress_ed25519_sqr:
+
+point_decopress_ed25519_sqr:
+    LSR r16, r16
+    MOV r12, r16
+    MUL25519 r16, r16, r16  ; r16 = y * y
+    MOVI     r1,  1
+    SUBP     r20, r16, r1   ; r20 = r16 - 1
+    MUL25519 r16, r16, r6   ; r16 = r16 * r6
+    ADDP     r21, r16, r1   ; r21 = r16 + 1
     
-    ; u = r20, v = r16
+                            ; u = r20
+                            ; v = r21
 
-    ; r18 = r16 * r16
-    ; r18 = r18 * r16   (r18 = v^3)
+    MUL25519 r18, r21, r21  ; r18 = r21 * r21
+    MUL25519 r18, r18, r21  ; r18 = r18 * r21   (r18 = v^3)
 
-    ; r19 = r18 * r20   (r19 = u*v^3)
+    MUL25519 r19, r18, r20  ; r19 = r18 * r20   (r19 = u*v^3)
     
-    ; r18 = r18 * r18
-    ; r18 = r18 * r16   (r18 = v^7)
+    MUL25519 r18, r18, r18  ; r18 = r18 * r18
+    MUL25519 r18, r18, r21  ; r18 = r18 * r21   (r18 = v^7)
 
-    ; r1 = r18 * r20    (r1 = u*v^7)
-    ; r16 = r1
+    MUL25519 r1,  r18, r20  ; r1 = r18 * r20    (r1 = u*v^7)
+    MOV      r16, r1        ; r16 = r1          (r16 = u*v^7)
 
-    CALL inv_p25519_250
+    CALL inv_p25519_250     ; r2 = (u*v^7)^(2^250-1)
 
-    ; r18 = r2 * r2
-    ; r18 = r18 * r18
-    ; r18 = r18 * r16  (r18 = (u*v^7)^((p-5)/8))
-    ; r18 = r18 * r19  (r18 = (u*v^3)(u*v^7)^((p-5)/8) = x)
+    MUL25519 r18, r2,  r2   ; r18 = r2 * r2     (r18 = (u*v^7)^(2^251-2))
+    MUL25519 r18, r18, r18  ; r18 = r18 * r18   (r18 = (u*v^7)^(2^252-4))
+    MUL25519 r18, r18, r16  ; r18 = r18 * r16   (r18 = (u*v^7)^(2^252-3) = (u*v^7)^((p-5)/8))
 
-    ; r16 = r18 * r18  (r16 = x^2)
+    MUL25519 r18, r18, r19  ; r18 = r18 * r19   (r18 = x = (u*v^3)(u*v^7)^((p-5)/8))
 
-    ; r17 = r18 * ca_eddsa_m1
+    MUL25519 r16, r18, r18  ; r16 = r18 * r18  (r16 = x^2)
+    MUL25519 r16, r16, r21  ; r16 = r16 * r21  (r16 = v*x^2)
 
-    ; r19 = r16 - r20
-    ; r20 = r16 + r20
+    LD       r1,  ca_eddsa_m1
+    MUL25519 r17, r18, r1   ; r17 = r18 * ca_eddsa_m1
 
-    CMPA r19, 0
-    BRZ point_decopress_ed25519_case1
+                            ; r16 = v * x^2
+                            ; r17 = x * 2^((p-1)/4)
+                            ; r18 = x
+                            ; r20 = u
 
-    CMPA r20, 0
-    BRZ point_decopress_ed25519_case2
+    SUBP     r19, r16, r20  ; r19 = r16 - r20   (r19 == 0 iff v*x^2 == u)
+    ADDP     r20, r16, r20  ; r20 = r16 + r20   (r20 == 0 iff v*x^2 == -u)
 
-    ; fail
+    MOVI r1, 0              ; r1 = flag
 
-point_decopress_ed25519_case1:
-    CMPA r20, 0
-    BRZ point_decopress_ed25519_case2
-    MOV r0, r16
-    JMP point_decopress_ed25519_success
+; point_decopress_ed25519_vx2_check1
+    CMPA r19, 0             ; v*x^2 == u
+    BRNZ point_decopress_ed25519_vx2_check2
+    MOV  r0, r18            ; res = x
+    MOVI r1, 1
+point_decopress_ed25519_vx2_check2:
+    CMPA r20, 0             ; v*x^2 == -u
+    BRNZ point_decopress_ed25519_vx2_check_flag
+    MOV  r0, r17            ; res = x * 2^((p-1)/4)
+    MOVI r1, 1
+point_decopress_ed25519_vx2_check_flag:
+    CMP r1, 0
+    BRZ point_decopress_ed25519_fail
 
-point_decopress_ed25519_case2:
-    MOV r0, r17
-    JMP point_decopress_ed25519_success
+    MOVI r1, 0
+; point_decopress_ed25519_check_x_is_0
+    CMPA r0, 0
+    BRNZ point_decopress_ed25519_check_X0_is_1
+    ORI r1, 1
+
+point_decopress_ed25519_check_X0_is_1:
+    CMPI r22, 1
+    BRNZ point_decopress_ed25519_check_x_is_0_and_X0_is_1
+    ORI r1, 2
+
+point_decopress_ed25519_check_x_is_0_and_X0_is_1:
+    CMPI r1, 3
+    BRZ point_decopress_ed25519_fail
+
+; point_decopress_ed25519_add_parity
+    MOVI r3, 0
+    SUBP r3, r3, r0         ; r3 = -x
+    ANDI r1, r0, 1          ; r1 = x mod 2
+    CMP r1, r22             ; x mod 2 == x0
+    BRZ point_decopress_ed25519_x_is_p_minus_x
+    MOV r11, r0
+    JMP point_decopress_ed25519_success:
+
+point_decopress_ed25519_x_is_p_minus_x:
+    MOV r11, r3
+    JMP point_decopress_ed25519_success:
 
 point_decopress_ed25519_success:
     MOVI r1, 1

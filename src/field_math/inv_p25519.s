@@ -1,6 +1,9 @@
 ; Inversion in GF(p25519)
 ; input Z in register r1
 ; output Z^-1 mod p25519 in register r1
+; 
+; Used registers:
+;   r1-5
 
 inv_p25519_250:
     MUL25519 r2, r1, r1
