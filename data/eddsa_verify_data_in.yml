@@ -1,0 +1,27 @@
+name: data_ram_in
+start_addr: 0x0000
+end_addr:   0x07FF
+data:
+  - name : ca_command
+    address : 0x0000
+    value : 0x4A
+  - name : ca_eddsa_verify_R
+    address : 0x0020
+    value : 2002052f204fc13574a176de46fd6f092b2f5c33a3c704a47595cf97eef049ab
+    is_string : True
+  - name : ca_eddsa_verify_S
+    address : 0x0040
+    value : b8b7fdf9e21690f0def687edb4925a9e3de6e03bfe78530c166425e7898f7809
+    is_string : True
+  - name : ca_eddsa_verify_A
+    address : 0x0060
+    value : 31b2524b8348f7ab1dfafa675cc538e9a84e3fe5819e27c12ad8bbc1a36e4dff
+    is_string : True
+  - name : ca_eddsa_verify_M1
+    address : 0x0080
+    value : 8f13b3a29344b73d22e681e9faeb3fedb88c94f7504f8f2ac2f17a09fc33a1f6
+    is_string : True
+  - name : ca_eddsa_verify_M2
+    address : 0x00A0
+    value : b83275219d83def87aa1f74537c8819db6759c80fff5b4c42aa09b663c5304d9
+    is_string : True

@@ -64,17 +64,18 @@
 ; Used registers (other than IN/OUT):
 ;   r0-5, r16-22
 
-point_decopress_ed25519:
+point_decompress_ed25519:
+    MOV r16, r12
     LSL r16, r16
-    BRC point_decopress_ed25519_x0_1
-; point_decopress_ed25519_x0_0
+    BRC point_decompress_ed25519_x0_1
+; point_decompress_ed25519_x0_0
     MOVI r22, 0     ; X0 = r22
-    JMP point_decopress_ed25519_sqr:
-point_decopress_ed25519_x0_1:
+    JMP point_decompress_ed25519_sqr
+point_decompress_ed25519_x0_1:
     MOVI r22, 1
-    JMP point_decopress_ed25519_sqr:
+    JMP point_decompress_ed25519_sqr
 
-point_decopress_ed25519_sqr:
+point_decompress_ed25519_sqr:
     LSR r16, r16
     MOV r12, r16
     MUL25519 r16, r16, r16  ; r16 = y * y
@@ -121,52 +122,52 @@ point_decopress_ed25519_sqr:
 
     MOVI r1, 0              ; r1 = flag
 
-; point_decopress_ed25519_vx2_check1
+; point_decompress_ed25519_vx2_check1
     CMPA r19, 0             ; v*x^2 == u
-    BRNZ point_decopress_ed25519_vx2_check2
+    BRNZ point_decompress_ed25519_vx2_check2
     MOV  r0, r18            ; res = x
     MOVI r1, 1
-point_decopress_ed25519_vx2_check2:
+point_decompress_ed25519_vx2_check2:
     CMPA r20, 0             ; v*x^2 == -u
-    BRNZ point_decopress_ed25519_vx2_check_flag
+    BRNZ point_decompress_ed25519_vx2_check_flag
     MOV  r0, r17            ; res = x * 2^((p-1)/4)
     MOVI r1, 1
-point_decopress_ed25519_vx2_check_flag:
-    CMP r1, 0
-    BRZ point_decopress_ed25519_fail
+point_decompress_ed25519_vx2_check_flag:
+    CMPI r1, 0
+    BRZ  point_decompress_ed25519_fail
 
     MOVI r1, 0
-; point_decopress_ed25519_check_x_is_0
+; point_decompress_ed25519_check_x_is_0
     CMPA r0, 0
-    BRNZ point_decopress_ed25519_check_X0_is_1
-    ORI r1, 1
+    BRNZ point_decompress_ed25519_check_X0_is_1
+    ORI r1, r1, 1
 
-point_decopress_ed25519_check_X0_is_1:
+point_decompress_ed25519_check_X0_is_1:
     CMPI r22, 1
-    BRNZ point_decopress_ed25519_check_x_is_0_and_X0_is_1
-    ORI r1, 2
+    BRNZ point_decompress_ed25519_check_x_is_0_and_X0_is_1
+    ORI r1, r1, 2
 
-point_decopress_ed25519_check_x_is_0_and_X0_is_1:
+point_decompress_ed25519_check_x_is_0_and_X0_is_1:
     CMPI r1, 3
-    BRZ point_decopress_ed25519_fail
+    BRZ point_decompress_ed25519_fail
 
-; point_decopress_ed25519_add_parity
+; point_decompress_ed25519_add_parity
     MOVI r3, 0
     SUBP r3, r3, r0         ; r3 = -x
     ANDI r1, r0, 1          ; r1 = x mod 2
     CMP r1, r22             ; x mod 2 == x0
-    BRZ point_decopress_ed25519_x_is_p_minus_x
+    BRZ point_decompress_ed25519_x_is_p_minus_x
     MOV r11, r0
-    JMP point_decopress_ed25519_success:
+    JMP point_decompress_ed25519_success
 
-point_decopress_ed25519_x_is_p_minus_x:
+point_decompress_ed25519_x_is_p_minus_x:
     MOV r11, r3
-    JMP point_decopress_ed25519_success:
+    JMP point_decompress_ed25519_success
 
-point_decopress_ed25519_success:
+point_decompress_ed25519_success:
     MOVI r1, 1
     RET
 
-point_decopress_ed25519_fail: 
+point_decompress_ed25519_fail: 
     MOVI r1, 0
     RET

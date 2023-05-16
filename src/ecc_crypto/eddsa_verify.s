@@ -8,20 +8,6 @@
 ; Outputs:
 ;   Fail/Success : 0x
 
-; API Address Constants
-ca_eddsa_verify_R   eq. 0x0020
-ca_eddsa_verify_S   eq. 0x0040
-ca_eddsa_verify_A   eq. 0x0060
-ca_eddsa_verify_M1  eq. 0x0080
-ca_eddsa_verify_M2  eq. 0x00A0
-ca_eddsa_verify_res eq. 0x1000
-
-; Internal Storage Address Constants
-ca_eddsa_verify_internal_SBx eq. 0x0100
-ca_eddsa_verify_internal_SBy eq. 0x0120
-ca_eddsa_verify_internal_SBy eq. 0x0140
-ca_eddsa_verify_internal_SBy eq. 0x0160
-
 eddsa_verify:
     ; load and set needed parameters
     LD          r28, ca_eddsa_verify_S
@@ -40,30 +26,37 @@ eddsa_verify:
     ST          r10, ca_eddsa_verify_internal_SBt
 
     ; Load Rest of Inputs
-    LD          r23, ca_eddsa_verify_M2
-    LD          r24, ca_eddsa_verify_M1
-    LD          r25, ca_eddsa_verify_A
-    LD          r26, ca_eddsa_verify_R
+    LD          r24, ca_eddsa_verify_M2
+    LD          r25, ca_eddsa_verify_M1
+    LD          r26, ca_eddsa_verify_A
+    LD          r27, ca_eddsa_verify_R
+
+    SWE         r20, r24
+    SWE         r21, r25
+    SWE         r22, r26
+    SWE         r23, r27
 
     ; E = SHA512(ENC(R)||ENC(A)||M) mod q
     HASH_IT
-    HASH        r28, r23
+    HASH        r28, r20
 
     MOVI        r3,  0x80
-    ROR         r3,  r3
-    MOVI        r1,  0
+    ROR8        r3,  r3
     MOVI        r2,  0
+    MOVI        r1,  0
     MOVI        r0,  1024
 
     HASH        r28, r0
 
+    SWE         r28, r28
+    SWE         r29, R29
     LD          r31, ca_eddsa_q
-    REDP        r28, r29, r28
+    REDP        r28, r28, r29
 
     ; Decompress ENC(A)
     LD          r31, ca_eddsa_p
-    MOV         r12, r25
-    CALL        point_decopress_ed25519
+    MOV         r12, r26
+    CALL        point_decompress_ed25519
     MOVI        r13, 1
     MUL25519    r14, r11, r12
 
@@ -89,15 +82,16 @@ eddsa_verify:
     CALL        point_compress_ed25519
 
     ; ENC(Q) == ENC(R)
-    SUBP        r0,  r26, r8
-    CMPI        r0,  0
+    LD          r31, ca_ffff
+    SUBP        r0,  r27, r8
+    CMPA        r0,  0
     BRZ         eddsa_verify_success
 ; eddsa_verify_fail
     MOVI        r0,  0
-    ST          r0,  0x1000
+    ST          r0,  ca_eddsa_verify_res
     RET
 
 eddsa_verify_success:
     MOVI        r0,  1
-    ST          r0,  0x1000
+    ST          r0,  ca_eddsa_verify_res
     RET

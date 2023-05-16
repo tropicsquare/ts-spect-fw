@@ -13,7 +13,7 @@ point_compress_ed25519:
     MUL25519    r8,  r8,  r1
     MOVI        r1,  1
     AND         r7,  r7,  r1
-    LSR         r8,  r8
+    ROL         r8,  r8
     OR          r8,  r8,  r7
     ROR         r8,  r8
     RET

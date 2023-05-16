@@ -57,8 +57,8 @@ point_add_ed25519:
     ADDP        r2,  r3,  r2    ; r2 = r3 + r2  r2 = G
 
     MUL25519    r11, r4,  r1    ; r11 = r4 * r1
-    MUL25519    r13, r4,  r0    ; r13 = r4 * r0
+    MUL25519    r14, r4,  r0    ; r14 = r4 * r0
     MUL25519    r12, r2,  r0    ; r12 = r2 * r0
-    MUL25519    r14, r2,  r1    ; r14 = r2 * r1
+    MUL25519    r13, r2,  r1    ; r13 = r2 * r1
 
     RET
