@@ -25,22 +25,24 @@ spm_ed25519_short:
     MOVI r10, 0 ;/
 
     MOVI r30, 256
-spm_ed25519_short:
+spm_ed25519_short_loop:
     ROL r28, r28
 
-    CSWAP r9,  r12
-    CSWAP r10, r13
-    CSWAP r11, r14
+    CSWAP r7,  r11
+    CSWAP r8,  r12
+    CSWAP r9,  r13
+    CSWAP r10, r14
 
     CALL point_add_ed25519
     CALL point_dub_ed25519
 
-    CSWAP r9,  r12
-    CSWAP r10, r13
-    CSWAP r11, r14
+    CSWAP r7,  r11
+    CSWAP r8,  r12
+    CSWAP r9,  r13
+    CSWAP r10, r14
 
     SUBI r30, r30, 1
-    BRNZ spm_ed25519_short
+    BRNZ spm_ed25519_short_loop
 
     RET
     
