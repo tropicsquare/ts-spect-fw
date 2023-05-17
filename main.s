@@ -1,32 +1,28 @@
 .include data/const_rom_leyout.s
 ;.include data/data_ram_in_leyout.s
 .include src/mem_leyouts/eddsa_verify_mem_leyout.s
-
+.include spect_ops_constants.s
 ca_command .eq 0x0000
 
 _start:
     LD r0, ca_command
 
-    CMPI r0, 0
+    CMPI r0, c_spect_op_sha512_init
     BRNZ next_cmd_1
-    ;CALL ecdsa_key_setup
-    END
+    JMP sha512_init
 next_cmd_1:
-    CMPI r0, 1
+    CMPI r0, c_spect_op_sha512_update
     BRNZ next_cmd_2
-    ;CALL ecdsa_sign
-    END
+    JMP sha512_update
 next_cmd_2:
-    CMPI r0, 2
+    CMPI r0, c_spect_op_sha512_final
     BRNZ next_cmd_3
-    ;CALL x25519
-    END
+    JMP sha512_final
 
 next_cmd_3:
-    CMPI r0, 0x4A
+    CMPI r0, c_spect_op_eddsa_verify
     BRNZ next_cmd_4
-    CALL eddsa_verify
-    END
+    JMP eddsa_verify
 
 next_cmd_4:
     END
@@ -49,3 +45,4 @@ next_cmd_4:
 ;.include    src/ecc_crypto/x25519.s
 .include    src/ecc_crypto/eddsa_verify.s
 
+.include    src/sha512/sha512_routines.s
