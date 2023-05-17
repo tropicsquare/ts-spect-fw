@@ -31,5 +31,5 @@ ecdsa_key_setup:
     ST r9, 0x1000
     ST r10, 0x1020
 
-    RET
+    END
     

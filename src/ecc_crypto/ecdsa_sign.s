@@ -54,9 +54,9 @@ ecdsa_sign:
     ST r0, 0x1020
     MOVI r0, 1
     ST r0, 0x1040
-    RET
+    END
 
 ecdsa_fail:
     MOVI r0, 2
     ST r0, 0x1040
-    RET
+    END

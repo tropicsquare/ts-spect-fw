@@ -7,15 +7,18 @@ data:
     value : 0x4A
   - name : ca_eddsa_verify_R
     address : 0x0020
-    value : 2002052f204fc13574a176de46fd6f092b2f5c33a3c704a47595cf97eef049ab
+    #value : 2002052f204fc13574a176de46fd6f092b2f5c33a3c704a47595cf97eef049ab
+    value : 2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623a
     is_string : True
   - name : ca_eddsa_verify_S
     address : 0x0040
-    value : b8b7fdf9e21690f0def687edb4925a9e3de6e03bfe78530c166425e7898f7809
+    #value : b8b7fdf9e21690f0def687edb4925a9e3de6e03bfe78530c166425e7898f7809
+    value : 86031e5bffd2b8fa2b5daf20a09dae43994d209d24042a34ba17cc6cea8ce40f
     is_string : True
   - name : ca_eddsa_verify_A
     address : 0x0060
-    value : 31b2524b8348f7ab1dfafa675cc538e9a84e3fe5819e27c12ad8bbc1a36e4dff
+    #value : 31b2524b8348f7ab1dfafa675cc538e9a84e3fe5819e27c12ad8bbc1a36e4dff
+    value : f13c21fd271db83863eab2d4d9a9b503fe745dcb15da3ef5a607a27f7478bbd1
     is_string : True
   - name : ca_eddsa_verify_M1
     address : 0x0080

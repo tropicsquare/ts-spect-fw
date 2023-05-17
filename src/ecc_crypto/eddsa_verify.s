@@ -57,6 +57,8 @@ eddsa_verify:
     LD          r31, ca_eddsa_p
     MOV         r12, r26
     CALL        point_decompress_ed25519
+    CMPI        r1, 0
+    BRNZ        eddsa_verify_fail
     MOVI        r13, 1
     MUL25519    r14, r11, r12
 
@@ -86,7 +88,7 @@ eddsa_verify:
     SUBP        r0,  r27, r8
     CMPA        r0,  0
     BRZ         eddsa_verify_success
-; eddsa_verify_fail
+eddsa_verify_fail:
     MOVI        r0,  0
     ST          r0,  ca_eddsa_verify_res
     RET
@@ -94,4 +96,4 @@ eddsa_verify:
 eddsa_verify_success:
     MOVI        r0,  1
     ST          r0,  ca_eddsa_verify_res
-    RET
+    END

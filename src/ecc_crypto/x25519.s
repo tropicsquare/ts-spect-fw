@@ -30,7 +30,7 @@ x25519_calculation:
     CSWAP r11, r13
     CSWAP r12, r14
 
-    RET
+    END
 
 x25519:
     LD r10, ca_ecdh_u_coordinate
@@ -73,4 +73,4 @@ x25519_loop_255_0:
     MUL25519 r10, r11, r1
     SWE r10, r10
     ST r10, 0x1000
-    RET
+    END
