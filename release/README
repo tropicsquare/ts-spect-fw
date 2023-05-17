@@ -1,0 +1,1 @@
+data_ram_in_const base address = 0x0200
