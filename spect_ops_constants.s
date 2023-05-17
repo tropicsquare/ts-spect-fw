@@ -1,3 +1,4 @@
+ca_command .eq 0x0000
 c_spect_op_clear .eq 0x00
 ; ECC Keys
 c_spect_op_ecc_key_gen .eq 0x21
