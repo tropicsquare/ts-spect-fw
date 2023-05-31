@@ -1,9 +1,4 @@
 sha512_one_block:
-    LD r3, 0x0020
-    LD r2, 0x0040
-    LD r1, 0x0060
-    LD r0, 0x0080
-
     SWE r3, r3
     SWE r2, r2
     SWE r1, r1
@@ -15,20 +10,28 @@ sha512_one_block:
 sha512_init:
     HASH_IT
     MOVI r0, 0
-    ST r0, 0x1000
+    ST r0, ca_op_status
     END
 
 sha512_update:
+    LD r3, sha512_update_input_data0
+    LD r2, sha512_update_input_data1
+    LD r1, sha512_update_input_data2
+    LD r0, sha512_update_input_data3
     CALL sha512_one_block
     MOVI r0, 0
-    ST r0, 0x1000
+    ST r0, ca_op_status
     END
 
 sha512_final:
+    LD r3, sha512_final_input_data0
+    LD r2, sha512_final_input_data1
+    LD r1, sha512_final_input_data2
+    LD r0, sha512_final_input_data3
     CALL sha512_one_block
-    ST r4, 0x1020
-    ST r5, 0x1040
+    ST r4, sha512_final_output_digest0
+    ST r5, sha512_final_output_digest1
     HASH_IT
     MOVI r0, 0
-    ST r0, 0x1000
+    ST r0, ca_op_status
     END

@@ -10,7 +10,7 @@
 
 eddsa_verify:
     ; load and set needed parameters
-    LD          r28, ca_eddsa_verify_S
+    LD          r28, eddsa_verify_input_s
     LD          r31, ca_eddsa_p
     LD          r6,  ca_eddsa_d
     LD          r11, ca_eddsa_xG
@@ -26,10 +26,10 @@ eddsa_verify:
     ST          r10, ca_eddsa_verify_internal_SBt
 
     ; Load Rest of Inputs
-    LD          r24, ca_eddsa_verify_M2
-    LD          r25, ca_eddsa_verify_M1
-    LD          r26, ca_eddsa_verify_A
-    LD          r27, ca_eddsa_verify_R
+    LD          r24, eddsa_verify_input_message1
+    LD          r25, eddsa_verify_input_message0
+    LD          r26, eddsa_verify_input_pubkey
+    LD          r27, eddsa_verify_input_r
 
     SWE         r20, r24
     SWE         r21, r25
@@ -90,10 +90,10 @@ eddsa_verify:
     BRZ         eddsa_verify_success
 eddsa_verify_fail:
     MOVI        r0,  0
-    ST          r0,  ca_eddsa_verify_res
-    RET
+    ST          r0,  eddsa_verify_output_result
+    END
 
 eddsa_verify_success:
     MOVI        r0,  1
-    ST          r0,  ca_eddsa_verify_res
+    ST          r0,  eddsa_verify_output_result
     END

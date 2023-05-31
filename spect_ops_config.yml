@@ -1,0 +1,52 @@
+- name : sha512_init
+  id : 0x51
+  input :
+  output :
+
+- name : sha512_update
+  id : 0x52
+  input :
+    - name : data0
+      address : 0x0020
+    - name : data1
+      address : 0x0040
+    - name : data2
+      address : 0x0060
+    - name : data3
+      address : 0x0080
+  output :
+
+- name : sha512_final
+  id : 0x53
+  input :
+    - name : data0
+      address : 0x0020
+    - name : data1
+      address : 0x0040
+    - name : data2
+      address : 0x0060
+    - name : data3
+      address : 0x0080
+  output :
+    - name : digest0
+      address : 0x1020
+    - name : digest1
+      address : 0x1040
+
+- name : eddsa_verify
+  id : 0x4A
+  input :
+    - name : r
+      address : 0x0020
+    - name : s
+      address : 0x0040
+    - name : pubkey
+      address : 0x0060
+    - name : message0
+      address : 0x0080
+    - name : message1
+      address : 0x00A0
+  output :
+    - name : result
+      address : 0x1020
+    
