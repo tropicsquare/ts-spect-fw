@@ -1,10 +1,10 @@
 0x8000: _start:        LD        R0,0
 0x8004:                CMPI      ,R0,81
 0x8008:                BRNZ      8010
-0x800c:                JMP       8448
+0x800c:                JMP       8438
 0x8010: next_cmd_1:    CMPI      ,R0,82
 0x8014:                BRNZ      801c
-0x8018:                JMP       8458
+0x8018:                JMP       8448
 0x801c: next_cmd_2:    CMPI      ,R0,83
 0x8020:                BRNZ      8028
 0x8024:                JMP       8468
@@ -257,33 +257,37 @@
 0x8400:                CMPA      ,R0,0
 0x8404:                BRZ       8414
 0x8408: eddsa_verify_fail:MOVI      R0,0
-0x840c:                ST        R0,4096
-0x8410:                RET       
+0x840c:                ST        R0,4128
+0x8410:                END       
 0x8414: eddsa_verify_success:MOVI      R0,1
-0x8418:                ST        R0,4096
+0x8418:                ST        R0,4128
 0x841c:                END       
-0x8420: sha512_one_block:LD        R3,32
-0x8424:                LD        R2,64
-0x8428:                LD        R1,96
-0x842c:                LD        R0,128
-0x8430:                SWE       R3,R3
-0x8434:                SWE       R2,R2
-0x8438:                SWE       R1,R1
-0x843c:                SWE       R0,R0
-0x8440:                HASH      R4,R0
-0x8444:                RET       
-0x8448: sha512_init:   HASH_IT   
-0x844c:                MOVI      R0,0
-0x8450:                ST        R0,4096
-0x8454:                END       
-0x8458: sha512_update: CALL      8420
+0x8420: sha512_one_block:SWE       R3,R3
+0x8424:                SWE       R2,R2
+0x8428:                SWE       R1,R1
+0x842c:                SWE       R0,R0
+0x8430:                HASH      R4,R0
+0x8434:                RET       
+0x8438: sha512_init:   HASH_IT   
+0x843c:                MOVI      R0,0
+0x8440:                ST        R0,4096
+0x8444:                END       
+0x8448: sha512_update: LD        R3,32
+0x844c:                LD        R2,64
+0x8450:                LD        R1,96
+0x8454:                LD        R0,128
+0x8458:                CALL      8420
 0x845c:                MOVI      R0,0
 0x8460:                ST        R0,4096
 0x8464:                END       
-0x8468: sha512_final:  CALL      8420
-0x846c:                ST        R4,4128
-0x8470:                ST        R5,4160
-0x8474:                HASH_IT   
-0x8478:                MOVI      R0,0
-0x847c:                ST        R0,4096
-0x8480:                END       
+0x8468: sha512_final:  LD        R3,32
+0x846c:                LD        R2,64
+0x8470:                LD        R1,96
+0x8474:                LD        R0,128
+0x8478:                CALL      8420
+0x847c:                ST        R4,4128
+0x8480:                ST        R5,4160
+0x8484:                HASH_IT   
+0x8488:                MOVI      R0,0
+0x848c:                ST        R0,4096
+0x8490:                END       

@@ -3,20 +3,20 @@
 _start:
     LD r0, ca_command
 
-    CMPI r0, c_spect_op_sha512_init
+    CMPI r0, sha512_init_id
     BRNZ next_cmd_1
     JMP sha512_init
 next_cmd_1:
-    CMPI r0, c_spect_op_sha512_update
+    CMPI r0, sha512_update_id
     BRNZ next_cmd_2
     JMP sha512_update
 next_cmd_2:
-    CMPI r0, c_spect_op_sha512_final
+    CMPI r0, sha512_final_id
     BRNZ next_cmd_3
     JMP sha512_final
 
 next_cmd_3:
-    CMPI r0, c_spect_op_eddsa_verify
+    CMPI r0, eddsa_verify_id
     BRNZ next_cmd_4
     JMP eddsa_verify
 
