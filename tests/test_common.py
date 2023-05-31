@@ -25,9 +25,9 @@ def get_ops_config():
     return ops_cfg
 
 def make_test_dir(test_name):
-    test_dir = TS_REPO_ROOT+"/spect_fw"+"/test_"+test_name
-    os.system(f"rm -rf {test_name}")
-    os.system(f"mkdir {test_name}")
+    test_dir = TS_REPO_ROOT+"/spect_fw/tests/test_"+test_name
+    os.system(f"rm -rf {test_dir}")
+    os.system(f"mkdir {test_dir}")
     cmd_file = open(test_dir+"/iss_cmd", 'w')
     return cmd_file, test_dir
 
@@ -50,8 +50,6 @@ def write_string(cmd_file, s: str, addr):
 
 
 def run_op(cmd_file, op_name, ops_cfg):
-    start(cmd_file)
-
     op = find_in_list(op_name, ops_cfg)
     set_op(cmd_file, op)
 
@@ -74,10 +72,13 @@ def run_test(test_dir):
 
     cmd = iss
     cmd += f" --instruction-mem={fw_dir}/main.hex"
+    cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={fw_dir}/data/const_rom.hex"
     cmd += f" --grv-hex={fw_dir}/data/grv.hex"
-    cmd += f" --data-ram-out=log/out.hex"
-    cmd += f" --shell --cmd-file=iss_cmd > {test_dir}/iss.log"
+    cmd += f" --data-ram-out={test_dir}/out.hex"
+    cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/iss.log"
 
+    print("Running command:")
     print(cmd)
-    #os.system(cmd)
+
+    os.system(cmd)
