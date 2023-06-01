@@ -1,5 +1,4 @@
-.include const_rom_leyout.s
-.include data_ram_in_leyout.s
+.include constants_includes.s
 _start:
     LD r0, ca_command
 
@@ -19,6 +18,9 @@ next_cmd_3:
     CMPI r0, eddsa_verify_id
     BRNZ next_cmd_4
     JMP eddsa_verify
+
+next_cmd_4:
+    END
 
 
 .include    src/field_math/inv_q256.s
