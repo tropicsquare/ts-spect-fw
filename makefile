@@ -39,10 +39,10 @@ run: compile
 	--shell --cmd-file=${BASE_DIR}/iss_cmd_file > ${BASE_DIR}/log/iss.log
 
 release: data_ram_in_const ops_constants
-	rm -r ${BASE_DIR}/${RELEASE_DIR}
-	mkdir ${RELEASEDIR}
-	mkdir ${RELEASEDIR}/log
-	mkdir ${RELEASEDIR}/dump
+	rm -rf ${BASE_DIR}/${RELEASE_DIR}
+	mkdir ${BASE_DIR}/${RELEASE_DIR}
+	mkdir ${BASE_DIR}/${RELEASE_DIR}/log
+	mkdir ${BASE_DIR}/${RELEASE_DIR}/dump
 	cp ${BASE_DIR}/data/data_ram_in_const.hex ${RELEASE_DIR}/data_ram_in_const.hex
 	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
