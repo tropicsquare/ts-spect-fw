@@ -5,6 +5,8 @@ ISS = ${TS_REPO_ROOT}/compiler/build/src/apps/spect_iss
 MEM_GEN = ${TS_REPO_ROOT}/scripts/gen_mem_files.py
 RNG_GEN = ${TS_REPO_ROOT}/scripts/gen_rng_hex.py
 
+RELEASE_DIR = release
+
 FW_BASE_ADDR = 0x8000
 
 TEST = ${BASE_DIR}/tests/dummy
@@ -35,3 +37,15 @@ run: compile
 	--data-ram-out=${BASE_DIR}/data/out.hex \
 	--grv-hex=${BASE_DIR}/data/grv.hex \
 	--shell --cmd-file=${BASE_DIR}/iss_cmd_file > ${BASE_DIR}/log/iss.log
+
+release: data_ram_in_const ops_constants
+	rm -r ${BASE_DIR}/${RELEASE_DIR}
+	mkdir ${RELEASEDIR}
+	mkdir ${RELEASEDIR}/log
+	mkdir ${RELEASEDIR}/dump
+	cp ${BASE_DIR}/data/data_ram_in_const.hex ${RELEASE_DIR}/data_ram_in_const.hex
+	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/main.hex \
+	--first-address=${FW_BASE_ADDR} \
+	--dump-program=${RELEASE_DIR}/dump/program_dump.s \
+	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump.s \
+	${BASE_DIR}/main.s > ${RELEASE_DIR}/log/compile.log
