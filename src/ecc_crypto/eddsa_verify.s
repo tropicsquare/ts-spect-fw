@@ -24,7 +24,7 @@ eddsa_verify:
     ST          r8,  ca_eddsa_verify_internal_SBy
     ST          r9,  ca_eddsa_verify_internal_SBz
     ST          r10, ca_eddsa_verify_internal_SBt
-bp_ eddsa_verify_sxb:
+bp_eddsa_verify_sxb:
 
     ; Load Rest of Inputs
     LD          r24, eddsa_verify_input_message1

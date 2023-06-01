@@ -29,8 +29,10 @@ sha512_final:
     LD r1, sha512_final_input_data2
     LD r0, sha512_final_input_data3
     CALL sha512_one_block
-    ST r4, sha512_final_output_digest0
-    ST r5, sha512_final_output_digest1
+    SWE r4, r4
+    SWE r5, r5
+    ST r5, sha512_final_output_digest0
+    ST r4, sha512_final_output_digest1
     HASH_IT
     MOVI r0, 0
     ST r0, ca_op_status
