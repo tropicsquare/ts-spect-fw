@@ -28,8 +28,11 @@ def make_test_dir(test_name):
     test_dir = TS_REPO_ROOT+"/spect_fw/tests/test_"+test_name
     os.system(f"rm -rf {test_dir}")
     os.system(f"mkdir {test_dir}")
+    return test_dir
+
+def get_cmd_file(test_dir):
     cmd_file = open(test_dir+"/iss_cmd", 'w')
-    return cmd_file, test_dir
+    return cmd_file
 
 def start(cmd_file):
     cmd_file.write("start\n")
@@ -43,42 +46,41 @@ def exit(cmd_file):
 def set_op(cmd_file, op):
     cmd_file.write("set mem[0x0000] 0x{}\n".format(format(op["id"], '08X')))
 
+def break_on(cmd_file, bp):
+    cmd_file.write(f"break {bp}\n")
+
 def write_string(cmd_file, s: str, addr):
     val = str2int32(s)
     for w in range(len(val)):
         cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr+(w*4), '04X'), format(val[w], '08X')))
 
-
-def run_op(cmd_file, op_name, ops_cfg):
+def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
     op = find_in_list(op_name, ops_cfg)
     set_op(cmd_file, op)
-
-    #in_name = op_name + ".yml"
-    #with open(in_name, 'r') as in_file:
-    #    inputs = yaml.safe_load(in_file)
-#
-    #if inputs != None:
-    #    for input in inputs:
-    #        addr = find_in_list(input["name"], op["input"])["address"]
-    #        val = str2int32(input["value"])
-    #        for w in range(len(val)):
-    #            cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr+(w*4), '04X'), format(val[w], '08X')))
-
     run(cmd_file)
+    exit(cmd_file)
+    cmd_file.close()
 
-def run_test(test_dir):
     fw_dir = TS_REPO_ROOT + "/spect_fw"
     iss = TS_REPO_ROOT + "/compiler/build/src/apps/spect_iss"
+    run_name = op_name+"_"+str(0)
+    new_context = run_name+".ctx"
+    run_log = run_name+"_iss.log"
 
     cmd = iss
-    cmd += f" --instruction-mem={fw_dir}/main.hex"
+    cmd += f" --program={fw_dir}/main.s"
     cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={fw_dir}/data/const_rom.hex"
     cmd += f" --grv-hex={fw_dir}/data/grv.hex"
-    cmd += f" --data-ram-out={test_dir}/out.hex"
-    cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/iss.log"
+    cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
+    if old_context:
+        cmd += f" --load-context={test_dir}/{old_context}"
+    cmd += f" --dump-context={test_dir}/{new_context}"
+    cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/{run_log}"
 
     print("Running command:")
     print(cmd)
 
     os.system(cmd)
+
+    return new_context

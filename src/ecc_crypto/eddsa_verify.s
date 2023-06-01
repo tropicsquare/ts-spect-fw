@@ -24,6 +24,7 @@ eddsa_verify:
     ST          r8,  ca_eddsa_verify_internal_SBy
     ST          r9,  ca_eddsa_verify_internal_SBz
     ST          r10, ca_eddsa_verify_internal_SBt
+bp_ eddsa_verify_sxb:
 
     ; Load Rest of Inputs
     LD          r24, eddsa_verify_input_message1
@@ -50,6 +51,7 @@ eddsa_verify:
 
     SWE         r28, r28
     SWE         r29, R29
+bp_eddsa_verify_after_hram:
     LD          r31, ca_eddsa_q
     REDP        r28, r28, r29
 
@@ -57,6 +59,7 @@ eddsa_verify:
     LD          r31, ca_eddsa_p
     MOV         r12, r26
     CALL        point_decompress_ed25519
+bp_eddsa_verify_deca:
     CMPI        r1, 0
     BRNZ        eddsa_verify_fail
     MOVI        r13, 1
@@ -65,6 +68,7 @@ eddsa_verify:
     ; Q2 = E . A
     CALL        spm_ed25519_short
 
+bp_eddsa_verify_exa:
     ; Q = Q1 - Q2
     MOVI        r0,  0
     SUBP        r7,  r0,  r7
@@ -83,6 +87,7 @@ eddsa_verify:
     ; ENC(Q)
     CALL        point_compress_ed25519
 
+bp_eddsa_verify_encq:
     ; ENC(Q) == ENC(R)
     LD          r31, ca_ffff
     SUBP        r0,  r27, r8
