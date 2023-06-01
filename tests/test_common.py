@@ -1,6 +1,7 @@
 import yaml
 import binascii
 import os
+import mmap
 
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
@@ -54,6 +55,20 @@ def write_string(cmd_file, s: str, addr):
     for w in range(len(val)):
         cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr+(w*4), '04X'), format(val[w], '08X')))
 
+def mmap_io(filename):
+    with open(filename, mode="r", encoding="utf8") as file_obj:
+        with mmap.mmap(file_obj.fileno(), length=0, access=mmap.ACCESS_READ) as mmap_obj:
+            text = mmap_obj.read()
+            print(text)
+
+def read_output(output_file: str, addr: int, count: int) -> list:
+    mmap_io(output_file)
+
+#def get_int(mem: list, str, addr: int, count: int)
+#    res = 0
+#    for i in range(count):
+#        res += mem.split
+    
 def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
     op = find_in_list(op_name, ops_cfg)
     set_op(cmd_file, op)
