@@ -22,3 +22,8 @@ eddsa_verify_input_pubkey .eq 0x0060
 eddsa_verify_input_message0 .eq 0x0080
 eddsa_verify_input_message1 .eq 0x00A0
 eddsa_verify_output_result .eq 0x1020
+; x25519_dbg
+x25519_dbg_id .eq 0x9F
+x25519_dbg_input_priv .eq 0x0020
+x25519_dbg_input_pub .eq 0x0040
+x25519_dbg_output_r .eq 0x1020
