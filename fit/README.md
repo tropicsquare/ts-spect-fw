@@ -11,3 +11,6 @@ x25519 rfc : https://www.rfc-editor.org/rfc/rfc7748
 
 ## Outputs:
 - `0x1000` : X25519(k, u), 32-byte string
+
+## Constants:
+Preload `data_ram_in_const.hex` from address `0x0200`. 
