@@ -60,4 +60,9 @@
   output :
     - name : r
       address : 0x1020
+
+- name : curve25519_rpg
+  id : 0xD0
+  input :
+  output :
     

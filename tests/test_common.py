@@ -78,15 +78,15 @@ def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
 
     fw_dir = TS_REPO_ROOT + "/spect_fw"
     iss = TS_REPO_ROOT + "/compiler/build/src/apps/spect_iss"
-    run_name = op_name+"_"+str(0)
+    run_name = op_name
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
 
     cmd = iss
-    cmd += f" --program={fw_dir}/main.s"
+    cmd += f" --program={fw_dir}/src/main.s"
     cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={fw_dir}/data/const_rom.hex"
-    cmd += f" --grv-hex={fw_dir}/data/grv.hex"
+    cmd += f" --grv-hex={fw_dir}/data/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     if old_context:
         cmd += f" --load-context={test_dir}/{old_context}"

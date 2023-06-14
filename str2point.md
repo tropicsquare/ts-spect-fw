@@ -70,14 +70,15 @@ dst_len = byte_len(DST) as string
 return SHA512(EXP_TAG || message || m_len || DST || dst_len)
 ```
 
-In case of SPECT `m_len = 32 = "20"` and `dst_len = 16 = "10"`. EXP_TAG is always 32 bytes. E.g. for:
+In case of SPECT `m_len = 32 = "20"`, `dst_len = 30 = "1E"`. EXP_TAG is always 32 bytes. E.g. for:
 - EXP_TAG `"E00000000000000000000000000000000000000000000000000000000000000E"`
 - message `"A00000000000000000000000000000000000000000000000000000000000000A"`
-- DST     `"D000000000000000000000000000000D"`
+- DST     `"D0000000000000000000000000000000000000000000000000000000000D"`
 
 the resulting string for SHA512 **with padding** is:
 ```
-"E00000000000000000000000000000000000000000000000000000000000000EA00000000000000000000000000000000000000000000000000000000000000A20D000000000000000000000000000000D101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000300"
+"E00000000000000000000000000000000000000000000000000000000000000EA00000000000000000000000000000000000000000000000000000000000000A
+20D0000000000000000000000000000000000000000000000000000000000D10100000000000000000000000000000000000000000000000000000000000300"
 ```
 
 ## Hashing to a finite field
@@ -365,3 +366,47 @@ Procedure:
 
 - Does the resulting point have to be in the subgroup of $G$ for the point blinding to work?
 - Does the encoding have to be uniform in case of point blinding 
+
+## Random Point Generation in SPECT
+
+```
+1. Get 256-bit random value m from TRNG.
+2. Represent m as big-endian encoded integer: 0x1234 = "1234"
+3. Use hash_to_field(m) to hash m to an element u in the finite field of the current curve.
+3. Use one of the methods to map the element u to a point on desired curve.
+
+```
+
+### Expand Message Tag
+
+Expand message tag (`EXP_TAG`) is 32-byte string used to separate use of random point generation in different projects and versions of the projects (e.g. TROPIC01, TROPIC02 ...)
+
+- `EXP_TAG[0] = 0x80`
+- `EXP_TAG[29] = 0x54`
+- `EXP_TAG[30] = 0x53`
+- `EXP_TAG[31] = version` (For TROPIC01 `x01`)
+- Others 0x00
+
+### Domain Separation Tag
+
+Domain Separation Tag `DST` is 30-byte string used to separate use of random point generation in different contexts, e.g. different SPECT command.
+
+`DTS` for all use-cases have the same prefix `"TS_SPECT_DST"` = `"54535F53504543545F445354"` padded with zero bytes. The last byte (`DST[29]`) is following:
+
+- `ecc_key_gen/store`, `CURVE = P256` : `0xD1`
+- `ecc_key_gen/store`, `CURVE = Ed25519` : `0xD2`
+
+- `x25519_kpair_gen` : `0xD3`
+- `x25519_sc_et_eh` : `0xD4`
+- `x25519_sc_et_sh` : `0xD5`
+- `x25519_sc_st_eh` : `0xD6`
+
+- `eddsa_R_part` : `0xD7`
+
+- `ecdsa_sign` : `0xD8`
+
+E.g. `DST` for `ecdsa_sign` = `"54535F53504543545F4453540000000000000000000000000000000000D8"`
+
+### Expand Message Function
+
+- `SHA512(EXP_TAG || m || 0x02 || DST || 0x1E)`
