@@ -10,4 +10,4 @@ x25519 rfc : https://www.rfc-editor.org/rfc/rfc7748
 - `0x0060` : mask for z-coordinate randomization, 256-bit unsigned integer
 
 ## Outputs:
-- `0x0000` : X25519(k, u)
+- `0x1000` : X25519(k, u), 32-byte string
