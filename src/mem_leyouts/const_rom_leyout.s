@@ -13,3 +13,6 @@ ca_eddsa_yG .eq 0x3160
 ca_eddsa_m1 .eq 0x3180
 ca_x25519_a24 .eq 0x31A0
 ca_ffff .eq 0x31C0
+ca_curve25519_a .eq 0x31E0
+ca_pg_curve25519_c3 .eq 0x3200
+ca_dst_template .eq 0x3220
