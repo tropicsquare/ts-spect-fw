@@ -1,12 +1,6 @@
 data:
   - name : rpg_1
-    value : 0xd68328b42d3f338b23303da1fd12a73a0d3fb1a1348f4ae2e51aca3584fd2712
-  - name : rpg_2
-    value : 0xa192b67a29cb785ba659fe80fabb051cd17a0316a588b64a31ac70938c200f40
-  - name : rpg_3
-    value : 0xe49867eae8258ab9572f35164482ae2f7baf1ffb38712c330914af86b36320d7
-  - name : rpg_4
-    value : 0xa9416b710b3458b6b1fa07b9b8917de4a18c290a38ef23b5f14a1f3f602dacd5
+    value : 0x7fcf6c12d1719c5cdbb1a8ae2012ab59891771bbc41bcf330f33831e9d49fe78
   - name : blind_1
     value : 0xf4499b06b3509188fde47a1c879c19e220b173d4bae66cf7be432e75565e41ac
   - name : blind_2

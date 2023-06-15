@@ -15,4 +15,5 @@ ca_x25519_a24 .eq 0x31A0
 ca_ffff .eq 0x31C0
 ca_curve25519_a .eq 0x31E0
 ca_pg_curve25519_c3 .eq 0x3200
-ca_dst_template .eq 0x3220
+ca_pg_map2ed25519_c5 .eq 0x3220
+ca_dst_template .eq 0x3240
