@@ -1,33 +1,6 @@
-; Point Generate on Curve25519
-;
-; Input:
-;   0x02 || DST || 0x1E in r1
-;
-; Output:
-;   Random point (x, y) on Curve25519 -- (r10, r11)
-;
-; Expects:
-;   /
-;
-; Intermediate value registers:
-;   r0,..,r14
-;
-
-; Using eligator method for hashing a field element to a point on Curve25519
-; https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#name-elligator-2
-; 
-; See spect_fw/str2point.md for detailed description.
-
-curve25519_point_generate:
-    CALL    compose_exp_tag         ; r8 = EXP_TAG
-    GRV     r2
-    MOVI    r0,  0x601
-    ROR     r0,  r0
-    HASH_IT
-    ; Hash to field with SHA512(EXP_TAG || r2 || 0x02 || DST || 0x1E) mod p
-    HASH    r0,  r0
-    LD      r31, ca_eddsa_p
-    REDP    r0,  r1,  r0
+; Input: u, an element of GF(2^255-19).
+; Output: (xn, xd, yn, yd) such that (xn / xd, yn / yd) is a point on curve25519.
+;         return (r3, r7, r11, r8) = (xn, xd, y, 1)
 
 map_to_curve_elligator2_curve25519:
 ; r0    u, y2
@@ -49,6 +22,8 @@ map_to_curve_elligator2_curve25519:
     ADDP        r6,  r6,  r6            ; tv1 = 2 * tv1 % p
     MOVI        r30, 0x001
     ADDP        r7,  r6,  r30           ; xd = tv1 + 1 % p          Nonzero: -1 is square (mod p), tv1 is not
+    CMPA        r7,  0                  ; If xd == 0, the resulting point is point at infinity -> 
+    BRZ         curve25519_point_generate_y_final
     LD          r8,  ca_curve25519_a
     MOVI        r30, 0x000
     SUBP        r9,  r30, r8            ; x1n = -A  % p             x1 = x1n / xd = -A / (1 + 2 * u^2)
@@ -81,10 +56,10 @@ map_to_curve_elligator2_curve25519:
     CMPA        r4,  0                  
     BRNZ        curve25519_point_generate_y1_y12
 curve25519_point_generate_y1_y11:
-    MOV         r1, r11
+    MOV         r1, r13
     JMP         curve25519_point_generate_y1_next
 curve25519_point_generate_y1_y12:
-    MOV         r1, r12
+    MOV         r1, r14
     JMP         curve25519_point_generate_y1_next
 curve25519_point_generate_y1_next:
 
@@ -127,19 +102,22 @@ curve25519_point_generate_xn_next:
                                         ; y = cmov(y2, y1, e3)      If e3, y = y1, else y = y2
 BRNZ        curve25519_point_generate_y_y2
 curve25519_point_generate_y_y1:
-    MOV         r2, r1
+    MOV         r2,  r1
+    MOVI        r30, 0x001 
     JMP         curve25519_point_generate_y_next
 curve25519_point_generate_y_y2:
     MOV         r2, r0
+    MOVI        r30, 0x000
     JMP         curve25519_point_generate_y_next
 curve25519_point_generate_y_next:
             
     MOVI            r0,  0x000
     SUBP            r1,  r0,  r2            ; r1 = -y
-    ANDI            r6,  r2, 0x001          ; e4 = sgn0(y) == 1         Fix sign of y
+    MOVI            r8,  0x001
+    AND             r6,  r2,  r8            ; e4 = sgn0(y) == 1         Fix sign of y
     XOR             r30, r30, r6
                                             ; y = cmov(y, -y, e3 ^ e4)
-    BRNZ        curve25519_point_generate_y_plus
+    BRZ         curve25519_point_generate_y_plus
 curve25519_point_generate_y_minus:
     MOV         r11, r1
     JMP         curve25519_point_generate_y_final
@@ -147,10 +125,4 @@ curve25519_point_generate_y_plus:
     MOV         r11, r2
     JMP         curve25519_point_generate_y_final
 curve25519_point_generate_y_final:
-
-    MOV         r10, r3
-    MOV         r1,  r7
-    CALL        inv_p25519                  ; r1 = xd^(-1) % p
-    MUL25519    r10, r10, r1                ; r10 = xn / xd % p
-
     RET
