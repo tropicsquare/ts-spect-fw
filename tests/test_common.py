@@ -50,19 +50,28 @@ def set_op(cmd_file, op):
 def break_on(cmd_file, bp):
     cmd_file.write(f"break {bp}\n")
 
+def write_int32(cmd_file, x: int, addr):
+    cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr, '04X'), format(x, '08X')))
+
 def write_string(cmd_file, s: str, addr):
     val = str2int32(s)
     for w in range(len(val)):
-        cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr+(w*4), '04X'), format(val[w], '08X')))
+        write_int32(cmd_file, val[w], addr+(w*4))
 
-def mmap_io(filename):
-    with open(filename, mode="r", encoding="utf8") as file_obj:
-        with mmap.mmap(file_obj.fileno(), length=0, access=mmap.ACCESS_READ) as mmap_obj:
-            text = mmap_obj.read()
-            print(text)
+def set_rng(test_dir: str, rng: list):
+    with open(f"{test_dir}/rng.hex", mode='w') as rng_hex:
+        for r in rng:
+            for i in range(8):
+                rng_hex.write(format((r >> i*32) & 0xffffffff, '08X') + "\n")
 
-def read_output(output_file: str, addr: int, count: int) -> list:
-    mmap_io(output_file)
+def read_output(output_file: str, addr: int, count: int) -> int:
+    with open(output_file, mode='r') as out:
+        data = out.read().split('\n')
+        idx = (addr - 0x1000) // 4
+        val = 0
+        for i in range(count):
+            val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
+        return val
 
 #def get_int(mem: list, str, addr: int, count: int)
 #    res = 0
@@ -86,16 +95,17 @@ def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
     cmd += f" --program={fw_dir}/src/main.s"
     cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={fw_dir}/data/const_rom.hex"
-    cmd += f" --grv-hex={fw_dir}/data/rng.hex"
+    cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     if old_context:
         cmd += f" --load-context={test_dir}/{old_context}"
     cmd += f" --dump-context={test_dir}/{new_context}"
     cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/{run_log}"
 
-    print("Running command:")
-    print(cmd)
+    #print("Running command:")
+    #print(cmd)
 
-    os.system(cmd)
+    if os.system(cmd):
+        print("ISS FAILED")
 
     return new_context
