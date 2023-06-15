@@ -29,3 +29,5 @@ x25519_dbg_input_pub .eq 0x0040
 x25519_dbg_output_r .eq 0x1020
 ; curve25519_rpg
 curve25519_rpg_id .eq 0xD0
+; ed25519_rpg
+ed25519_rpg_id .eq 0xD1

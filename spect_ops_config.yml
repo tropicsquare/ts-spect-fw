@@ -65,4 +65,9 @@
   id : 0xD0
   input :
   output :
+
+- name : ed25519_rpg
+  id : 0xD1
+  input :
+  output :
     
