@@ -1,8 +1,7 @@
 import yaml
 import binascii
 import os
-import mmap
-
+import sys
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 OPS_CONFIG = TS_REPO_ROOT+"/spect_fw/spect_ops_config.yml"
@@ -72,13 +71,8 @@ def read_output(output_file: str, addr: int, count: int) -> int:
         for i in range(count):
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
         return val
-
-#def get_int(mem: list, str, addr: int, count: int)
-#    res = 0
-#    for i in range(count):
-#        res += mem.split
     
-def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
+def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=-1, old_context=None):
     op = find_in_list(op_name, ops_cfg)
     set_op(cmd_file, op)
     run(cmd_file)
@@ -88,8 +82,12 @@ def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
     fw_dir = TS_REPO_ROOT + "/spect_fw"
     iss = TS_REPO_ROOT + "/compiler/build/src/apps/spect_iss"
     run_name = op_name
+    if run_id >= 0:
+        run_name += f"_{run_id}"
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
+
+    print(f"running {run_name}")
 
     cmd = iss
     cmd += f" --program={fw_dir}/src/main.s"
@@ -102,10 +100,8 @@ def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=0, old_context=None):
     cmd += f" --dump-context={test_dir}/{new_context}"
     cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/{run_log}"
 
-    #print("Running command:")
-    #print(cmd)
-
     if os.system(cmd):
         print("ISS FAILED")
+        sys.exit(2)
 
     return new_context
