@@ -4,6 +4,17 @@
 _start:
     LD r0, ca_command
 
+.ifdef SPECT_ISA_VERSION_1
+    ADDI r0, r0, 0
+    MOVI r1, 0xF0
+    AND  r1, r0, r1
+.endif
+
+.ifdef SPECT_ISA_VERSION_2
+    MOVI r1, 0xF0
+    ANDI r1, r0, r1
+.endif
+
     CMPI r0, sha512_init_id
     BRNZ next_cmd_1
     JMP sha512_init
@@ -20,6 +31,10 @@ next_cmd_3:
     CMPI r0, eddsa_verify_id
     BRNZ next_cmd_4
     JMP eddsa_verify
+
+next_cmd_4:
+    CMPI r0, eddsa_key_gen_id
+
 
 ; ============================================================
 ; Curve25519 Random Point Generation
