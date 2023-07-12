@@ -1,4 +1,4 @@
-; Internal Storage Address Constants
+; Internal Address Constants for intermediate values
 
 ca_eddsa_verify_internal_SBx .eq 0x0100
 ca_eddsa_verify_internal_SBy .eq 0x0120
