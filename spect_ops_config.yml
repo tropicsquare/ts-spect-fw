@@ -53,6 +53,8 @@
   id : 0x20
   input :
   output :
+    - name : result
+      address : 0x0
 
 - name : ecc_key_gen
   id : 0x21
@@ -62,12 +64,16 @@
 - name : ecc_key_store
   id : 0x22
   input :
+    - name : k
+      address : 0x10
   output :
 
 - name : ecc_key_read
   id : 0x23
   input :
   output :
+    - name : pub_key
+      address : 0x10
 
 - name : ecc_key_erase
   id : 0x24
@@ -104,8 +110,8 @@
     - name : slot
       address : 0x0020
   output:
-    - name : etpub
-      address : r2
+    - name : r2
+      address : 0x1020
 
 - name : x25519_sc_st_eh
   id : 0x14
@@ -131,6 +137,60 @@
       address : 0x00C0
   output :
 
+- name : eddsa_nonce_init
+  id : 0x42
+  input :
+  output :
+
+- name : eddsa_nonce_update
+  id : 0x43
+  input :
+    - name : message
+      address : 0x00
+  output :
+
+- name : eddsa_nonce_finish
+  id : 0x42
+  input :
+    - name : message
+      address : 0x00
+  output :
+
+- name : eddsa_R_part
+  id : 0x45
+  input :
+  output :
+
+- name : eddsa_e_prep
+  id : 0x46
+  input :
+    - name : message
+      address : 0x00
+  output :
+
+- name : eddsa_e_update
+  id : 0x47
+  input :
+    - name : message
+      address : 0x00
+  output :
+
+- name : eddsa_e_finish
+  id : 0x48
+  input :
+    - name : message
+      address : 0x00
+  output :
+
+- name : eddsa_finish
+  id : 0x49
+  input :
+  output :
+    - name : r
+      address : 0x10
+    - name : s
+      address : 0x10
+
 - name : eddsa_verify
   id : 0x4A
   input :
@@ -147,6 +207,29 @@
   output :
     - name : result
       address : 0x1020
+
+############################################
+# ECDSA
+############################################
+
+- name : ecdsa_sign
+  id : 0x31
+  input :
+    - name : message
+      address : 0x10
+    - name : sch
+      address : 0x00A0
+    - name : scn
+      address : 0x00C0
+  output :
+    - name : r
+      address : 0x10
+    - name : s
+      address : 0x10
+
+############################################
+# Debug
+############################################
 
 - name : x25519_dbg
   id : 0x9F
