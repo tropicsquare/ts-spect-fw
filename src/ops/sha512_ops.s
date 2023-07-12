@@ -6,24 +6,23 @@ sha512_one_block:
 
     HASH r4, r0
     RET
-
-sha512_init:
+op_sha512_init:
     HASH_IT
-    MOVI r0, 0
+    MOVI r0, ret_op_success
     ST r0, ca_op_status
     END
 
-sha512_update:
+op_sha512_update:
     LD r3, sha512_update_input_data0
     LD r2, sha512_update_input_data1
     LD r1, sha512_update_input_data2
     LD r0, sha512_update_input_data3
     CALL sha512_one_block
-    MOVI r0, 0
+    MOVI r0, ret_op_success
     ST r0, ca_op_status
     END
 
-sha512_final:
+op_sha512_final:
     LD r3, sha512_final_input_data0
     LD r2, sha512_final_input_data1
     LD r1, sha512_final_input_data2
@@ -34,6 +33,6 @@ sha512_final:
     ST r5, sha512_final_output_digest0
     ST r4, sha512_final_output_digest1
     HASH_IT
-    MOVI r0, 0
+    MOVI r0, ret_op_success
     ST r0, ca_op_status
     END

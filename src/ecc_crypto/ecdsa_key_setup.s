@@ -31,7 +31,7 @@ ecdsa_key_setup:
 
 .ifdef SPECT_ISA_VERSION_2
 ; possible need of 4 GRV
-    TMAC_IT
+    TMAC_IT r0
     TMAC_IS r16, 0xA
 
     MOVI    r2,  0x04

@@ -1,13 +1,13 @@
 ; ECDSA P-256 Sign
 ;
 ; Input:
-;   Private Key d
-;   Message Digest e
-;   (random scalar k)
+;   Private Key part d in r24
+;   Message Digest e in r25
+;   Nonce k in r26
 ;
 ; Output:
-;   ECDSA Signature (R,S) = (0x1000, 0x1020)
-;   Status = 0x1040
+;   ECDSA Signature (R,S) = (r9, r0)
+;   Status in r30
 
 ecdsa_sign:
     LD r26, ca_ecdsa_k
