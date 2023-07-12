@@ -1,4 +1,4 @@
-; Scalar Point Multiplication on curve Ed25519
+; Scalar Point Multiplication on curve Ed25519 with 256 bit scalar
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
 ;
 ; Imputs:
