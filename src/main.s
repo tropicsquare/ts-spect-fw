@@ -2,38 +2,114 @@
 .include spect_ops_constants.s
 
 _start:
-    LD r0, ca_command
+    LD      r0, ca_spect_inout_src
+
+.ifdef SPECT_ISA_VERSION_1
+    
+.endif
+
+    BRC     addr_base_cpb
+
+addr_base_memsubs:
+    MOVI    r1, 0x10
+    ROL8    r1, r1
+    JMP     addr_base_continue
+
+addr_base_cpb:
+    MOVI    r1, 0x50
+    ROL8    r1, r1
+    ORI     r1, r1, 0x40
+addr_base_continue:
+    ST      r1, ca_addr_base
+
+    ROL8    r2, r1
+    ADDI    r1, r2, ca_spect_op_id
+
+    LDR     r0, r1
 
 .ifdef SPECT_ISA_VERSION_1
     ADDI r0, r0, 0
     MOVI r1, 0xF0
+    MOVI r3, 0xFF
     AND  r1, r0, r1
+    AND  r3, r0, r3
 .endif
 
 .ifdef SPECT_ISA_VERSION_2
     MOVI r1, 0xF0
-    ANDI r1, r0, r1
+    MOVI r3, 0xFF
+    AND  r1, r0, r1
+    AND  r3, r0, r3
 .endif
 
-    CMPI r0, sha512_init_id
-    BRNZ next_cmd_1
-    JMP sha512_init
-next_cmd_1:
-    CMPI r0, sha512_update_id
-    BRNZ next_cmd_2
-    JMP sha512_update
-next_cmd_2:
-    CMPI r0, sha512_final_id
-    BRNZ next_cmd_3
-    JMP sha512_final
+op_id_check_clear:
+    CMPI r1, clear_id
+    BRZ  op_clear
 
-next_cmd_3:
-    CMPI r0, eddsa_verify_id
-    BRNZ next_cmd_4
-    JMP eddsa_verify
+op_id_check_sha512:
+    CMPI r1, sha512_id
+    BRZ  op_sha512
 
-next_cmd_4:
-    CMPI r0, eddsa_key_gen_id
+op_id_check_ecc_key:
+    CMPI r1, ecc_key_id
+    BRZ  op_ecc_key
+
+op_id_check_x25519:
+    CMPI r1, x25519_id
+    BRZ  op_x25519
+
+op_id_check_eddsa:
+    CMPI r1, eddsa_id
+    BRZ  op_eddsa
+
+op_id_check_ecdsa:
+    CMPI r1, ecdsa_id
+    BRZ  op_ecdsa
+
+; ============================================================
+op_id_debug:
+    MOVI    r30, 0
+    ST      r30, ca_op_status
+    END
+
+; ============================================================
+op_clear:
+    MOVI    r30, ret_op_success
+    ST      r30, ca_op_status
+    END
+; ============================================================
+op_sha512:
+    CMPI    r3, sha512_init_id
+    BRZ     op_sha512_init
+
+    CMPI    r3, sha512_update
+    BRZ     op_sha512_init
+
+    CMPI    r3, sha512_final
+    BRZ     op_sha512_init
+; ============================================================
+op_ecc_key:
+    CMPI    r3, ecc_key_gen_id
+    BRZ     op_ecc_key_gen
+
+    CMPI    r3, ecc_key_store_id
+    BRZ     op_ecc_key_store
+
+    CMPI    r3, ecc_key_read_id
+    BRZ     op_ecc_key_read
+
+    CMPI    r3, ecc_key_erase_id
+    BRZ     op_ecc_key_erase
+
+    JMP     invalid_op_id
+
+; ============================================================
+op_x25519:
+; ============================================================
+op_eddsa:
+; ============================================================
+op_ecdsa:
+; ============================================================
 
 
 ; ============================================================
@@ -67,6 +143,9 @@ next_cmd_5:
     END 
 ; ============================================================
 
+invalid_op_id:
+    MOVI    r30, ret_op_id_err
+    ST      r30, ca_op_status
 next_cmd_end:
     END
 

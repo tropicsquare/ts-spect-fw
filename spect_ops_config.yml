@@ -212,6 +212,11 @@
 # ECDSA
 ############################################
 
+- name : ecdsa
+  id : 0x30
+  input :
+  output :
+
 - name : ecdsa_sign
   id : 0x31
   input :
