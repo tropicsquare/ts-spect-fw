@@ -1,7 +1,5 @@
 op_ecdsa_sign:
-
-    ADDI    r3, r2, 
-
-    MOVI    r30, ret_op_success
-    ST      r30, ca_op_status
-    END
+    MOVI    r0, ret_op_success
+    MOVI    r1, 80
+    MOVI    r30, ecdsa_sign_id
+    JMP     set_res_word
