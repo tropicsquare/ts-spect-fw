@@ -43,8 +43,7 @@ eddsa_nonce_init_id .eq 0x42
 ; eddsa_nonce_update
 eddsa_nonce_update_id .eq 0x43
 ; eddsa_nonce_finish
-eddsa_nonce_finish_id .eq 0x42
-eddsa_nonce_finish_input_message .eq 0x0
+eddsa_nonce_finish_id .eq 0x44
 ; eddsa_R_part
 eddsa_R_part_id .eq 0x45
 ; eddsa_e_at_once
@@ -56,7 +55,7 @@ eddsa_e_update_id .eq 0x48
 ; eddsa_e_finish
 eddsa_e_finish_id .eq 0x49
 ; eddsa_finish
-eddsa_finish_id .eq 0x0A
+eddsa_finish_id .eq 0x4A
 eddsa_finish_output_R .eq 0x10
 eddsa_finish_output_S .eq 0x30
 ; eddsa_verify
@@ -69,9 +68,10 @@ eddsa_verify_input_message1 .eq 0xA0
 eddsa_verify_output_result .eq 0x1000
 ; ecdsa
 ecdsa_id .eq 0x70
+ecdsa_input_result .eq 0x0
+ecdsa_input_message .eq 0x10
 ; ecdsa_sign
 ecdsa_sign_id .eq 0x70
-ecdsa_sign_input_message .eq 0x10
 ecdsa_sign_input_sch .eq 0xA0
 ecdsa_sign_input_scn .eq 0xC0
 ecdsa_sign_output_R .eq 0x10
@@ -90,12 +90,3 @@ sha512_update_id .eq 0x52
 sha512_final_id .eq 0x53
 sha512_final_output_digest0 .eq 0x1010
 sha512_final_output_digest1 .eq 0x1030
-; x25519_dbg
-x25519_dbg_id .eq 0x9F
-x25519_dbg_input_priv .eq 0x20
-x25519_dbg_input_pub .eq 0x40
-x25519_dbg_output_r .eq 0x1020
-; curve25519_rpg
-curve25519_rpg_id .eq 0xD0
-; ed25519_rpg
-ed25519_rpg_id .eq 0xD1
