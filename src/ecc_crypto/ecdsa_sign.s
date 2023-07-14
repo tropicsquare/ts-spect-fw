@@ -34,7 +34,17 @@ ecdsa_sign:
 
     REDP r9, r10, r9
 
+
     CMPA r9, 0
+
+.ifdef SPECT_ISA_VERSION_1
+    CMPA    r9, 0
+.endif
+
+.ifdef SPECT_ISA_VERSION_2
+    XORI    r30, r9,  0
+.endif
+
     BRZ ecdsa_fail
 
     ST r9, 0x1000
@@ -48,7 +58,13 @@ ecdsa_sign:
     ADDP r0, r0, r25
     MULP r0, r0, r26
 
-    CMPA r0, 0
+.ifdef SPECT_ISA_VERSION_1
+    CMPA    r0, 0
+.endif
+
+.ifdef SPECT_ISA_VERSION_2
+    XORI    r30, r0,  0
+.endif
     BRZ ecdsa_fail
 
     ST r0, 0x1020

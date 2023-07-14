@@ -10,7 +10,7 @@
 
 eddsa_verify:
     ; load and set needed parameters
-    LD          r28, eddsa_verify_input_s
+    LD          r28, eddsa_verify_input_S
     LD          r31, ca_eddsa_p
     LD          r6,  ca_eddsa_d
     LD          r11, ca_eddsa_xG
@@ -30,7 +30,7 @@ bp_eddsa_verify_sxb:
     LD          r24, eddsa_verify_input_message1
     LD          r25, eddsa_verify_input_message0
     LD          r26, eddsa_verify_input_pubkey
-    LD          r27, eddsa_verify_input_r
+    LD          r27, eddsa_verify_input_R
 
     SWE         r20, r24
     SWE         r21, r25
@@ -60,7 +60,13 @@ bp_eddsa_verify_after_hram:
     MOV         r12, r26
     CALL        point_decompress_ed25519
 bp_eddsa_verify_deca:
-    CMPI        r1, 0
+.ifdef SPECT_ISA_VERSION_1
+    CMPA        r1,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    MOVI        r30, 0
+    XOR         r1, r1, r30
+.endif
     BRNZ        eddsa_verify_fail
     MOVI        r13, 1
     MUL25519    r14, r11, r12
@@ -91,7 +97,13 @@ bp_eddsa_verify_encq:
     ; ENC(Q) == ENC(R)
     LD          r31, ca_ffff
     SUBP        r0,  r27, r8
+.ifdef SPECT_ISA_VERSION_1
     CMPA        r0,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    MOVI        r30, 0
+    XOR         r0, r0, r30
+.endif
     BRZ         eddsa_verify_success
 eddsa_verify_fail:
     MOVI        r0,  0
