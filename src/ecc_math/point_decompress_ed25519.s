@@ -117,6 +117,7 @@ point_decompress_ed25519_sqr:
                             ; r18 = x
                             ; r20 = u
 
+.ifdef SPECT_ISA_VERSION_1
     SUBP     r19, r16, r20  ; r19 = r16 - r20   (r19 == 0 iff v*x^2 == u)
     ADDP     r20, r16, r20  ; r20 = r16 + r20   (r20 == 0 iff v*x^2 == -u)
 
@@ -127,18 +128,44 @@ point_decompress_ed25519_sqr:
     BRNZ point_decompress_ed25519_vx2_check2
     MOV  r0, r18            ; res = x
     MOVI r1, 1
+    JMP  point_decompress_ed25519_vx2_check_flag
 point_decompress_ed25519_vx2_check2:
     CMPA r20, 0             ; v*x^2 == -u
     BRNZ point_decompress_ed25519_vx2_check_flag
     MOV  r0, r17            ; res = x * 2^((p-1)/4)
     MOVI r1, 1
+    JMP  point_decompress_ed25519_vx2_check_flag
+.endif
+
+.ifdef SPECT_ISA_VERSION_2
+    MOVI r1, 0              ; r1 = flag
+
+    XOR     r30, r16, r20   ; v*x^2 == u
+    BRNZ point_decompress_ed25519_vx2_check2
+    MOV  r0, r18            ; res = x
+    MOVI r1, 1
+point_decompress_ed25519_vx2_check2:
+    MOVI r30, 0
+    SUBP r20, r30, r16
+    XOR  r30, r16, r20             ; v*x^2 == -u
+    BRNZ point_decompress_ed25519_vx2_check_flag
+    MOV  r0, r17            ; res = x * 2^((p-1)/4)
+    MOVI r1, 1
+.endif
+
 point_decompress_ed25519_vx2_check_flag:
     CMPI r1, 0
     BRZ  point_decompress_ed25519_fail
 
     MOVI r1, 0
 ; point_decompress_ed25519_check_x_is_0
+.ifdef SPECT_ISA_VERSION_1
     CMPA r0, 0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XOR r30, r30, r0
+.endif
+
     BRNZ point_decompress_ed25519_check_X0_is_1
     ORI r1, r1, 1
 
