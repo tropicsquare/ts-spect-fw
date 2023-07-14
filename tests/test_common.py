@@ -52,6 +52,12 @@ def break_on(cmd_file, bp):
 def write_int32(cmd_file, x: int, addr):
     cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr, '04X'), format(x, '08X')))
 
+def break_on(cmd_file, bp):
+    cmd_file.write(f"break {bp}\n")
+
+def write_int32(cmd_file, x: int, addr):
+    cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr, '04X'), format(x, '08X')))
+
 def write_string(cmd_file, s: str, addr):
     val = str2int32(s)
     for w in range(len(val)):

@@ -129,6 +129,91 @@
     - name : S
       address : 0x30
 
+############################################
+# ECC Key Gen/Store
+############################################
+- name : ecc_key
+  id : 0x20
+  input :
+  output :
+
+- name : ecc_key_gen
+  id : 0x21
+  input :
+  output :
+
+- name : ecc_key_store
+  id : 0x22
+  input :
+  output :
+
+- name : ecc_key_read
+  id : 0x23
+  input :
+  output :
+
+- name : ecc_key_erase
+  id : 0x24
+  input :
+  output :
+
+############################################
+# Secure Channel
+############################################
+- name : x25519
+  id : 0x10
+  input:
+  output:
+
+- name : x25519_kpair_gen
+  id : 0x11
+  input:
+  output:
+    - name : etpub
+      address : 0x1020
+
+- name : x25519_sc_et_eh
+  id : 0x12
+  input:
+    - name : ehpub
+      address : 0x0020
+  output:
+    - name : x1
+      address : 0x1020
+
+- name : x25519_sc_et_sh
+  id : 0x13
+  input:
+    - name : slot
+      address : 0x0020
+  output:
+    - name : etpub
+      address : r2
+
+- name : x25519_sc_st_eh
+  id : 0x14
+  input:
+  output:
+    - name : r3
+      address : 0x1020
+
+############################################
+# EdDSA
+############################################
+- name : eddsa
+  id : 0x40
+  input :
+  output :
+
+- name : eddsa_set_context
+  id : 0x41
+  input :
+    - name : sch
+      address : 0x00A0
+    - name : scn
+      address : 0x00C0
+  output :
+
 - name : eddsa_verify
   id : 0x4B
   input :
@@ -218,4 +303,18 @@
 
 - name : ed25519_rpg
   id : 0xD1
-    
+
+- name : x25519_dbg
+  id : 0x9F
+  input :
+    - name : priv
+      address : 0x0020
+    - name : pub
+      address : 0x0040
+  output :
+    - name : r
+
+- name : curve25519_rpg
+  id : 0xD0
+  input :
+  output :

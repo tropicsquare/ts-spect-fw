@@ -134,7 +134,6 @@ __end__:
     ST      r30, 0x1000
     ROL8    r0, r0
     ROL8    r0, r0
-    OR      r0, r0, r1
     ST      r0, ca_spect_res_word
     END
 
@@ -163,4 +162,39 @@ __end__:
 ;.include    ecc_crypto/eddsa_verify.s
 
 ;.include    ops/sha512_routines.s
+next_cmd_4:
+    CMPI r0, curve25519_rpg_id
+    BRNZ next_cmd_5
+    LD      r1, ca_dst_template
+    LD      r2, 0x0020              ; DST ID
+    OR      r1, r1, r2
+    ROL8    r1, r1
+    CALL    curve25519_point_generate
+    ST      r10, 0x1000 
+    ST      r11, 0x1020
+    ST      r12, 0x1040
+    END 
+; ============================================================
+; ============================================================
+; Ed25519 Random Point Generation
+next_cmd_5:
+    CMPI r0, ed25519_rpg_id
+    BRNZ next_cmd_end
+    LD      r1, ca_dst_template
+    LD      r2, 0x0020              ; DST ID
+    OR      r1, r1, r2
+    ROL8    r1, r1
+    CALL    ed25519_point_generate
+    ST      r10, 0x1000 
+    ST      r11, 0x1020
+    ST      r12, 0x1040
+    END 
+; ============================================================
+
+next_cmd_end:
+    END
+
+.include    field_math/inv_q256.s
+;.include    field_math/inv_p256.s
+.include    field_math/inv_p25519.s
 
