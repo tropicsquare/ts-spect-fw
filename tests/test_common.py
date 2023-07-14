@@ -78,9 +78,9 @@ def read_output(output_file: str, addr: int, count: int) -> int:
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
         return val
     
-def run_op(cmd_file, op_name, insrc, outsrc, diata_in_size, ops_cfg, test_dir, run_id=-1, old_context=None):
+def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, run_id=-1, old_context=None):
     op = find_in_list(op_name, ops_cfg)
-    cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (diata_in_size << 16)
+    cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (data_in_size << 16)
     set_cfg_word(cmd_file, cfg_word)
     run(cmd_file)
     exit(cmd_file)
@@ -105,6 +105,7 @@ def run_op(cmd_file, op_name, insrc, outsrc, diata_in_size, ops_cfg, test_dir, r
     if old_context:
         cmd += f" --load-context={test_dir}/{old_context}"
     cmd += f" --dump-context={test_dir}/{new_context}"
+    #cmd += f" --isa-version=1"
     cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/{run_log}"
 
     if os.system(cmd):
