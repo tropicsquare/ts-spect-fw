@@ -16,19 +16,9 @@ $$to\_string(0x3456) = "0x34, 0x56"$$
 
 ## Registers
 
-SPECT works with 256 bit (or 32 byte) registers. Data to the registers can be loaded two ways:
+SPECT works with 256 bit (or 32 byte) registers. Data to the registers data are loaded from memory by 4 byte words as $w_7 || w_6 || ... || w_1 || w_0$. One word is composed of 4 bytes as $"w_{x,3},w_{x,2},w_{x,1},w_{x,0}"$. One word can by also seen as an unsigned integer $w_{x,0} + w_{x,1} \times 2^{8} + w_{x,2} \times 2^{16} + w_{x,3} \times 2^{24}$.
 
-1. With `LD` instruction from **DATA RAM IN**
-
-    In this case, data are loaded from memory by 4 byte words as $w_7 || w_6 || ... || w_1 || w_0$. One word is composed of 4 bytes as $"w_{x,3},w_{x,2},w_{x,1},w_{x,0}"$. One word can by also seen as an unsigned integer $w_{x,0} + w_{x,1} \times 2^{8} + w_{x,2} \times 2^{16} + w_{x,3} \times 2^{24}$.
-
-    Value in the register can be then interpreted as 256 bit unsigned integer : $r = w_{0,0} + w_{0,1} \times 2^{32} + w_{0,2} \times 2^{64} + ... + w_{7,3} \times 2^{223}$
-
-2. With `LDR` instruction from **CPB**
-
-    In this case, data are loaded from buffer in **CPB** by bytes as $"b_{31}, b_{30}, ..., b_1, b_0"$
-
-    Value in the register can be then interpreted as 256 bit unsigned integer : $r = b_0 + b_1 \times 2^{8} + b_2 \times 2^{16} + ... + b_{31} \times 2^{248}$
+Value in the register can be then interpreted as 256 bit unsigned integer : $r = w_{0,0} + w_{0,1} \times 2^{32} + w_{0,2} \times 2^{64} + ... + w_{7,3} \times 2^{223}$
 
 ## SHA-512
 
@@ -51,7 +41,7 @@ $$pad = "0x80" || "0x00"^{j+14} || s$$
 
 In case of message $M$, $pad = "0x08" || "0x00"^{43} || "0x06, 0x90$
 
-The second block is the composed as:
+The second block is then composed as:
 
 $$r3 = "M_{128}, ..., M_{159}"$$
 $$r2 = "M_{160}, ..., M_{191}"$$
@@ -67,12 +57,18 @@ SPECT provides instruction for TMAC as specified in [TMAC](TMAC.md). The instruc
 
 Let $M$ be a 34 byte message. $M = "M_0, M_1, ..., M_{32}, M_{33}"$.
 
-After initialization of TMCA core, the message is then processed in two rounds of TMAC calculation. The first block is composed as:
+The message is padded with the $10^*1$ padding to be a multiple of 18 bytes. The number of padding bytes is $q = 18 - (byte\_len(M) \pmod{18})$
 
-$$r = "0x00, ..., M_0, ..., M_{17}"$$
+| # Padding Bytes | Padded Message |
+| - | - |
+| $q = 1$ | $M\|\|0x84$ |
+| $q = 2$ | $M\|\|0x04\|\|0x80$ |
+| $q > 2$ | $M\|\|0x04\|\|0x00^{q-2}|\|0x80$ |
 
-The second block is composed as:
+After initialization of TMCA core (shares are loaded and initialization string is processed), the message is then processed in two rounds of TMAC calculation. The first block is composed as:
 
-$$r = "0x00, ..., M_{18}, ..., M_{33}, 0x20, 0x01"$$
+First block:
+$$r = "0x00^{14}, M_0, ..., M_{17}"$$
 
-    NOTE: "0x20, 0x01" is the last 2 zero bits and 10*1 padding.
+Last block:
+$$r = "0x00^{14}, M_{18}, ..., M_{33}, 0x04, 0x80"$$
