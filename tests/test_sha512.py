@@ -20,19 +20,19 @@ if __name__ == "__main__":
         m_blocks.append(message[i:i+256])
 
     tc.start(cmd_file)
-    ctx = tc.run_op(cmd_file, "sha512_init", ops_cfg, test_dir)
+    ctx = tc.run_op(cmd_file, "sha512_init", 0x4, 0x1, 0xabcd, ops_cfg, test_dir)
 
     for i in range(len(m_blocks)-1):
         cmd_file = tc.get_cmd_file(test_dir)
         tc.start(cmd_file)
-        tc.write_string(cmd_file, m_blocks[i], 0x0020)
-        ctx = tc.run_op(cmd_file, "sha512_update", ops_cfg, test_dir, run_id=i, old_context=ctx)
+        tc.write_string(cmd_file, m_blocks[i], 0x0010)
+        ctx = tc.run_op(cmd_file, "sha512_update", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, run_id=i, old_context=ctx)
 
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
-    tc.write_string(cmd_file, m_blocks[-1], 0x0020)
-    ctx = tc.run_op(cmd_file, "sha512_final", ops_cfg, test_dir, old_context=ctx)
+    tc.write_string(cmd_file, m_blocks[-1], 0x0010)
+    ctx = tc.run_op(cmd_file, "sha512_final", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, old_context=ctx)
 
-    digest = tc.read_output(f"{test_dir}/{test_name}_final_out.hex", 0x1020, 16)
+    digest = tc.read_output(f"{test_dir}/{test_name}_final_out.hex", 0x1010, 16)
 
     sys.exit(not(digest == digest_ref_int))

@@ -29,9 +29,9 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, run_id=run_id)
 
-    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1020, 1)
+    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1000, 1)
 
     if res != 1:
         sys.exit(1)
@@ -55,9 +55,9 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, run_id=run_id)
 
-    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1020, 1)
+    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1000, 1)
 
     if res != 0:
         sys.exit(1)
@@ -81,9 +81,9 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, run_id=run_id)
 
-    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1020, 1)
+    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1000, 1)
 
     if res != 0:
         sys.exit(1)
@@ -107,9 +107,9 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, run_id=run_id)
 
-    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1020, 1)
+    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1000, 1)
 
     if res != 0:
         sys.exit(1)
@@ -133,9 +133,9 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x4, 0x1, 0xabcd, ops_cfg, test_dir, run_id=run_id)
 
-    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1020, 1)
+    res = tc.read_output(f"{test_dir}/{test_name}_{run_id}_out.hex", 0x1000, 1)
 
     if res != 0:
         sys.exit(1)
