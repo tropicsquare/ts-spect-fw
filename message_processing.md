@@ -61,9 +61,10 @@ The message is padded with the $10^*1$ padding to be a multiple of 18 bytes. The
 
 | # Padding Bytes | Padded Message |
 | - | - |
+| $q = 0$ | $0x04\|\|0x00^{16}\|\|0x80$|
 | $q = 1$ | $M\|\|0x84$ |
 | $q = 2$ | $M\|\|0x04\|\|0x80$ |
-| $q > 2$ | $M\|\|0x04\|\|0x00^{q-2}|\|0x80$ |
+| $q > 2$ | $M\|\|0x04\|\|0x00^{q-2}\|\|0x80$ |
 
 After initialization of TMCA core (shares are loaded and initialization string is processed), the message is then processed in two rounds of TMAC calculation. The first block is composed as:
 

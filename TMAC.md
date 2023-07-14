@@ -5,7 +5,7 @@ TMAC uses KECCAK permutation function with $p = 400$ and $r = 18$. Thus size of 
 $TMAC(K, X, N)$:
 
 1. $initstr = (N||byte\_size(K)||K||0x00||0x00)$
-2. $msgstr = (X||00)$
+2. $msgstr = (X||"00")$
 3. $i = -bitlen(X)-2 \pmod{18}$
 3. $pad = (10^{i}1)$
 4. $fstring = (msgstr||pad)$
@@ -32,15 +32,16 @@ Secure Channel Hash $SCh$ is 32 bytes.
 
 Secure Channel Nonce $SCn$ is 4 bytes.
 
-Let $j$ be an integer such that $byte\_size(M) = n \times 18 + j$ for some $n \in \N$.
+Let $q = 18 - (byte\_len(M) \pmod{18})$.
 
 Message $M$ is than padded as follows:
 
-| $j$ | $pad$ |
+| $q$ | $pad$ |
 | - | - |
-| 0 | $(0x20)(0x00)^{16}(0x01)$ |
-| 1 | $(0x21)$ |
-| [2,17] | $(0x20)(0x00)^{j-2}(0x01)$ |
+| $q = 0$ | $0x04\|\|0x00^{16}\|\|0x80$|
+| $q = 1$ | $M\|\|0x84$ |
+| $q = 2$ | $M\|\|0x04\|\|0x80$ |
+| $q > 2$ | $M\|\|0x04\|\|0x00^{q-2}\|\|0x80$|
 
 ## TMAC in ECDSA Key Setup
 
@@ -50,7 +51,7 @@ In ECDSA Key Setup, TMAC is used to generate second private key $w$.
 - $N = 0x0A$
 - $X = ""$
 
-Empty message $X$ shall be padded with $pad = (0x20)(0x00)^{16}(0x01)$
+Empty message $X$ shall be padded with $pad = 0x04||0x00^{16}||0x80$
 
 1. $TMAC\_INIT(d, 0x0A)$
 2. $w = TMAC\_UPDATE(pad)$
@@ -61,7 +62,7 @@ Empty message $X$ shall be padded with $pad = (0x20)(0x00)^{16}(0x01)$
 - $N = 0x0B$
 - $X = (SCh||SCn||z)$
 
-Size of $z$ is fixed to 32 bytes, thus $pad$ is also fixed to value $0x2001$.
+Size of $z$ is fixed to 32 bytes, thus $pad$ is also fixed to $0x04||0x00^{2}||0x80$.
 
 1. $TMAC\_INIT(w, 0x0B)$
 2. $TMAC\_UPDATE(z[])
