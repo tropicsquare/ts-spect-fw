@@ -4,81 +4,34 @@
   output :
 
 ############################################
-# SHA
-############################################
-- name : sha512
-  id : 0x50
-  input :
-  output :
-
-- name : sha512_init
-  id : 0x51
-  input :
-  output :
-
-- name : sha512_update
-  id : 0x52
-  input :
-    - name : data0
-      address : 0x0020
-    - name : data1
-      address : 0x0040
-    - name : data2
-      address : 0x0060
-    - name : data3
-      address : 0x0080
-  output :
-
-- name : sha512_final
-  id : 0x53
-  input :
-    - name : data0
-      address : 0x0020
-    - name : data1
-      address : 0x0040
-    - name : data2
-      address : 0x0060
-    - name : data3
-      address : 0x0080
-  output :
-    - name : digest0
-      address : 0x1020
-    - name : digest1
-      address : 0x1040
-
-############################################
 # ECC Key Gen/Store
 ############################################
 - name : ecc_key
-  id : 0x20
+  id : 0x60
   input :
+    - name : cmd_in
+      address : 0x00
   output :
     - name : result
-      address : 0x0
+      address : 0x00
 
 - name : ecc_key_gen
-  id : 0x21
-  input :
-  output :
+  id : 0x60
 
 - name : ecc_key_store
-  id : 0x22
+  id : 0x61
   input :
     - name : k
       address : 0x10
-  output :
 
 - name : ecc_key_read
-  id : 0x23
-  input :
+  id : 0x62
   output :
     - name : pub_key
       address : 0x10
 
 - name : ecc_key_erase
-  id : 0x24
-  input :
-  output :
+  id : 0x63
 
 ############################################
 # Secure Channel
@@ -126,7 +79,12 @@
 - name : eddsa
   id : 0x40
   input :
+    - name : message
+      address : 0x00
   output :
+    - name : result
+      address : 0x00
+
 
 - name : eddsa_set_context
   id : 0x41
@@ -135,68 +93,48 @@
       address : 0x00A0
     - name : scn
       address : 0x00C0
-  output :
 
 - name : eddsa_nonce_init
   id : 0x42
-  input :
-  output :
 
 - name : eddsa_nonce_update
   id : 0x43
-  input :
-    - name : message
-      address : 0x00
-  output :
 
 - name : eddsa_nonce_finish
   id : 0x42
   input :
     - name : message
       address : 0x00
-  output :
 
 - name : eddsa_R_part
   id : 0x45
-  input :
-  output :
+
+- name : eddsa_e_at_once
+  id : 0x46
 
 - name : eddsa_e_prep
-  id : 0x46
-  input :
-    - name : message
-      address : 0x00
-  output :
+  id : 0x47
 
 - name : eddsa_e_update
-  id : 0x47
-  input :
-    - name : message
-      address : 0x00
-  output :
+  id : 0x48
 
 - name : eddsa_e_finish
-  id : 0x48
-  input :
-    - name : message
-      address : 0x00
-  output :
+  id : 0x49
 
 - name : eddsa_finish
-  id : 0x49
-  input :
+  id : 0xA
   output :
-    - name : r
+    - name : R
       address : 0x10
-    - name : s
-      address : 0x10
+    - name : S
+      address : 0x30
 
 - name : eddsa_verify
-  id : 0x4A
+  id : 0x4B
   input :
-    - name : r
+    - name : R
       address : 0x0020
-    - name : s
+    - name : S
       address : 0x0040
     - name : pubkey
       address : 0x0060
@@ -206,19 +144,17 @@
       address : 0x00A0
   output :
     - name : result
-      address : 0x1020
+      address : 0x1000
 
 ############################################
 # ECDSA
 ############################################
 
 - name : ecdsa
-  id : 0x30
-  input :
-  output :
+  id : 0x70
 
 - name : ecdsa_sign
-  id : 0x31
+  id : 0x70
   input :
     - name : message
       address : 0x10
@@ -227,10 +163,40 @@
     - name : scn
       address : 0x00C0
   output :
-    - name : r
+    - name : R
       address : 0x10
-    - name : s
-      address : 0x10
+    - name : S
+      address : 0x30
+
+############################################
+# SHA
+############################################
+- name : sha512
+  id : 0x50
+  input :
+    - name : data0
+      address : 0x0010
+    - name : data1
+      address : 0x0030
+    - name : data2
+      address : 0x0050
+    - name : data3
+      address : 0x0070
+
+- name : sha512_init
+  id : 0x51
+
+- name : sha512_update
+  id : 0x52
+  
+- name : sha512_final
+  id : 0x53
+  output :
+    - name : digest0
+      address : 0x1010
+    - name : digest1
+      address : 0x1030
+
 
 ############################################
 # Debug
@@ -249,11 +215,7 @@
 
 - name : curve25519_rpg
   id : 0xD0
-  input :
-  output :
 
 - name : ed25519_rpg
   id : 0xD1
-  input :
-  output :
     
