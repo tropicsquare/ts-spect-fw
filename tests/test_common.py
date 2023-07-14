@@ -43,8 +43,8 @@ def run(cmd_file):
 def exit(cmd_file):
     cmd_file.write("exit\n")
 
-def set_op(cmd_file, op):
-    cmd_file.write("set mem[0x0000] 0x{}\n".format(format(op["id"], '08X')))
+def set_cfg_word(cmd_file, cfg_word):
+    cmd_file.write("set mem[0x0100] 0x{}\n".format(format(cfg_word, '08X')))
 
 def break_on(cmd_file, bp):
     cmd_file.write(f"break {bp}\n")
@@ -72,9 +72,10 @@ def read_output(output_file: str, addr: int, count: int) -> int:
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
         return val
     
-def run_op(cmd_file, op_name, ops_cfg, test_dir, run_id=-1, old_context=None):
+def run_op(cmd_file, op_name, insrc, outsrc, diata_in_size, ops_cfg, test_dir, run_id=-1, old_context=None):
     op = find_in_list(op_name, ops_cfg)
-    set_op(cmd_file, op)
+    cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (diata_in_size << 16)
+    set_cfg_word(cmd_file, cfg_word)
     run(cmd_file)
     exit(cmd_file)
     cmd_file.close()
