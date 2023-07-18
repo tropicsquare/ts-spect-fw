@@ -16,6 +16,8 @@ ecc_key_read_output_pub_key .eq 0x10
 ecc_key_erase_id .eq 0x63
 ; x25519
 x25519_id .eq 0x10
+x25519_context_etpriv .eq 0x40
+x25519_context_ehpub .eq 0x60
 ; x25519_kpair_gen
 x25519_kpair_gen_id .eq 0x11
 x25519_kpair_gen_output_etpub .eq 0x1020
@@ -90,3 +92,8 @@ sha512_update_id .eq 0x52
 sha512_final_id .eq 0x53
 sha512_final_output_digest0 .eq 0x1010
 sha512_final_output_digest1 .eq 0x1030
+; x25519_dbg
+x25519_dbg_id .eq 0x9F
+x25519_dbg_input_priv .eq 0x20
+x25519_dbg_input_pub .eq 0x40
+x25519_dbg_output_r .eq 0x1020

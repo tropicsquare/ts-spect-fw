@@ -5,6 +5,9 @@
 ;   X25519 Private Key k in r19
 ;   DST_ID for point generation in r0
 ;
+; Outputs:
+;   X25519(k, u) in r11
+;
 ;   1) Random Projective Coordinates -- (x, 1) == (r * x, r)
 ;   2) Group Scalar Randomization -- k = k + r * #E (mod p)
 ;   3) Point Splitting -- k.P1 = k.P2 + k.P3 for P = P1 + P2
@@ -23,16 +26,13 @@
 ;   11) Compute sP1 = sP2 - sP3
 ;   12) Transform sP1.x to affine coordinate system
 ;
-; Intemediate values:
-;   P1 = (r16, r17, r18)
-;   P2 = 
-;   P3 =
-;   k 
+; TODO: Check point integrity
 
 x25519_full_masked:
     LD          r31, ca_p25519
 ;    1) Compute P1.y from P1.x
     CALL        get_y_curve25519
+    BRNZ        x25519_pubkey_fail
 ;    2) Randomize P1.z
     GRV         r18
     MUL25519    r16, r16, r18
@@ -51,3 +51,48 @@ x25519_full_masked:
     CALL        spm_curve25519
 ;    6) Recover sP2.y
     CALL        y_recovery_curve25519
+    CALL        point_check_curve25519
+    BRNZ        x25519_spm_fail
+    MOV         r23, r7
+    MOV         r24, r8
+    MOV         r25, r9
+;    7) Compute P3 = P2 + P1
+    CALL        point_add_curve25519
+;    8) Mask scalar s as s3 = s + r3 * #E
+    GRV         r30
+    LD          r31, ca_p8q25519
+    SCB         r28, r19, r30
+;    9) Compute sP3.x = s3.P3
+    LD          r31, ca_p25519
+    CALL        spm_curve25519
+;   10) Recover sP3.y
+    CALL        y_recovery_curve25519
+    CALL        point_check_curve25519
+    BRNZ        x25519_spm_fail
+;   11) Compute sP1 = sP2 - sP3
+    MOVI        r0,  0
+    SUBP        r7,  r0,  r7
+    MOV         r11, r23
+    MOV         r12, r24
+    MOV         r13, r25
+    CALL        point_add_curve25519
+;   12) Transform sP1.x to affine coordinate system
+    MOV         r1, r12
+    CALL        inv_p25519
+    MUL25519    r11, r11, r1
+    MUL25519    r13, r13, r1
+    MOVI        r12, 1
+
+    CALL        point_check_curve25519
+    BRNZ        x25519_spm_fail
+
+    MOVI        r0,  0
+
+    RET
+x25519_pubkey_fail:
+    MOVI        r0,  ret_x25519_err_inv_pub_key
+    RET
+
+x25519_spm_fail:
+    MOVI        r0, ret_spm_err
+    RET

@@ -9,7 +9,7 @@
 ;
 ; Output:
 ;                     X    Z
-;   Point k.P)    = (r7,  r8)
+;   Point k.P     = (r7,  r8)
 ;   Point (k+1).P = (r9,  r10)
 ; 
 ; Expects:
