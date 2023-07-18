@@ -13,7 +13,7 @@
 ; Intermediate value registers:
 ;   r0-7
 
-point_dub_p256:
+point_dbl_p256:
     MUL256  r0,  r9,  r9
     MUL256  r1,  r10, r10
     MUL256  r2,  r11, r11

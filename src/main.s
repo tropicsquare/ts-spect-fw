@@ -150,8 +150,8 @@ next_cmd_4:
 ;    OR      r1, r1, r2
 ;    ROL8    r1, r1
 ;    CALL    curve25519_point_generate
-;    ST      r10, 0x1000 
-;    ST      r11, 0x1020
+;    ST      r11, 0x1000 
+;    ST      r13, 0x1020
 ;    ST      r12, 0x1040
 ;    END 
 ; ============================================================
@@ -227,9 +227,9 @@ set_res_word:
 .include    ecc_math/point_compress_ed25519.s
 .include    ecc_math/point_decompress_ed25519.s
 ;.include    ecc_math/point_add_p256.s
-;.include    ecc_math/point_dub_p256.s
+;.include    ecc_math/point_dbl_p256.s
 .include    ecc_math/point_add_ed25519.s
-.include    ecc_math/point_dub_ed25519.s
+.include    ecc_math/point_dbl_ed25519.s
 ;.include    ecc_math/spm_p256.s
 .include    ecc_math/spm_ed25519_short.s
 

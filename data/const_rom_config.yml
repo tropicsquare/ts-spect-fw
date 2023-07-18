@@ -1,6 +1,6 @@
-name: const_rom
-start_addr: 0x3000
-end_addr:   0x37FF
+name: data_ram_in_const
+start_addr: 0x0200
+end_addr:   0x07FF
 data:
   - name : ca_ecdsa_p
     value : 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
@@ -14,11 +14,11 @@ data:
     value : 0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296
   - name : ca_ecdsa_yG
     value : 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5
-  - name : ca_eddsa_p
+  - name : ca_p25519
     value : 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed
-  - name : ca_eddsa_q
+  - name : ca_q25519
     value : 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed
-  - name : ca_eddsa_8q
+  - name : ca_p8q25519
     value : 0x80000000000000000000000000000000a6f7cef517bce6b2c09318d2e7ae9f68
   - name : ca_eddsa_d
     value : 0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3
@@ -26,7 +26,7 @@ data:
     value : 0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a
   - name : ca_eddsa_yG
     value : 0x6666666666666666666666666666666666666666666666666666666666666658
-  - name : ca_eddsa_m1
+  - name : ca_p25519_c3
     value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0
   - name : ca_x25519_a24
     value : 121665
@@ -34,8 +34,8 @@ data:
     value : 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
   - name : ca_curve25519_a
     value : 486662
-  - name : ca_pg_curve25519_c3
-    value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0
+  - name : ca_curve25519_a2d4
+    value : 0x1db42
   - name : ca_pg_map2ed25519_c5
     value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
   - name : ca_dst_template

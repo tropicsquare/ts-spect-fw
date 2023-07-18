@@ -46,7 +46,7 @@ map_to_curve_elligator2_curve25519:
     MUL25519    r13, r2,  r10           ; y11 = pow(tv2, c4, p)     (gx1 * gxd^7)^((p - 5) / 8)
 
     MUL25519    r13, r13, r12           ; y11 = y11 * tv3  % p      gx1 * gxd^3 * (gx1 * gxd^7)^((p - 5) / 8)
-    LD          r30, ca_pg_curve25519_c3
+    LD          r30, ca_p25519_c3
     MUL25519    r14, r13, r30           ; y12 = y11 * c3  % p
     MUL25519    r10, r13, r13           ; tv2 = pow(y11, 2, p)
     MUL25519    r10, r10, r11           ; tv2 = tv2 * gxd  % p

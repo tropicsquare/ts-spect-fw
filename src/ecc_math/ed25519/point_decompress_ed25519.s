@@ -109,8 +109,8 @@ point_decompress_ed25519_sqr:
     MUL25519 r16, r18, r18  ; r16 = r18 * r18  (r16 = x^2)
     MUL25519 r16, r16, r21  ; r16 = r16 * r21  (r16 = v*x^2)
 
-    LD       r1,  ca_eddsa_m1
-    MUL25519 r17, r18, r1   ; r17 = r18 * ca_eddsa_m1
+    LD       r1,  ca_p25519_c3
+    MUL25519 r17, r18, r1   ; r17 = r18 * ca_p25519_c3
 
                             ; r16 = v * x^2
                             ; r17 = x * 2^((p-1)/4)
