@@ -38,8 +38,11 @@
 ############################################
 - name : x25519
   id : 0x10
-  input:
-  output:
+  context :
+    - name : etpriv
+      address : 0x0040
+    - name : ehpub
+      address : 0x0060
 
 - name : x25519_kpair_gen
   id : 0x11

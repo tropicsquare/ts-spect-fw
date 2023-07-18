@@ -19,5 +19,8 @@ for op in cfg:
     if "output" in op.keys() and op["output"]:
         for output in op["output"]:
             cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_output_"+output["name"], format(output["address"], 'X')))
+    if "context" in op.keys() and op["context"]:
+        for context in op["context"]:
+            cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_context_"+context["name"], format(context["address"], 'X')))
 
 cfg_file.close()
