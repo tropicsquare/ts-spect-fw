@@ -10,7 +10,7 @@ ca_eddsa_8q .eq 0x3100
 ca_eddsa_d .eq 0x3120
 ca_eddsa_xG .eq 0x3140
 ca_eddsa_yG .eq 0x3160
-ca_eddsa_m1 .eq 0x3180
+ca_p25519 .eq 0x3180
 ca_x25519_a24 .eq 0x31A0
 ca_ffff .eq 0x31C0
 ca_curve25519_a .eq 0x31E0

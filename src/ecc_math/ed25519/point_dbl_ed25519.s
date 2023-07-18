@@ -2,8 +2,9 @@
 ; Input:
 ;               X    Y    Z    T
 ;   Point Q1 = (r7,  r8,  r9,  r10)
+;
 ; Output:
-;   Q1 = 2 Q1
+;   Q1 = 2.Q1
 ;
 ; Expects:
 ;   Ed25519 prime in r31
@@ -13,7 +14,7 @@
 
 ;   https://datatracker.ietf.org/doc/rfc8032/
 ;   
-;      For point addition, the following method is recommended.  A point
+;      For point doubling, the following method is recommended.  A point
 ;      (x,y) is represented in extended homogeneous coordinates (X, Y, Z,
 ;      T), with x = X/Z, y = Y/Z, x * y = T/Z.
 ;   
@@ -32,7 +33,7 @@
 ;                T3 = E*H
 ;                Z3 = F*G
 
-point_dub_ed25519:
+point_dbl_ed25519:
     MUL25519    r0,  r7,  r7    ; r0 = X1^2     r0 = A
 
     MUL25519    r1,  r8,  r8    ; r1 = Y1^2     r1 = B

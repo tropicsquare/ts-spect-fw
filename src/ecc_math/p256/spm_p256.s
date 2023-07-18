@@ -33,7 +33,7 @@ spm_p256_loop_511_256:
     CSWAP r11, r14
 
     CALL point_add_p256
-    CALL point_dub_p256
+    CALL point_dbl_p256
 
     CSWAP r9,  r12
     CSWAP r10, r13
@@ -51,7 +51,7 @@ spm_p256_loop_255_0:
     CSWAP r11, r14
 
     CALL point_add_p256
-    CALL point_dub_p256
+    CALL point_dbl_p256
 
     CSWAP r9,  r12
     CSWAP r10, r13

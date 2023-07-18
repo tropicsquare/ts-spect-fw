@@ -200,35 +200,19 @@
 # Debug
 ############################################
 
-#- name : x25519_dbg
-#  id : 0x9F
-#  input :
-#    - name : priv
-#      address : 0x0020
-#    - name : pub
-#      address : 0x0040
-#  output :
-#    - name : r
-#      address : 0x1020
-#
+- name : x25519_dbg
+  id : 0x9F
+  input :
+    - name : priv
+      address : 0x0020
+    - name : pub
+      address : 0x0040
+  output :
+    - name : r
+      address : 0x1020
+
 #- name : curve25519_rpg
 #  id : 0xD0
 #
 #- name : ed25519_rpg
 #  id : 0xD1
-#
-#- name : x25519_dbg
-#  id : 0x9F
-#  input :
-#    - name : priv
-#      address : 0x0020
-#    - name : pub
-#      address : 0x0040
-#  output :
-#    - name : r
-#
-#- name : curve25519_rpg
-#  id : 0xD0
-#  input :
-#  output :
-#

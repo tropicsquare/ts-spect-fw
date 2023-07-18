@@ -8,7 +8,7 @@ cfg_name = sys.argv[1]
 with open(cfg_name, 'r') as cfg_file:
     cfg = yaml.safe_load(cfg_file)
 
-cfg_file = open("spect_ops_constants.s", 'w')
+cfg_file = open("src/spect_ops_constants.s", 'w')
 
 for op in cfg:
     cfg_file.write("; " + op["name"] + '\n' )
