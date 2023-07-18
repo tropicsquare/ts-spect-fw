@@ -36,6 +36,12 @@ data:
     value : 486662
   - name : ca_curve25519_a2d4
     value : 0x1db42
+  - name : ca_curve25519_amap
+    value : 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2451
+  - name : ca_w25519_a
+    value : 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa984914a144
+  - name : ca_w25519_3b
+    value : 0x71c71c71c71c71c71c71c71c71c71c71c71c71c71c71c71c72221bd565325952
   - name : ca_pg_map2ed25519_c5
     value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
   - name : ca_dst_template
