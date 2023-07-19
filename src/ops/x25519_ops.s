@@ -18,6 +18,7 @@ op_x25519_kpair_gen:
     CMPI    r0,  0
     BRNZ    op_x25519_kpair_gen_dont_store
     ST      r11, x25519_kpair_gen_output_etpub
+    
 op_x25519_kpair_gen_dont_store:
     MOVI    r1, 32
     MOVI    r30, x25519_kpair_gen_id

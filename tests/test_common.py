@@ -6,6 +6,12 @@ import sys
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 OPS_CONFIG = TS_REPO_ROOT+"/spect_fw/spect_ops_config.yml"
 
+def print_passed():
+    print("\033[92m{}\033[00m".format("PASSED"))
+
+def print_failed():
+    print("\033[91m{}\033[00m".format("FAILED"))
+
 def find_in_list (name: str, l: list) -> dict:
     for item in l:
         if item["name"] == name:

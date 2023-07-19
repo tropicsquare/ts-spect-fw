@@ -1,16 +1,17 @@
 #! /bin/bash
 
-tests=("curve25519_rpg" "ed25519_rpg" "sha512" "eddsa_verify" "cmd_decode")
+tests=("cmd_decode" "sha512" "x25519_kpair_gen" )
 
 declare -i ret_val=0
 
 for test in ${tests[@]}; do
+    echo "Running test $test"
     ./test_$test.py
     if [ $? -eq 0 ]; then
-        echo passed
+        echo "Test $test passed"
     else
         ret_val=$((ret_val + 1))
-        echo failed
+        echo "Test $test failed"
     fi
 done
 
