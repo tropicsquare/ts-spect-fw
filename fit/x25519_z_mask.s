@@ -17,7 +17,7 @@ x25519:
     ROR8        r28, r28
     ANDI        r28, r28, 0xFF8
 
-    LD          r31, ca_eddsa_p
+    LD          r31, ca_p25519
 
     MOVI        r11, 1          ; r11 = x2
     MOVI        r12, 0          ; r12 = z2

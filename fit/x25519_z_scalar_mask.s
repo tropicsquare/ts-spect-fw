@@ -21,7 +21,7 @@ x25519:
     LD          r3,  scalar_mask
     SCB         r28, r28, r3
 
-    LD          r31, ca_eddsa_p
+    LD          r31, ca_p25519
 
     MOVI        r11, 1          ; r11 = x2
     MOVI        r12, 0          ; r12 = z2

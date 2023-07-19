@@ -22,7 +22,7 @@ x25519:
     MOV         r13, r10        ; r13 = x3
     MOVI        r14, 1         ; r14 = z3
 
-    LD          r31, ca_eddsa_p
+    LD          r31, ca_p25519
 
     MOVI        r30, 256
 x25519_loop_255_0:
