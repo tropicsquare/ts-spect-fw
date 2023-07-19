@@ -81,9 +81,6 @@ x25519_full_masked:
     MOV         r12, r24
     MOV         r13, r25
     CALL        point_add_curve25519
-    ST          r11, 0x1040
-    ST          r12, 0x1060
-    ST          r13, 0x1080
 ;   12) Transform sP1.x to affine coordinate system
     MOV         r1, r12
     CALL        inv_p25519
