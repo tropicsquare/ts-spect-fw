@@ -46,6 +46,13 @@ def exit(cmd_file):
 def set_cfg_word(cmd_file, cfg_word):
     cmd_file.write("set mem[0x0100] 0x{}\n".format(format(cfg_word, '08X')))
 
+def get_res_word(test_dir, test_name):
+    res_word = read_output(f"{test_dir}/{test_name}_out.hex", 0x1100, 1)
+    SPECT_OP_STATUS = res_word & 0xFF
+    SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFF
+    return SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE
+
+
 def break_on(cmd_file, bp):
     cmd_file.write(f"break {bp}\n")
 
