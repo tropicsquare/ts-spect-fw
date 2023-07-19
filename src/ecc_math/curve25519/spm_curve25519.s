@@ -32,8 +32,8 @@ spm_curve25519_loop_511_256:
     CSWAP   r7,  r9
     CSWAP   r8,  r10
 
-    CALL    point_add_curve25519
-    CALL    point_dbl_curve25519
+    CALL    point_xadd_curve25519
+    CALL    point_xdbl_curve25519
 
     CSWAP   r7,  r9
     CSWAP   r8,  r10
@@ -43,7 +43,7 @@ spm_curve25519_loop_511_256:
 
     MOVI    r30, 256
 
-spm_curve25519_loop_255_0
+spm_curve25519_loop_255_0:
     ROL     r28, r28
     CSWAP   r7,  r9
     CSWAP   r8,  r10

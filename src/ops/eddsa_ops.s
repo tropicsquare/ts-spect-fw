@@ -59,7 +59,7 @@ op_eddsa_finish:
     JMP     set_res_word
 
 op_eddsa_verify:
-    JMP     eddsa_verify
+    ;JMP     eddsa_verify
     MOVI    r0, ret_op_success
     MOVI    r1, 4
     MOVI    r30, eddsa_verify_id

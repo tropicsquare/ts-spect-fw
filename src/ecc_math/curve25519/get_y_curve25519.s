@@ -26,6 +26,6 @@ get_y_curve25519:
     CALL        sqrt_p25519
     MOV         r17, r1
     MOVI        r2,  1
-    NOT         r2
+    NOT         r2,  r2
     AND         r2,  r0,  r2
     RET
