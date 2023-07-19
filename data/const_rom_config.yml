@@ -1,6 +1,6 @@
-name: data_ram_in_const
-start_addr: 0x0200
-end_addr:   0x07FF
+name: const_rom
+start_addr: 0x3000
+end_addr:   0x37FF
 data:
   - name : ca_ecdsa_p
     value : 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
