@@ -29,7 +29,6 @@ rng:
 
 ops_constants:
 	${FW_DIR}/gen_spect_ops_constants.py ${FW_DIR}/spect_ops_config.yml
-	mv ${FW_DIR}/spect_ops_constants.s ${FW_DIR}/src/spect_ops_constants.s
 
 compile: const_rom ops_constants
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
