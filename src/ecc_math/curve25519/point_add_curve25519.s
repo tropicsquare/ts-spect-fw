@@ -66,7 +66,7 @@ point_add_curve25519:
     ADDP        r12, r12, r0    ;
 
     MUL25519    r22, r22, r12
-    SUBP        r12, r12, r22
+    SUBP        r11, r11, r22
 
     RET
 

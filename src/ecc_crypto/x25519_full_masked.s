@@ -3,7 +3,7 @@
 ; Inputs:
 ;   X25519 Public Key u in r16
 ;   X25519 Private Key k in r19
-;   DST_ID for point generation in r0
+;   DST_ID for point generation in r20
 ;
 ; Outputs:
 ;   X25519(k, u) in r11
@@ -35,6 +35,8 @@ x25519_full_masked:
     BRNZ        x25519_pubkey_fail
 ;    2) Randomize P1.z
     GRV         r18
+    MOVI        r0,  0
+    REDP        r18, r0,  r18
     MUL25519    r16, r16, r18
     MUL25519    r17, r17, r18
 ;    3) Mask the scalar s as s2 = s + r2 * #E
@@ -44,19 +46,22 @@ x25519_full_masked:
 ;    4) Generate random point P2
     LD          r31, ca_p25519
     LD          r1, ca_dst_template
-    OR          r1, r1, r0
+    OR          r1, r1, r20
     ROL8        r1, r1
-    CALL        ed25519_point_generate
+    CALL        curve25519_point_generate
 ;    5) Compute sP2 = s2.P2
     CALL        spm_curve25519
 ;    6) Recover sP2.y
     CALL        y_recovery_curve25519
-    CALL        point_check_curve25519
-    BRNZ        x25519_spm_fail
     MOV         r23, r7
     MOV         r24, r8
     MOV         r25, r9
+    CALL        point_check_curve25519
+    BRNZ        x25519_spm_fail
 ;    7) Compute P3 = P2 + P1
+    MOV         r7,  r16
+    MOV         r8,  r18
+    MOV         r9,  r17
     CALL        point_add_curve25519
 ;    8) Mask scalar s as s3 = s + r3 * #E
     GRV         r30
@@ -71,11 +76,14 @@ x25519_full_masked:
     BRNZ        x25519_spm_fail
 ;   11) Compute sP1 = sP2 - sP3
     MOVI        r0,  0
-    SUBP        r7,  r0,  r7
+    SUBP        r9,  r0,  r9
     MOV         r11, r23
     MOV         r12, r24
     MOV         r13, r25
     CALL        point_add_curve25519
+    ST          r11, 0x1040
+    ST          r12, 0x1060
+    ST          r13, 0x1080
 ;   12) Transform sP1.x to affine coordinate system
     MOV         r1, r12
     CALL        inv_p25519

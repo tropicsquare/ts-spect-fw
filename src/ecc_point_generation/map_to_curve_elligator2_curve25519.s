@@ -22,7 +22,13 @@ map_to_curve_elligator2_curve25519:
     ADDP        r6,  r6,  r6            ; tv1 = 2 * tv1 % p
     MOVI        r30, 0x001
     ADDP        r7,  r6,  r30           ; xd = tv1 + 1 % p          Nonzero: -1 is square (mod p), tv1 is not
-    CMPA        r7,  0                  ; If xd == 0, the resulting point is point at infinity -> 
+.ifdef SPECT_ISA_VERSION_1
+    CMPA        r7,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XORI        r30, r7,  0
+.endif
+    ; If xd == 0, the resulting point is point at infinity -> 
     BRZ         curve25519_point_generate_y_final
     LD          r8,  ca_curve25519_a
     MOVI        r30, 0x000
@@ -51,9 +57,15 @@ map_to_curve_elligator2_curve25519:
     MUL25519    r10, r13, r13           ; tv2 = pow(y11, 2, p)
     MUL25519    r10, r10, r11           ; tv2 = tv2 * gxd  % p
 
-    SUBP        r4,  r10, r8            ; e1 = tv2 == gx1
-                                        ; y1 = cmov(y12, y11, e1)   If g(x1) is square, this is its sqrt
-    CMPA        r4,  0                  
+    ; e1 = tv2 == gx1
+    ; y1 = cmov(y12, y11, e1)   If g(x1) is square, this is its sqrt
+.ifdef SPECT_ISA_VERSION_1
+    SUBP        r4,  r10, r8
+    CMPA        r4,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XOR         r4, r10, r8
+.endif
     BRNZ        curve25519_point_generate_y1_y12
 curve25519_point_generate_y1_y11:
     MOV         r1, r13
@@ -75,7 +87,12 @@ curve25519_point_generate_y1_next:
 
     SUBP        r30, r10, r6            ; e2 = tv2 == gx2
                                         ; y2 = cmov(y22, y21, e2)   If g(x2) is square, this is its sqrt
+.ifdef SPECT_ISA_VERSION_1
     CMPA        r30, 0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XORI        r30, r30, 0
+.endif
     BRNZ        curve25519_point_generate_y2_y22
 curve25519_point_generate_y2_y21:
     MOV         r0, r3
@@ -90,7 +107,12 @@ curve25519_point_generate_y2_next:
 
     SUBP        r30, r10, r8,           ; e3 = tv2 == gx1
                                         ; xn = cmov(x2n, x1n, e3)   If e3, x = x1, else x = x2
+.ifdef SPECT_ISA_VERSION_1
     CMPA        r30, 0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XORI        r30, r30, 0
+.endif
     BRNZ        curve25519_point_generate_xn_x2n
 curve25519_point_generate_xn_x1n:
     MOV         r3, r9

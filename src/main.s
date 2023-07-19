@@ -218,7 +218,7 @@ set_res_word:
     ROL8    r1, r1
     ADD     r0, r0, r1
     ST      r0, ca_spect_res_word
-    RET
+    END
 
 ;.include    field_math/inv_q256.s
 ;.include    field_math/inv_p256.s

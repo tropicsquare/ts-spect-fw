@@ -19,15 +19,15 @@
 ; See spect_fw/str2point.md for detailed description.
 
 curve25519_point_generate:
-    GRV     r2
-    CALL    hash_to_field_p25519                ; r0 = x in GF(2^255 - 19)
+    GRV         r2
+    CALL        hash_to_field_p25519                ; r0 = x in GF(2^255 - 19)
 
-    CALL    map_to_curve_elligator2_curve25519  ; (r3, r7, r11, r8) = (xn, xd, y, 1)
-    XORI    r7, 0
-    BRZ     curve25519_point_generate
+    CALL        map_to_curve_elligator2_curve25519  ; (r3, r7, r11, r8) = (xn, xd, y, 1)
+    XORI        r30, r7, 0
+    BRZ         curve25519_point_generate
 
+    MUL25519    r13, r11, r7
     MOV         r11, r3
     MOV         r12, r7
-    MUL25519    r13, r13, r12
 
     RET

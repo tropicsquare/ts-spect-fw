@@ -11,7 +11,7 @@
 eddsa_verify:
     ; load and set needed parameters
     LD          r28, eddsa_verify_input_S
-    LD          r31, ca_eddsa_p
+    LD          r31, ca_p25519
     LD          r6,  ca_eddsa_d
     LD          r11, ca_eddsa_xG
     LD          r12, ca_eddsa_yG
@@ -56,7 +56,7 @@ bp_eddsa_verify_after_hram:
     REDP        r28, r28, r29
 
     ; Decompress ENC(A)
-    LD          r31, ca_eddsa_p
+    LD          r31, ca_p25519
     MOV         r12, r26
     CALL        point_decompress_ed25519
 bp_eddsa_verify_deca:

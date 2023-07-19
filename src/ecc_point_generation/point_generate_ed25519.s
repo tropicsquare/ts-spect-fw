@@ -20,12 +20,12 @@
 ; See spect_fw/str2point.md for detailed description.
 
 ed25519_point_generate:
-    LD      r31, ca_eddsa_p
+    LD      r31, ca_p25519
     GRV     r2
     CALL    hash_to_field_p25519                ; r0 = x in GF(2^255 - 19)
 
     CALL    map_to_curve_elligator2_curve25519  ; (r3, r7, r11, r8) = (xMn, xMd, yMn, 1)
-    CMPA    r7, 0
+    XORI    r30, r7, 0
     BRZ     ed25519_point_generate
 
 ; r0    tv1
@@ -41,7 +41,7 @@ ed25519_point_generate:
     SUBP        r11, r3,  r7        ; yn = xMn - xMd
     ADDP        r13, r3,  r7        ; yd = xMn + xMd    # (n / d - 1) / (n / d + 1) = (n - d) / (n + d)
     MUL25519    r0,  r12, r13       ; tv1 = xd * yd
-    CMPA        r0,  0              ; e = tv1 == 0
+    XORI        r30, r0,  0         ; e = tv1 == 0
     BRZ         ed25519_point_generate
     
     MUL25519    r10, r10, r13       ; x = xn * yd

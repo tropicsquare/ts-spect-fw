@@ -4,7 +4,7 @@ ca_ecdsa_exp_low .eq 0x0240
 ca_ecdsa_b .eq 0x0260
 ca_ecdsa_xG .eq 0x0280
 ca_ecdsa_yG .eq 0x02A0
-ca_eddsa_p .eq 0x02C0
+ca_p25519 .eq 0x02C0
 ca_eddsa_q .eq 0x02E0
 ca_eddsa_8q .eq 0x0300
 ca_eddsa_d .eq 0x0320
