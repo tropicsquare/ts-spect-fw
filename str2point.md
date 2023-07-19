@@ -409,4 +409,4 @@ E.g. `DST` for `ecdsa_sign` = `"54535F53504543545F445354000000000000000000000000
 
 ### Expand Message Function
 
-- `SHA512(EXP_TAG || m || 0x02 || DST || 0x1E)`
+- `SHA512(EXP_TAG || m || 0x20 || DST || 0x1E)`
