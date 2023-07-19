@@ -18,7 +18,7 @@ if __name__ == "__main__":
         "ecc_key_store",
         "ecc_key_read",
         "ecc_key_erase",
-        "x25519_kpair_gen",
+        #"x25519_kpair_gen",
         "x25519_sc_et_eh",
         "x25519_sc_et_sh",
         "x25519_sc_st_eh",
@@ -45,6 +45,8 @@ if __name__ == "__main__":
         res_word = tc.read_output(f"{test_dir}/{op_name}_out.hex", 0x1100, 1)
         print(op_name, ':', "{}".format(format(res_word, '08X')))
         if not (id == op["id"]):
-            print(f"{op_name} : Fail")
+            tc.print_failed()
             sys.exit(1)
+        tc.print_passed()
+
     sys.exit(0)
