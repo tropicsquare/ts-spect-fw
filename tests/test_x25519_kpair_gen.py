@@ -31,7 +31,7 @@ if __name__ == "__main__":
     x = tc.read_output(f"{test_dir}/{test_name}_out.hex", 0x1020, SPECT_OP_DATA_OUT_SIZE//4)
 
     if (not(ref == x)):
-        print("FAILED")
+        tc.print_failed()
     else:
         tc.print_passed()
 
