@@ -1,6 +1,7 @@
 .include mem_leyouts/mem_leyouts_includes.s
 .include spect_ops_constants.s
 .include spect_descriptors_constants.s
+.include l3_result_const.s
 .include spect_ops_status.s
 _start:
     LD      r0, ca_spect_cfg_word
@@ -60,10 +61,10 @@ op_sha512:
 ; ============================================================
 op_ecc_key:
     CMPI    r1, ecc_key_gen_id
-    BRZ     op_ecc_key_gen
+    BRZ     op_ecc_key_gen_store
 
     CMPI    r1, ecc_key_store_id
-    BRZ     op_ecc_key_store
+    BRZ     op_ecc_key_gen_store
 
     CMPI    r1, ecc_key_read_id
     BRZ     op_ecc_key_read

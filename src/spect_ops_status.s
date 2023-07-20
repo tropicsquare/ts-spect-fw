@@ -2,6 +2,7 @@ ret_op_success .eq 0x00
 ret_ctx_err .eq 0xf1
 ret_key_err .eq 0xf2
 ret_op_id_err .eq 0xf3
+ret_curve_type_err .eq 0xf4
 ret_x25519_err_inv_priv_key .eq 0x11
 ret_x25519_err_inv_pub_key .eq 0x12
 ret_ecdsa_err_inv_nonce .eq 0x21

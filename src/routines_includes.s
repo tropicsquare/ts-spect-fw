@@ -2,7 +2,7 @@
 ; Field Math
 ; ====================================================
 ;.include    field_math/inv_q256.s
-;.include    field_math/inv_p256.s
+.include    field_math/256/inv_p256.s
 .include    field_math/25519/inv_p25519.s
 .include    field_math/25519/sqrt_p25519.s
 
@@ -12,18 +12,21 @@
 
 ; .......... Ed25519 ..........
 
-;.include   ecc_math/ed25519/point_compress_ed25519.s
+.include   ecc_math/ed25519/point_compress_ed25519.s
 ;.include   ecc_math/ed25519/point_decompress_ed25519.s
-;.include   ecc_math/ed25519/point_add_ed25519.s
-;.include   ecc_math/ed25519/point_dbl_ed25519.s
-;.include   ecc_math/ed25519/spm_ed25519_short.s
+.include   ecc_math/ed25519/point_add_ed25519.s
+.include   ecc_math/ed25519/point_dbl_ed25519.s
+.include   ecc_math/ed25519/spm_ed25519_short.s
 ;.include   ecc_math/ed25519/spm_ed25519_long.s
+.include    ecc_math/ed25519/point_check_ed25519.s
 
 ; .......... P256 ..........
 
-;.include   ecc_math/p256/point_add_p256.s
-;.include   ecc_math/p256/point_dbl_p256.s
-;.include   ecc_math/p256/spm_p256.s
+.include   ecc_math/p256/point_add_p256.s
+.include   ecc_math/p256/point_dbl_p256.s
+.include   ecc_math/p256/spm_p256_short.s
+;.include   ecc_math/p256/spm_p256_long.s
+.include   ecc_math/p256/point_check_p256.s
 
 ; .......... Curve25519 ..........
 
@@ -49,7 +52,8 @@
 ; ECC Crypto
 ; ====================================================
 
-;.include   ecc_crypto/ecdsa_key_setup.s
+.include   ecc_crypto/p256_key_setup.s
+.include    ecc_crypto/ed25519_key_setup.s
 ;.include   ecc_crypto/ecdsa_sign.s
 ;.include   ecc_crypto/eddsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
