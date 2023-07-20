@@ -58,6 +58,14 @@ def get_res_word(test_dir, test_name):
     SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFF
     return SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE
 
+# ==========================================
+# TODO
+def set_key(key, type, slot, offset):
+    return 0
+
+def get_key(type, slot, offset):
+    return 0
+# ==========================================
 
 def break_on(cmd_file, bp):
     cmd_file.write(f"break {bp}\n")
