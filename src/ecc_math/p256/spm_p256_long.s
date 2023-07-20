@@ -19,13 +19,13 @@
 ;   (r9, r10, r11) -> Q0
 ;   r30 -> counter
 
-spm_p256:
+spm_p256_long:
     MOVI r9,  0 ;\
     MOVI r10, 1 ;|-> (r9, r10, r11) = Q0 = "point at infinity O"
     MOVI r11, 0 ;/
 
     MOVI r30, 256
-spm_p256_loop_511_256:
+spm_p256_long_loop_511_256:
     ROL r29, r29
 
     CSWAP r9,  r12
@@ -40,10 +40,10 @@ spm_p256_loop_511_256:
     CSWAP r11, r14
 
     SUBI r30, r30, 1
-    BRNZ spm_p256_loop_511_256
+    BRNZ spm_p256_long_loop_511_256
 
     MOVI r30, 256
-spm_p256_loop_255_0:
+spm_p256_long_loop_255_0:
     ROL r28, r28
 
     CSWAP r9,  r12
@@ -58,7 +58,7 @@ spm_p256_loop_255_0:
     CSWAP r11, r14
 
     SUBI r30, r30, 1
-    BRNZ spm_p256_loop_255_0
+    BRNZ spm_p256_long_loop_255_0
 
     RET
     

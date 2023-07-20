@@ -12,18 +12,18 @@
 ecdsa_sign:
     LD r26, ca_ecdsa_k
 
-    LD r31, ca_ecdsa_q
+    LD r31, ca_q256
     GRV r27
 
     SCB r28, r26, r27
 
     CALL inv_q256
 
-    LD r31, ca_ecdsa_p
-    LD r8, ca_ecdsa_b
+    LD r31, ca_p256
+    LD r8, ca_p256_b
 
-    LD r12, ca_ecdsa_xG
-    LD r13, ca_ecdsa_yG
+    LD r12, ca_p256_xG
+    LD r13, ca_p256_yG
     MOVI r14, 1
 
     CALL spm_p256
@@ -49,7 +49,7 @@ ecdsa_sign:
 
     ST r9, 0x1000
 
-    LD r31, ca_ecdsa_q
+    LD r31, ca_q256
     LD r24, ca_ecdsa_key
     LD r25, ca_ecdsa_msg_digest
 
