@@ -134,11 +134,12 @@ op_sha512_final .eq 0x88e8     ; Label
 op_sha512_init .eq 0x88b0     ; Label
 op_sha512_update .eq 0x88c4     ; Label
 op_x25519 .eq 0x80a0     ; Label
-op_x25519_kpair_gen .eq 0x8920     ; Label
-op_x25519_kpair_gen_dont_store .eq 0x895c     ; Label
-op_x25519_sc_et_eh .eq 0x8968     ; Label
-op_x25519_sc_et_sh .eq 0x8978     ; Label
-op_x25519_sc_st_eh .eq 0x8988     ; Label
+op_x25519_end .eq 0x8920     ; Label
+op_x25519_key_fail .eq 0x8928     ; Label
+op_x25519_kpair_gen .eq 0x8930     ; Label
+op_x25519_sc_et_eh .eq 0x8970     ; Label
+op_x25519_sc_et_sh .eq 0x8994     ; Label
+op_x25519_sc_st_eh .eq 0x89c4     ; Label
 point_add_curve25519 .eq 0x830c     ; Label
 point_check_curve25519 .eq 0x83d4     ; Label
 point_xadd_curve25519 .eq 0x8400     ; Label
