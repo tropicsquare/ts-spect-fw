@@ -24,15 +24,10 @@ if __name__ == "__main__":
     shpriv_scalar = models.x25519.int2scalar()
     shpub = models.x25519.x25519(shpriv_scalar, 9)
 
-    slot = rn.randint(0, 3)
-    tc.set_key(key=shpub, type=0x02, slot=slot)
-
     # calculate stpub a stpriv
     stpriv = rn.randint(0, 2**256-1)
     stpriv_scalar = models.x25519.int2scalar()
     stpub = models.x25519.x25519(stpriv_scalar, 9)
-
-    tc.set_key(key=stpriv, type=0x00, slot=slot)
 
 # ===================================================================================
 #   x25519_kpair_gen
@@ -103,6 +98,9 @@ if __name__ == "__main__":
 
     R2_ref = models.x25519.x25519(etpriv_scalar, shpub)
 
+    slot = rn.randint(0, 3)
+    tc.set_key(key=shpub, type=0x02, slot=slot, offset=0)
+
     tc.write_int32(cmd_file, slot, 0x0020)
 
     ctx = tc.run_op(cmd_file, "x25519_sc_et_sh", 0x0, 0x1, 1, ops_cfg, test_dir, old_context=ctx)
@@ -132,6 +130,8 @@ if __name__ == "__main__":
 
     R3_ref = models.x25519.x25519(stpriv_scalar, ehpub)
 
+    tc.set_key(key=stpriv, type=0x00, slot=slot, offset=0)
+
     ctx = tc.run_op(cmd_file, "x25519_sc_st_eh", 0x0, 0x1, 1, ops_cfg, test_dir, old_context=ctx)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, "x25519_sc_st_eh")
@@ -148,3 +148,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     tc.print_passed()
+    sys.exit(0)
