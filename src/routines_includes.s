@@ -13,7 +13,7 @@
 ; .......... Ed25519 ..........
 
 .include   ecc_math/ed25519/point_compress_ed25519.s
-;.include   ecc_math/ed25519/point_decompress_ed25519.s
+.include   ecc_math/ed25519/point_decompress_ed25519.s
 .include   ecc_math/ed25519/point_add_ed25519.s
 .include   ecc_math/ed25519/point_dbl_ed25519.s
 .include   ecc_math/ed25519/spm_ed25519_short.s
@@ -55,7 +55,7 @@
 .include   ecc_crypto/p256_key_setup.s
 .include    ecc_crypto/ed25519_key_setup.s
 ;.include   ecc_crypto/ecdsa_sign.s
-;.include   ecc_crypto/eddsa_verify.s
+.include   ecc_crypto/eddsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
 ;.include   ecc_crypto/x25519.s
 

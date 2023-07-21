@@ -52,7 +52,7 @@ bp_eddsa_verify_sxb:
     SWE         r28, r28
     SWE         r29, R29
 bp_eddsa_verify_after_hram:
-    LD          r31, ca_eddsa_q
+    LD          r31, ca_q25519
     REDP        r28, r28, r29
 
     ; Decompress ENC(A)
@@ -93,24 +93,26 @@ bp_eddsa_verify_exa:
     ; ENC(Q)
     CALL        point_compress_ed25519
 
+    MOVI        r0,  ret_op_success
+    MOVI        r1,  1
 bp_eddsa_verify_encq:
     ; ENC(Q) == ENC(R)
-    LD          r31, ca_ffff
-    SUBP        r0,  r27, r8
 .ifdef SPECT_ISA_VERSION_1
-    CMPA        r0,  0
+    LD          r31, ca_ffff
+    SUBP        r2,  r27, r8
+    CMPA        r2,  0
 .endif
 .ifdef SPECT_ISA_VERSION_2
     MOVI        r30, 0
-    XOR         r0, r0, r30
+    XOR         r2,  r27, r8
 .endif
     BRZ         eddsa_verify_success
 eddsa_verify_fail:
-    MOVI        r0,  0
-    ST          r0,  eddsa_verify_output_result
-    END
+    MOVI        r2,  0
+    ST          r2,  eddsa_verify_output_result
+    JMP         set_res_word
 
 eddsa_verify_success:
-    MOVI        r0,  1
-    ST          r0,  eddsa_verify_output_result
-    END
+    MOVI        r2,  1
+    ST          r2,  eddsa_verify_output_result
+    JMP         set_res_word
