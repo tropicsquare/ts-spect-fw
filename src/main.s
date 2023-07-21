@@ -194,6 +194,7 @@ get_input_base:
 get_output_base:
     LD      r0, ca_spect_cfg_word
     MOVI    r1, 0xF0
+    ROL8    r1, r1
     LSL     r0, r0
     LSL     r0, r0
     LSL     r0, r0
