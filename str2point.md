@@ -6,14 +6,13 @@ This is a summary of algorithms used in SPECT firmware to encode an arbitrary st
 
 ### Use of domain separation for the encoding.
 
-- ECDSA vs. EdDSA vs. X25519
-- Generate / Store / Sign
+- ECDSA / EdDSA / X25519
 - Different for each op withing secure channel establishment
 
 Rationale: https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#name-domain-separation-requireme
 
-Domain separation tag (DST) requirements:
-- Tags MUST be supplied as the DST parameter to hash_to_field, as described in Section 5.
+#### Domain separation tag (DST) requirements:
+- Tags MUST be supplied as the DST parameter to hash_to_field.
 - Tags MUST have nonzero length. A minimum length of 16 bytes is RECOMMENDED to reduce the chance of collisions with other applications.
 - Tags SHOULD begin with a fixed identification string that is unique to the application.
 - Tags SHOULD include a version number.
@@ -48,8 +47,8 @@ CMOV(a, b, c): If c is False, CMOV returns a, otherwise it returns b.
 
 ### is_square
 ```
-is_square(x) := { True,  if x^((q - 1) / 2) is 0 or 1 in F;
-                   { False, otherwise.
+is_square(x) := { True,  iff x^((p - 1) / 2) is 0 or 1 in GF(p);
+                { False, otherwise.
 ```
 
 ### expand message
@@ -83,7 +82,7 @@ the resulting string for SHA512 **with padding** is:
 
 ## Hashing to a finite field
 
-The hash_to_field function hashes a byte string msg of arbitrary length into one or more elements of a field F. The function uses DST to separate different contexts of its use.
+The hash_to_field function hashes a byte string msg of arbitrary length into one or more elements of a field GF(p). The function uses DST to separate different contexts of its use.
 
 ```
 hash_to_field(msg)
@@ -108,7 +107,7 @@ return x mod p
 
 `(x, y) = map_to_curve(u)`
 
-A mapping is a deterministic function from an element of the field F to a point on an elliptic curve E defined over F. In general, the set of all points that a mapping can produce over all possible inputs may be only a subset of the points on an elliptic curve (i.e., the mapping may not be surjective). In addition, a mapping may output the same point for two or more distinct inputs (i.e., the mapping may not be injective). In general, the result of mapping is not uniform random point.
+A mapping is a deterministic function from an element of the field F to a point on an elliptic curve E defined over GF(p). In general, the set of all points that a mapping can produce over all possible inputs may be only a subset of the points on the elliptic curve (i.e., the mapping may not be surjective). In addition, a mapping may output the same point for two or more distinct inputs (i.e., the mapping may not be injective). In general, the result of mapping is not uniform random point.
 
 ### Weierstrass Curve
 
@@ -123,11 +122,11 @@ A mapping is a deterministic function from an element of the field F to a point 
 ```
 A and B, the parameters of the Weierstrass curve.
 
-Z, an element of F meeting the below criteria.
+Z, an element of GF(p) meeting the below criteria.
 
-    Z is non-square in F,
-    Z != -1 in F,
-    g(B / (Z * A)) is square in F.
+    Z is non-square in GF(p),
+    Z != -1 in GF(p),
+    g(B / (Z * A)) is square in GF(p).
 ```
 
 For NIST P-256 the recommended `Z` is -10
@@ -141,7 +140,7 @@ The exceptional cases for u occur when `Z^2 * u^4 + Z * u^2 == 0`. Implementatio
 **map_to_curve_simple_swu(u)**
 
 ```
-Input: u, an element of F.
+Input: u, an element of GF(p).
 Output: (x, y), a point on E.
 
 Steps:
@@ -177,13 +176,13 @@ Steps:
 
 ```
 Parameters:
-- F, a finite field of characteristic p and order q = p^m,
+- GF(p), a finite field of characteristic p and order q = p^m,
   where q = 3 mod 4.
 - Z, the constant from the simplified SWU map.
 
-Input: u and v, elements of F, where v != 0.
+Input: u and v, elements of GF(p), where v != 0.
 Output: (b, y), where
-  b = True and y = sqrt(u / v) if (u / v) is square in F, and
+  b = True and y = sqrt(u / v) if (u / v) is square in GF(p), and
   b = False and y = sqrt(Z * (u / v)) otherwise.
 
 Constants:
@@ -231,7 +230,7 @@ No exceptions for `p = 2^255 - 19` in case of Curve25519
 **map_to_curve_elligator2_curve25519(u)**
 
 ```
-Input: u, an element of F.
+Input: u, an element of GF(p).
 Output: (xn, xd, yn, yd) such that (xn / xd, yn / yd) is a
         point on curve25519.
 
@@ -296,7 +295,7 @@ Reuse of mapping to related Montgomery Curve and then applying rational mapping.
 **map_to_curve_elligator2_edwards25519(u)**
 
 ```
-Input: u, an element of F.
+Input: u, an element of GF(p).
 Output: (xn, xd, yn, yd) such that (xn / xd, yn / yd) is a
         point on edwards25519.
 
@@ -327,13 +326,13 @@ Steps:
 sqrt_5mod8(x)
 
 Parameters:
-- F, a finite field of characteristic p and order q = p^m.
+- GF(p), a finite field of characteristic p and order q = p^m.
 
-Input: x, an element of F.
-Output: z, an element of F such that (z^2) == x, if x is square in F.
+Input: x, an element of GF(p).
+Output: z, an element of GF(p) such that (z^2) == x, if x is square in GF(p).
 
 Constants:
-1. c1 = sqrt(-1) in F, i.e., (c1^2) == -1 in F
+1. c1 = sqrt(-1) in GF(p), i.e., (c1^2) == -1 in GF(p)
 2. c2 = (q + 3) / 8     # Integer arithmetic
 
 Procedure:
@@ -350,10 +349,10 @@ Procedure:
 sqrt_3mod4(x)
 
 Parameters:
-- F, a finite field of characteristic p and order q = p^m.
+- GF(p), a finite field of characteristic p and order q = p^m.
 
-Input: x, an element of F.
-Output: z, an element of F such that (z^2) == x, if x is square in F.
+Input: x, an element of GF(p).
+Output: z, an element of GF(p) such that (z^2) == x, if x is square in GF(p).
 
 Constants:
 1. c1 = (q + 1) / 4     # Integer arithmetic
@@ -373,7 +372,7 @@ Procedure:
 1. Get 256-bit random value m from TRNG.
 2. Represent m as big-endian encoded integer: 0x1234 = "1234"
 3. Use hash_to_field(m) to hash m to an element u in the finite field of the current curve.
-3. Use one of the methods to map the element u to a point on desired curve.
+4. Use one of the methods to map the element u to a point on desired curve.
 
 ```
 
@@ -391,10 +390,7 @@ Expand message tag (`EXP_TAG`) is 32-byte string used to separate use of random 
 
 Domain Separation Tag `DST` is 30-byte string used to separate use of random point generation in different contexts, e.g. different SPECT command.
 
-`DTS` for all use-cases have the same prefix `"TS_SPECT_DST"` = `"54535F53504543545F445354"` padded with zero bytes. The last byte (`DST[29]`) is following:
-
-- `ecc_key_gen/store`, `CURVE = P256` : `0xD1`
-- `ecc_key_gen/store`, `CURVE = Ed25519` : `0xD2`
+`DTS` for all use-cases have the same prefix `"TS_SPECT_DST"` = `"54535F53504543545F445354"` followed by version and padded with zero bytes. The last byte (`DST[29]`) is following:
 
 - `x25519_kpair_gen` : `0xD3`
 - `x25519_sc_et_eh` : `0xD4`
@@ -405,7 +401,7 @@ Domain Separation Tag `DST` is 30-byte string used to separate use of random poi
 
 - `ecdsa_sign` : `0xD8`
 
-E.g. `DST` for `ecdsa_sign` = `"54535F53504543545F4453540000000000000000000000000000000000D8"`
+E.g. `DST` for `ecdsa_sign`, version `0x01 = `"54535F53504543545F4453540100000000000000000000000000000000D8"`
 
 ### Expand Message Function
 
