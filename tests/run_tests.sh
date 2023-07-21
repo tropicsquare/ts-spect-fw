@@ -1,17 +1,23 @@
 #! /bin/bash
 
-tests=("cmd_decode" "sha512" "x25519_kpair_gen" )
+echo "*************************************************" 
+echo "  Compile Firmware"
+echo "*************************************************" 
+cd ..
+make compile
+cd tests
+
+tests=("sha512" "x25519_kpair_gen" "eddsa_verify")
 
 declare -i ret_val=0
 
 for test in ${tests[@]}; do
-    echo "Running test $test"
+    echo "*************************************************" 
+    echo "  Running test $test"
+    echo "*************************************************" 
     ./test_$test.py
-    if [ $? -eq 0 ]; then
-        echo "Test $test passed"
-    else
+    if [ $? -ne 0 ]; then
         ret_val=$((ret_val + 1))
-        echo "Test $test failed"
     fi
 done
 

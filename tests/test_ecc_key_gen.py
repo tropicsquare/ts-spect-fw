@@ -15,7 +15,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
 
     run_name = f"ecc_key_gen_{run_id}"
 
-    print("\033[94m{}\033[00m".format(f"running {run_name}"))
+    tc.print_run_name(run_name)
 
     rng = [rn.randint(0, 2**256-1) for i in range(8)]
     tc.set_rng(test_dir, rng)

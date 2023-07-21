@@ -12,6 +12,9 @@ def print_passed():
 def print_failed():
     print("\033[91m{}\033[00m".format("FAILED"))
 
+def print_run_name(run_name: str):
+    print("\033[94m{}\033[00m".format(f"running {run_name}"))
+
 def find_in_list (name: str, l: list) -> dict:
     for item in l:
         if item["name"] == name:
@@ -86,6 +89,9 @@ def write_string(cmd_file, s: str, addr):
     for w in range(len(val)):
         write_int32(cmd_file, val[w], addr+(w*4))
 
+def write_bytes(cmd_file, b: bytes, addr):
+    write_string(cmd_file, b.hex(), addr)
+
 def set_rng(test_dir: str, rng: list):
     with open(f"{test_dir}/rng.hex", mode='w') as rng_hex:
         for r in rng:
@@ -125,7 +131,7 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     run_log = run_name+"_iss.log"
 
     cmd = iss
-    cmd += f" --program={TS_REPO_ROOT}/src/main.s"
+    cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
     cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={TS_REPO_ROOT}/data/const_rom.hex"
     cmd += f" --grv-hex={test_dir}/rng.hex"
