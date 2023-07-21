@@ -52,8 +52,8 @@ def exit(cmd_file):
 def set_cfg_word(cmd_file, cfg_word):
     cmd_file.write("set mem[0x0100] 0x{}\n".format(format(cfg_word, '08X')))
 
-def get_res_word(test_dir, test_name):
-    res_word = read_output(f"{test_dir}/{test_name}_out.hex", 0x1100, 1)
+def get_res_word(test_dir, run_name):
+    res_word = read_output(test_dir, run_name, 0x1100, 1)
     SPECT_OP_STATUS = res_word & 0xFF
     SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFF
     return SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE
@@ -92,10 +92,18 @@ def set_rng(test_dir: str, rng: list):
             for i in range(8):
                 rng_hex.write(format((r >> i*32) & 0xffffffff, '08X') + "\n")
 
-def read_output(output_file: str, addr: int, count: int) -> int:
+def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
+    mem = addr & 0xF000
+    if mem == 0x1000:
+        output_file = f"{test_dir}/{run_name}_out.hex"
+    elif mem == 0x5000:
+        output_file = f"{test_dir}/{run_name}_emem_out.hex"
+    else:
+        raise Exception(f"Address {addr} is invalid output address!")
+
     with open(output_file, mode='r') as out:
         data = out.read().split('\n')
-        idx = (addr - 0x1000) // 4
+        idx = (addr - mem) // 4
         val = 0
         for i in range(count):
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
@@ -117,14 +125,13 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
 
-    print(f"running {run_name}")
-
     cmd = iss
     cmd += f" --program={fw_dir}/src/main.s"
     cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={fw_dir}/data/const_rom.hex"
     cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
+    cmd += f" --emem-out={test_dir}/{run_name}_emem_out.hex"
     if old_context:
         cmd += f" --load-context={test_dir}/{old_context}"
     cmd += f" --dump-context={test_dir}/{new_context}"
