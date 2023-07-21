@@ -52,9 +52,9 @@ p256_key_setup_tmac_padding_loop:
     LD      r13, ca_p256_yG
     MOVI    r14, 1
 
-    MOV     r9,  r11
-    MOV     r10, r12
-    MOV     r11, r13
+    MOV     r9,  r12
+    MOV     r10, r13
+    MOV     r11, r14
 
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail
