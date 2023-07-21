@@ -4,7 +4,7 @@ import os
 import sys
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
-OPS_CONFIG = TS_REPO_ROOT+"/spect_fw/spect_ops_config.yml"
+OPS_CONFIG = TS_REPO_ROOT+"/spect_ops_config.yml"
 
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
@@ -31,7 +31,7 @@ def get_ops_config():
     return ops_cfg
 
 def make_test_dir(test_name):
-    test_dir = TS_REPO_ROOT+"/spect_fw/tests/test_"+test_name
+    test_dir = TS_REPO_ROOT+"/tests/test_"+test_name
     os.system(f"rm -rf {test_dir}")
     os.system(f"mkdir {test_dir}")
     return test_dir
@@ -117,8 +117,7 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     exit(cmd_file)
     cmd_file.close()
 
-    fw_dir = TS_REPO_ROOT + "/spect_fw"
-    iss = TS_REPO_ROOT + "/compiler/build/src/apps/spect_iss"
+    iss = "spect_iss"
     run_name = op_name
     if run_id >= 0:
         run_name += f"_{run_id}"
@@ -126,9 +125,9 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     run_log = run_name+"_iss.log"
 
     cmd = iss
-    cmd += f" --program={fw_dir}/src/main.s"
+    cmd += f" --program={TS_REPO_ROOT}/src/main.s"
     cmd += f" --first-address=0x8000"
-    cmd += f" --const-rom={fw_dir}/data/const_rom.hex"
+    cmd += f" --const-rom={TS_REPO_ROOT}/data/const_rom.hex"
     cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --emem-out={test_dir}/{run_name}_emem_out.hex"

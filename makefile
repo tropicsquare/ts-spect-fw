@@ -1,36 +1,32 @@
-FW_DIR = ${TS_REPO_ROOT}/spect_fw
-SRC_DIR = ${FW_DIR}/src
-FIT_DIR = ${FW_DIR}/fit
-BUILD_DIR = ${FW_DIR}/build
-TEST_DIR = ${BUILD_DIR}/build
+SRC_DIR = ${TS_REPO_ROOT}/src
+FIT_DIR = ${TS_REPO_ROOT}/fit
+BUILD_DIR = ${TS_REPO_ROOT}/build
+RELEASE_DIR = ${TS_REPO_ROOT}/release
 
-COMPILER = ${TS_REPO_ROOT}/compiler/build/src/apps/spect_compiler
-ISS = ${TS_REPO_ROOT}/compiler/build/src/apps/spect_iss
+COMPILER = spect_compiler
+ISS = spect_iss
 
 MEM_GEN = ${TS_REPO_ROOT}/scripts/gen_mem_files.py
-RNG_GEN = ${TS_REPO_ROOT}/scripts/gen_rng_hex.py
-
-RELEASE_DIR = release
+OPS_GEN = ${TS_REPO_ROOT}/scripts/gen_spect_ops_constants.py
 
 FW_BASE_ADDR = 0x8000
 
-TEST = dummy
+clear:
+	rm -rf ${TS_REPO_ROOT}/build
+	mkdir ${TS_REPO_ROOT}/build
 
 const_rom:
-	${MEM_GEN} ${FW_DIR}/data/const_rom_config.yml
-	mv ${FW_DIR}/data/const_rom_leyout.s ${SRC_DIR}/mem_leyouts/const_rom_leyout.s
+	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
+	mv ${TS_REPO_ROOT}/data/const_rom_leyout.s ${SRC_DIR}/mem_leyouts/const_rom_leyout.s
 
 data_ram_in_const:
-	${MEM_GEN} ${FW_DIR}/data/data_ram_in_const_config.yml
-	mv ${FW_DIR}/data/data_ram_in_const_leyout.s ${SRC_DIR}/mem_leyouts/data_ram_in_const_leyout.s
-
-rng:
-	${RNG_GEN} ${FW_DIR}/data/rng_data.yml
+	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
+	mv ${TS_REPO_ROOT}/data/data_ram_in_const_leyout.s ${SRC_DIR}/mem_leyouts/data_ram_in_const_leyout.s
 
 ops_constants:
-	${FW_DIR}/gen_spect_ops_constants.py ${FW_DIR}/spect_ops_config.yml
+	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
 
-compile: const_rom ops_constants
+compile: clear const_rom ops_constants
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--dump-program=${BUILD_DIR}/program_dump.s \
@@ -38,9 +34,9 @@ compile: const_rom ops_constants
 	${SRC_DIR}/main.s > ${BUILD_DIR}/compile.log
 
 release: data_ram_in_const ops_constants
-	rm -rf ${FW_DIR}/${RELEASE_DIR}
-	mkdir ${FW_DIR}/${RELEASE_DIR}
-	mv ${FW_DIR}/data/data_ram_in_const.hex ${RELEASE_DIR}/data_ram_in_const.hex
+	rm -rf ${TS_REPO_ROOT}/${RELEASE_DIR}
+	mkdir ${TS_REPO_ROOT}/${RELEASE_DIR}
+	mv ${TS_REPO_ROOT}/data/data_ram_in_const.hex ${RELEASE_DIR}/data_ram_in_const.hex
 	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--dump-program=${RELEASE_DIR}/program_dump.s \
@@ -50,9 +46,9 @@ release: data_ram_in_const ops_constants
 fit_sources = x25519_nomask x25519_scalar_mask x25519_z_mask x25519_z_scalar_mask
 
 release_fit: data_ram_in_const
-	${MEM_GEN} ${FW_DIR}/data/data_ram_in_const_config.yml
-	mv ${FW_DIR}/data/data_ram_in_const_leyout.s ${FIT_DIR}/data_ram_in_const_leyout.s
-	mv ${FW_DIR}/data/data_ram_in_const.hex ${FIT_DIR}/data_ram_in_const.hex
+	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
+	mv ${TS_REPO_ROOT}/data/data_ram_in_const_leyout.s ${FIT_DIR}/data_ram_in_const_leyout.s
+	mv ${TS_REPO_ROOT}/data/data_ram_in_const.hex ${FIT_DIR}/data_ram_in_const.hex
 	$(foreach src, ${fit_sources}, ${COMPILER} --hex-format=1 --hex-file=${FIT_DIR}/${src}.hex --first-address=${FW_BASE_ADDR} ${FIT_DIR}/${src}.s > ${FIT_DIR}/log/${src}.compile.log;)
 
 fit_test_data:

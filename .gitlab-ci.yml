@@ -1,0 +1,17 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - test
+
+###################################################################################################
+# Run tests
+###################################################################################################
+run_test:
+  stage: test
+  tags:
+    - shell
+  script:
+    - source ./setup_env
+    - cd tests
+    - ./run_tests.sh
