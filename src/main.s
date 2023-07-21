@@ -137,10 +137,6 @@ op_ecdsa:
 ; ============================================================
 
 
-next_cmd_4:
-    CMPI r0, eddsa_key_gen_id
-
-
 ; ============================================================
 ; Curve25519 Random Point Generation
 ;next_cmd_4:
@@ -173,13 +169,7 @@ next_cmd_4:
 ; ============================================================
 
 invalid_op_id:
-    MOVI    r30, ret_op_id_err
-    ST      r30, ca_op_status
-__end__:
-    ST      r30, 0x1000
-    ROL8    r0, r0
-    ROL8    r0, r0
-    OR      r0, r0, r1
+    MOVI    r0, ret_op_id_err
     ST      r0, ca_spect_res_word
 
 ; ============================================================
@@ -222,34 +212,4 @@ set_res_word:
     ST      r0, ca_spect_res_word
     END
 
-;.include    field_math/inv_q256.s
-;.include    field_math/inv_p256.s
-.include    field_math/inv_p25519.s
-
-.include    ecc_math/point_compress_ed25519.s
-.include    ecc_math/point_decompress_ed25519.s
-;.include    ecc_math/point_add_p256.s
-;.include    ecc_math/point_dbl_p256.s
-.include    ecc_math/point_add_ed25519.s
-.include    ecc_math/point_dbl_ed25519.s
-;.include    ecc_math/spm_p256.s
-.include    ecc_math/spm_ed25519_short.s
-
-;.include    ecc_point_generation/hash_to_field_p25519.s
-;.include    ecc_point_generation/map_to_curve_elligator2_curve25519.s
-;.include    ecc_point_generation/point_generate_curve25519.s
-;.include    ecc_point_generation/point_generate_ed25519.s
-;.include    ecc_point_generation/compose_exp_tag.s
-
-;.include    ecc_crypto/ecdsa_key_setup.s
-;.include    ecc_crypto/ecdsa_sign.s
-;.include    ecc_crypto/x25519.s
-;.include    ecc_crypto/eddsa_verify.s
-
-;.include    ops/sha512_routines.s
-
-.include    ops/sha512_ops.s
-.include    ops/ecc_key_ops.s
-.include    ops/x25519_ops.s
-.include    ops/eddsa_ops.s
-.include    ops/ecdsa_ops.s
+.include    routines_includes.s
