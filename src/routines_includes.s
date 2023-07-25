@@ -25,7 +25,8 @@
 .include   ecc_math/p256/point_add_p256.s
 .include   ecc_math/p256/point_dbl_p256.s
 .include   ecc_math/p256/spm_p256_short.s
-;.include   ecc_math/p256/spm_p256_long.s
+.include   ecc_math/p256/spm_p256_long.s
+.include   ecc_math/p256/spm_p256_full_masked.s
 .include   ecc_math/p256/point_check_p256.s
 
 ; .......... Curve25519 ..........
@@ -43,10 +44,14 @@
 ; ====================================================
 
 .include    ecc_point_generation/compose_exp_tag.s
-.include    ecc_point_generation/hash_to_field_p25519.s
+.include    ecc_point_generation/hash_to_field.s
 .include    ecc_point_generation/map_to_curve_elligator2_curve25519.s
 .include    ecc_point_generation/point_generate_curve25519.s
 ;.include    ecc_point_generation/point_generate_ed25519.s
+.include    ecc_point_generation/sqrt_ratio_3mod4.s
+.include    ecc_point_generation/map_to_curve_simple_swu.s
+.include    ecc_point_generation/point_generate_p256.s
+
 
 ; ====================================================
 ; ECC Crypto

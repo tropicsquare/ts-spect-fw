@@ -14,9 +14,9 @@
 ;   a, an element of GF(2^255 - 19) in r0
 ; 
 ; Expects:
-;   2^255 - 19 in r31
+;   p in r31
 
-hash_to_field_p25519:
+hash_to_field:
     CALL    compose_exp_tag
     MOVI    r0,  0x601
     ROR     r0,  r0
