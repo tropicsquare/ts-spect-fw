@@ -16,10 +16,16 @@ for op in cfg:
     cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_id", format(op["id"], '02X')))
     if "input" in op.keys() and op["input"]:
         for input in op["input"]:
-            cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_input_"+input["name"], format(input["address"], 'X')))
+            addr = input["address"]
+            if "base" in input.keys() and input["base"]:
+                addr += input["base"]
+            cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_input_"+input["name"], format(addr, 'X')))
     if "output" in op.keys() and op["output"]:
         for output in op["output"]:
-            cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_output_"+output["name"], format(output["address"], 'X')))
+            addr = output["address"]
+            if "base" in output.keys() and output["base"]:
+                addr += output["base"]
+            cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_output_"+output["name"], format(addr, 'X')))
     if "context" in op.keys() and op["context"]:
         for context in op["context"]:
             cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_context_"+context["name"], format(context["address"], 'X')))
