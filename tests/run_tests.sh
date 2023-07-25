@@ -7,7 +7,7 @@ cd ..
 make compile
 cd tests
 
-tests=("sha512" "x25519_kpair_gen" "eddsa_verify")
+tests=("sha512" "x25519_full_sc" ecc_key_gen "eddsa_verify")
 
 declare -i ret_val=0
 

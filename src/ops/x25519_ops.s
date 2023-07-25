@@ -80,6 +80,14 @@ op_x25519_sc_st_eh:
     KBO     r1, 0x005
     BRE     op_x25519_key_fail
 
+    MOVI    r0,  7
+    MOVI    r1,  255
+    SBIT    r0,  r0, r1
+    NOT     r0,  r0
+    AND     r19, r0, r19
+    MOVI    r1,  254
+    SBIT    r19, r19, r1
+
     MOVI    r20, 0xD6
 
     CALL    x25519_full_masked

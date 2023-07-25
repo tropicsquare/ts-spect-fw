@@ -87,7 +87,9 @@ def parse_key_mem(test_dir, run_name):
     return kmem_array
 
 def set_key(cmd_file, key, ktype, slot, offset):
-    cmd_file.write("set keymem[{}][{}][{}] {}\n".format(ktype, slot, offset, key))
+    val = [(key >> i*32) & 0xFFFFFFFF for i in range(8)]
+    for w in range(len(val)):
+        cmd_file.write("set keymem[{}][{}][{}] {}\n".format(ktype, slot, offset+w, val[w]))
 
 def get_key(kmem_array, ktype, slot, offset) -> int:
     val = 0
@@ -103,7 +105,7 @@ def write_int32(cmd_file, x: int, addr):
     cmd_file.write("set mem[0x{}] 0x{}\n".format(format(addr, '04X'), format(x, '08X')))
 
 def write_int256(cmd_file, x: int, addr):
-    val = [(x >> i*32) & 0xFFFFFFFF for i in range(0)]
+    val = [(x >> i*32) & 0xFFFFFFFF for i in range(8)]
     for w in range(len(val)):
         write_int32(cmd_file, val[w], addr+(w*4))
 
@@ -141,7 +143,7 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
         return val
     
-def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, run_id=-1, old_context=None, keymem=None):
+def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, run_name=None, old_context=None, keymem=None):
     op = find_in_list(op_name, ops_cfg)
     cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (data_in_size << 16)
     set_cfg_word(cmd_file, cfg_word)
@@ -150,9 +152,8 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     cmd_file.close()
 
     iss = "spect_iss"
-    run_name = op_name
-    if run_id >= 0:
-        run_name += f"_{run_id}"
+    if not run_name:
+        run_name = op_name
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
 

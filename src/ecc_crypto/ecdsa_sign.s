@@ -26,7 +26,7 @@ ecdsa_sign:
     LD r13, ca_p256_yG
     MOVI r14, 1
 
-    CALL spm_p256
+    CALL spm_p256_full_masked
     MOV r1, r11
     CALL inv_p256
     MUL256 r9, r9, r1

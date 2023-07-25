@@ -30,7 +30,8 @@ p256_key_setup:
 
 .ifdef SPECT_ISA_VERSION_2
     TMAC_IT r0
-    TMAC_IS r16, 0xA
+    SWE     r20, r19
+    TMAC_IS r20, 0xA
 
     MOVI    r2,  0x04
     MOVI    r30, 17
@@ -38,6 +39,7 @@ p256_key_setup_tmac_padding_loop:
     ROL8    r2,  r2
     SUBI    r30, r30, 1
     BRNZ    p256_key_setup_tmac_padding_loop
+    ORI     r2, r2, 0x80
 
     TMAC_UP r2
     TMAC_RD r29
@@ -83,9 +85,9 @@ p256_key_setup_tmac_padding_loop:
     STK         r20, r26, 0x400     ; store metadata
     BRE         p256_key_setup_fail
     ; Store the pubkey to key slot
-    STK         r9,  r26, 0x400     ; store Ax
+    STK         r9,  r26, 0x401     ; store Ax
     BRE         p256_key_setup_fail
-    STK         r10, r26, 0x400     ; store Ay
+    STK         r10, r26, 0x402     ; store Ay
     BRE         p256_key_setup_fail
     
     KBO         r26, 0x402          ; program

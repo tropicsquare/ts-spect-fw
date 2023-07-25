@@ -99,12 +99,11 @@ bp_eddsa_verify_encq:
     ; ENC(Q) == ENC(R)
 .ifdef SPECT_ISA_VERSION_1
     LD          r31, ca_ffff
-    SUBP        r2,  r27, r8
+    SUBP        r2,  r23, r8
     CMPA        r2,  0
 .endif
 .ifdef SPECT_ISA_VERSION_2
-    MOVI        r30, 0
-    XOR         r2,  r27, r8
+    XOR         r2,  r23, r8
 .endif
     BRZ         eddsa_verify_success
 eddsa_verify_fail:

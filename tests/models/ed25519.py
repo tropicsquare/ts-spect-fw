@@ -90,7 +90,6 @@ def point_compress(P):
     zinv = modp_inv(P[2])
     x = P[0] * zinv % p
     y = P[1] * zinv % p
-    print(hex(x), hex(y))
     return int.to_bytes(y | ((x & 1) << 255), 32, "little")
 
 def point_decompress(s):

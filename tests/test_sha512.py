@@ -41,7 +41,8 @@ if __name__ == "__main__":
         cmd_file = tc.get_cmd_file(test_dir)
         tc.start(cmd_file)
         tc.write_bytes(cmd_file, m_blocks[i], 0x0010)
-        ctx = tc.run_op(cmd_file, "sha512_update", 0x0, 0x1, 128, ops_cfg, test_dir, run_id=i, old_context=ctx)
+        run_name = "sha512_update" + f"_{i}"
+        ctx = tc.run_op(cmd_file, "sha512_update", 0x0, 0x1, 128, ops_cfg, test_dir, run_name, old_context=ctx)
 
     tc.print_run_name("sha512_final")
     cmd_file = tc.get_cmd_file(test_dir)
