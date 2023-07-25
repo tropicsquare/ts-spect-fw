@@ -18,20 +18,23 @@ ed25519_key_setup:
     ROR         r18, r18
     MOVI        r17, 0
     MOVI        r16, 256
+    SWE         r19, r19
     ; H = SHA512(k)
     HASH_IT
     HASH        r28, r16
     ; Mask H[255:0] to become scalar s
+    SWE         r29, r29
     MOVI        r0,  7
     MOVI        r1,  255
     SBIT        r0,  r0, r1
     NOT         r0,  r0
-    AND         r28, r0, r28
+    AND         r29, r0, r29
     MOVI        r1,  254
-    SBIT        r28, r28, r1
+    SBIT        r29, r29, r1
 
-    ST          r28, ca_ed25519_key_setup_internal_s
-    ST          r29, ca_ed25519_key_setup_internal_prefix
+    ST          r29, ca_ed25519_key_setup_internal_s
+    ST          r28, ca_ed25519_key_setup_internal_prefix
+    MOV         r28, r29
 
     ; Load base point G and check its validity
     LD          r31, ca_p25519
@@ -67,7 +70,7 @@ ed25519_key_setup:
     STK         r9,  r26, 0x400     ; store metadata
     BRE         ed25519_key_setup_kbus_fail
     ; Store the pubkey to key slot
-    STK         r8,  r26, 0x400     ; store A
+    STK         r8,  r26, 0x401     ; store A
     BRE         ed25519_key_setup_kbus_fail
     
     KBO         r26, 0x402          ; program

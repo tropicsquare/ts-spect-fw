@@ -70,8 +70,8 @@ eddsa_verify_input_message1 .eq 0xA0
 eddsa_verify_output_result .eq 0x1000
 ; ecdsa
 ecdsa_id .eq 0x70
-ecdsa_input_result .eq 0x0
 ecdsa_input_message .eq 0x10
+ecdsa_output_result .eq 0x0
 ; ecdsa_sign
 ecdsa_sign_id .eq 0x70
 ecdsa_sign_input_sch .eq 0xA0

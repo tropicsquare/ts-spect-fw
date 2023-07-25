@@ -20,6 +20,8 @@ data:
     value : 0x3fffffffc00000004000000000000000000000003fffffffffffffffffffffff
   - name : ca_p256_c2
     value : 0xda538e3be1d89b99c978fc675180aab27b8d1ff84c55d5b62ccd3427e433c47f
+  - name : ca_p256_Z
+    value : 0xffffffff00000001000000000000000000000000fffffffffffffffffffffff5
   - name : ca_p25519
     value : 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed
   - name : ca_q25519

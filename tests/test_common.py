@@ -2,6 +2,7 @@ import yaml
 import binascii
 import os
 import sys
+import numpy as np
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 OPS_CONFIG = TS_REPO_ROOT+"/spect_ops_config.yml"
@@ -61,14 +62,39 @@ def get_res_word(test_dir, run_name):
     SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFF
     return SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE
 
-# ==========================================
-# TODO
-def set_key(key, type, slot, offset):
-    return 0
+def parse_key_mem(test_dir, run_name):
+    kmem_file = f"{test_dir}/{run_name}_keymem.hex"
+    kmem_array = np.empty(shape=(16, 256, 256), dtype='uint32')
+    with open(kmem_file, 'r') as km_file:
+        data = km_file.read().split('\n')
+        ktype = 0
+        slot = 0
+        offset = 0
+        for line in data[3:]:
+            if not line:
+                continue
+            if line[0] == '*':
+                continue
+            if line[0] == 'T':
+                ls = line.split(' ')
+                ktype = int(ls[1])
+                slot = int(ls[3])
+                offset = 0
+                continue
+            d = int.from_bytes(binascii.unhexlify(line), 'big')
+            kmem_array[ktype][slot][offset] = d
+            offset += 1
+    return kmem_array
 
-def get_key(type, slot, offset):
-    return 0
-# ==========================================
+def set_key(cmd_file, key, ktype, slot, offset):
+    cmd_file.write("set keymem[{}][{}][{}] {}\n".format(ktype, slot, offset, key))
+
+def get_key(kmem_array, ktype, slot, offset) -> int:
+    val = 0
+    for i in range(8):
+        w = kmem_array[ktype][slot][offset+i]
+        val += (int(w) << (i*32))
+    return val
 
 def break_on(cmd_file, bp):
     cmd_file.write(f"break {bp}\n")
@@ -115,7 +141,7 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
         return val
     
-def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, run_id=-1, old_context=None):
+def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, run_id=-1, old_context=None, keymem=None):
     op = find_in_list(op_name, ops_cfg)
     cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (data_in_size << 16)
     set_cfg_word(cmd_file, cfg_word)
@@ -137,6 +163,9 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --emem-out={test_dir}/{run_name}_emem_out.hex"
+    cmd += f" --dump-keymem={test_dir}/{run_name}_keymem.hex"
+    if keymem:
+        cmd += f" --load-keymem={keymem}"
     if old_context:
         cmd += f" --load-context={test_dir}/{old_context}"
     cmd += f" --dump-context={test_dir}/{new_context}"

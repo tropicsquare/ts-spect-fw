@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
+import numpy as np
 
 import test_common as tc
 
