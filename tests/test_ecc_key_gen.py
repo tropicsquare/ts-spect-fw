@@ -101,6 +101,11 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
     return 0
 
 if __name__ == "__main__":
+
+    seed = rn.randint(0, 2**32-1)
+    rn.seed(seed)
+    print("seed:", seed)
+    
     ops_cfg = tc.get_ops_config()
     test_name = "ecc_key_gen"
 

@@ -1,4 +1,5 @@
 import hashlib
+import random as rn
 
 from .tmac import tmac
 
@@ -14,22 +15,8 @@ def sha256(m):
 def shift(x, i):
     return (x >> i) & 1
 
-def gf_mul(a, b):
-    return (a*b) % p
-
-def gf_add(a, b):
-    return (a+b) % p
-
-def gf_sub(a, b):
-    return (a-b) % p
-
-def gf_exp(z, e, mod=p):
-    x = z
-    for i in range(254, -1, -1):
-        x = (x*x) % mod
-        if shift(e, i):
-            x = (x*z) % mod
-    return x
+def inv0(x, mod=p):
+    return pow(x, mod-2, mod)
 
 def ec_add(x1, y1, x2, y2):
     if x1 == 0 and y1 == 0:
@@ -39,7 +26,7 @@ def ec_add(x1, y1, x2, y2):
 
     r0 = (y2 - y1) % p
     r1 = (x2 - x1) % p
-    lmbd = (r0 * gf_exp(r1, p-2)) % p
+    lmbd = (r0 * inv0(r1)) % p
     x3 = (lmbd * lmbd - x1 - x2) % p
     y3 = (lmbd * (x1 - x3) - y1) % p
     return x3, y3
@@ -49,7 +36,7 @@ def ec_dub(x1, y1):
         return 0, 0
     r0 = (3*x1*x1 + a) % p
     r1 = (2*y1) % p
-    lmbd = (r0 * gf_exp(r1, p-2)) % p
+    lmbd = (r0 * inv0(r1)) % p
     x3 = (lmbd * lmbd - x1 - x1) % p
     y3 = (lmbd * (x1 - x3) - y1) % p
     return x3, y3
@@ -72,14 +59,28 @@ def key_gen(k):
     Ax, Ay = spm(d, xG, yG)
     return d, w, Ax, Ay
 
-def sign(k, d, m):
-    x, y = spm(k, xG, yG)
+def sign(d, w, sch, scn, z):
+    #print("tmac msg:", (sch + scn + z).hex())
+    k = tmac(w, sch + scn + z, b"\x0B")
+    k_int = int.from_bytes(k, byteorder="big") % q
+
+    #print("sign, k_int:", hex(k_int))
+
+    if k_int == 0:
+        print("Test Model: k_int = 0. ECDSA Failed.")
+
+    x, y = spm(k_int, xG, yG)
+    #print("sign, x:", hex(x))
+    #print("sign, y:", hex(y))
     r = x % q
-    e = sha256(m)
-    print("e : ", hex(e))
-    invk = gf_exp(k, q-2, q)
-    print("invk : ", hex(invk))
-    s = (invk * (e + d*r)) % q
+
+    if r == 0:
+        print("Test Model: r = 0. ECDSA Failed.")
+
+    z_int = int.from_bytes(z, 'big')
+
+    s = ((z_int + d*r) * inv0(k_int, q)) % q
+
     return r, s
 
 

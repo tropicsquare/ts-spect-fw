@@ -10,6 +10,10 @@ import models.x25519
 
 if __name__ == "__main__":
 
+    seed = rn.randint(0, 2**32-1)
+    rn.seed(seed)
+    print("seed:", seed)
+
     ops_cfg = tc.get_ops_config()
     test_name = "x25519_full_sc"
 

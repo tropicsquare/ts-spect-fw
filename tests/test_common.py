@@ -73,7 +73,7 @@ def parse_key_mem(test_dir, run_name):
         for line in data[3:]:
             if not line:
                 continue
-            if line[0] == '*':
+            if line[0] == '*' or line[0] == 'S':
                 continue
             if line[0] == 'T':
                 ls = line.split(' ')
@@ -109,8 +109,13 @@ def write_int256(cmd_file, x: int, addr):
     for w in range(len(val)):
         write_int32(cmd_file, val[w], addr+(w*4))
 
-def break_on(cmd_file, bp):
+def dump_gpr_on(cmd_file, bp, gpr: list) -> str:
     cmd_file.write(f"break {bp}\n")
+    s = ""
+    for r in gpr:
+        s += f"get R{r}\n"
+    s += "run\n"
+    return s
 
 def write_string(cmd_file, s: str, addr):
     val = str2int32(s)
@@ -143,11 +148,19 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
             val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
         return val
     
-def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, run_name=None, old_context=None, keymem=None):
+def run_op(
+                cmd_file,           op_name,
+                insrc,              outsrc,         data_in_size,
+                ops_cfg,            test_dir,       run_name=None,
+                old_context=None,   keymem=None,    break_s=None
+            ):
+
     op = find_in_list(op_name, ops_cfg)
     cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (data_in_size << 16)
     set_cfg_word(cmd_file, cfg_word)
     run(cmd_file)
+    if break_s:
+        cmd_file.write(break_s)
     exit(cmd_file)
     cmd_file.close()
 
@@ -158,7 +171,10 @@ def run_op(cmd_file, op_name, insrc, outsrc, data_in_size, ops_cfg, test_dir, ru
     run_log = run_name+"_iss.log"
 
     cmd = iss
-    cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
+    if break_s:
+        cmd += f" --program={TS_REPO_ROOT}/src/main.s"
+    else:
+        cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
     cmd += f" --first-address=0x8000"
     cmd += f" --const-rom={TS_REPO_ROOT}/data/const_rom.hex"
     cmd += f" --grv-hex={test_dir}/rng.hex"
