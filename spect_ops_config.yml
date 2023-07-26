@@ -167,6 +167,8 @@
 - name : ecdsa
   id : 0x70
   input :
+    - name : cmd_in
+      address : 0x00
     - name : message
       address : 0x10
   output :

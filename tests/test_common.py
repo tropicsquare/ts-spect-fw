@@ -65,6 +65,7 @@ def get_res_word(test_dir, run_name):
 def parse_key_mem(test_dir, run_name):
     kmem_file = f"{test_dir}/{run_name}_keymem.hex"
     kmem_array = np.empty(shape=(16, 256, 256), dtype='uint32')
+    kmem_slots = np.empty(shape=(16, 256), dtype='bool')
     with open(kmem_file, 'r') as km_file:
         data = km_file.read().split('\n')
         ktype = 0
@@ -73,7 +74,7 @@ def parse_key_mem(test_dir, run_name):
         for line in data[3:]:
             if not line:
                 continue
-            if line[0] == '*' or line[0] == 'S':
+            if line[0] == '*':
                 continue
             if line[0] == 'T':
                 ls = line.split(' ')
@@ -81,10 +82,17 @@ def parse_key_mem(test_dir, run_name):
                 slot = int(ls[3])
                 offset = 0
                 continue
+            if line[0] == 'S':
+                ls = line.split(' ')
+                if ls[1] == "FULL":
+                    kmem_slots[ktype][slot] = True
+                else:
+                    kmem_slots[ktype][slot] = False
+                continue
             d = int.from_bytes(binascii.unhexlify(line), 'big')
             kmem_array[ktype][slot][offset] = d
             offset += 1
-    return kmem_array
+    return kmem_array, kmem_slots
 
 def set_key(cmd_file, key, ktype, slot, offset):
     val = [(key >> i*32) & 0xFFFFFFFF for i in range(8)]

@@ -55,7 +55,15 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 1
 
-    kmem_data = tc.parse_key_mem(test_dir, run_name)
+    kmem_data, kmem_slots = tc.parse_key_mem(test_dir, run_name)
+
+    if not kmem_slots[0x4][slot<<1]:
+        print("Private Key Slot is empty.")
+        return 1
+
+    if not kmem_slots[0x4][(slot<<1)+1]:
+        print("Public Key Slot is empty.")
+        return 1
 
     priv1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
     priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
