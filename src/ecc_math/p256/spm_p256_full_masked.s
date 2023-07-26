@@ -2,7 +2,7 @@
 ;
 ; Inputs:
 ;   Scalar k in r27
-;   Point P in affine coordinates in (r22, r23, r24)
+;   Point P in affine coordinates in (r22, r23)
 ;   DST_ID  in r25
 ;
 ; Outputs:
@@ -23,6 +23,8 @@
 ;   7) Compute k3.P3
 ;   8) Compute k.P = k2.P2 + k3.P3
 ;   9) Convert k.P to affine coordinates
+
+; TODO integrity checks
 
 spm_p256_full_masked:
 ;   1) Convert P to randomized projective coordinates
@@ -63,7 +65,7 @@ spm_p256_full_masked:
     SUBP    r13, r0, r13    ; invert P2
 
     CALL    point_add_p256  ; r9.. = P1, r12.. = P3, r22.. = k2.P2
-
+    
 ;   6) Mask scalar k as k3 = k + rng3 * #E
     LD      r31, ca_q256
     GRV     r30
@@ -74,15 +76,18 @@ spm_p256_full_masked:
     CALL    spm_p256_long
 
 ;   8) Compute k.P = k2.P2 + k3.P3
-    MOV     r12, r17
-    MOV     r13, r18
-    MOV     r14, r19
+    MOV     r12, r22
+    MOV     r13, r23
+    MOV     r14, r24
 
     CALL    point_add_p256
 
 ;   9) Convert k.P to affine coordinates
     MOV     r1,  r14
-    MUL256  r22, r12, r14
-    MUL256  r23, r13, r14
+    CALL    inv_p256
+    MUL256  r22, r12, r1
+    MUL256  r23, r13, r1
+
+    MOVI    r0,  0
 
     RET

@@ -72,6 +72,7 @@ map_to_curve_simple_swu:
 
     ; is_gx1_square, y1 = sqrt_ratio_3mod4(r12, r16)
     CALL    sqrt_ratio_3mod4
+bp_swu_after_sqrt_ratio:
 
     MUL256  r18, r11, r20
     MUL256  r18, r18, r10
@@ -86,11 +87,12 @@ map_to_curve_simple_swu:
     SUBP    r1,  r1,  r18
     ; e1 = sgn0(r20) == sgn0(r18)
     XOR     r0,  r20, r18
-    ANDI    r0,  r0,  1
+    MOVI    r2,  1
+    AND     r0,  r0,  r2
 
     ; r18 = cmov(r1, r18, e1)
-    ZSWAP   r18, r0
-    MOV     r18, r0
+    ZSWAP   r18, r1
+    MOV     r18, r1
     MUL256  r18, r18, r14
     MOV     r19, r14
 

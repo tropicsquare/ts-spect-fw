@@ -40,19 +40,19 @@ sqrt_ratio_3mod4:
 ; y1 -> r9
 ; y2 -> r10
 
-    MUL256  r6,  r12,  r12
-    ADDP    r7,  r16,  r12
+    MUL256  r6,  r16, r16
+    MUL256  r7,  r16, r12
     MUL256  r6,  r6,  r7
 
     MOV     r1,  r6
     CALL    inv_p256_c1
-    MOV     r9,  r1
+    MOV     r9,  r3
 
     MUL256  r9,  r9,  r7
     LD      r0,  ca_p256_c2
-    MUL256  r10, r10, r0
+    MUL256  r10, r9,  r0
     MUL256  r8,  r9,  r9
-    MUL256  r8,  r8,  r12
-    XOR     r0,  r8,  r16
+    MUL256  r8,  r8,  r16
+    XOR     r0,  r8,  r12
     ZSWAP   r10, r9
     RET

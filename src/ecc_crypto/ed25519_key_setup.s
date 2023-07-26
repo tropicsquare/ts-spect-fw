@@ -67,28 +67,28 @@ ed25519_key_setup:
     AND         r9,  r0,  r4        ; mask SPECT_OP_ID to r1[7:0]
     ROL8        r9,  r9
     ORI         r9,  r9,  ecc_type_ed25519
-    STK         r9,  r26, 0x400     ; store metadata
+    STK         r9,  r26, ecc_key_metadata     ; store metadata
     BRE         ed25519_key_setup_kbus_fail
     ; Store the pubkey to key slot
-    STK         r8,  r26, 0x401     ; store A
+    STK         r8,  r26, ecc_pub_key_Ax     ; store A
     BRE         ed25519_key_setup_kbus_fail
     
-    KBO         r26, 0x402          ; program
+    KBO         r26, ecc_kbus_program          ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r26, 0x405          ; flush
+    KBO         r26, ecc_kbus_flush          ; flush
     BRE         ed25519_key_setup_kbus_fail
 
     ; Store s and prefix to key slot
     LD          r28, ca_ed25519_key_setup_internal_s
     LD          r29, ca_ed25519_key_setup_internal_prefix
 
-    STK         r28, r25, 0x400     ; store s
+    STK         r28, r25, ecc_priv_key_1     ; store s
     BRE         ed25519_key_setup_kbus_fail
-    STK         r29, r25, 0x401     ; store prefix
+    STK         r29, r25, ecc_priv_key_2     ; store prefix
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, 0x402          ; program
+    KBO         r25, ecc_kbus_program          ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, 0x405          ; flush
+    KBO         r25, ecc_kbus_flush          ; flush
     BRE         ed25519_key_setup_kbus_fail
     ; Return success
     MOVI        r3,  0

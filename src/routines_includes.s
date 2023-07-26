@@ -1,7 +1,7 @@
 ; ====================================================
 ; Field Math
 ; ====================================================
-;.include    field_math/inv_q256.s
+.include    field_math/256/inv_q256.s
 .include    field_math/256/inv_p256.s
 .include    field_math/25519/inv_p25519.s
 .include    field_math/25519/sqrt_p25519.s
@@ -59,10 +59,9 @@
 
 .include   ecc_crypto/p256_key_setup.s
 .include    ecc_crypto/ed25519_key_setup.s
-;.include   ecc_crypto/ecdsa_sign.s
+.include   ecc_crypto/ecdsa_sign.s
 .include   ecc_crypto/eddsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
-;.include   ecc_crypto/x25519.s
 
 ; ====================================================
 ; SPECT Ops
@@ -73,3 +72,8 @@
 .include    ops/eddsa_ops.s
 .include    ops/sha512_ops.s
 .include    ops/x25519_ops.s
+
+; ====================================================
+; Others
+; ====================================================
+.include    others/tmac_shc_shn.s
