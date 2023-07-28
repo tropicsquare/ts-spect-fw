@@ -33,9 +33,12 @@ x25519_full_masked:
     CALL        get_y_curve25519
     BRNZ        x25519_pubkey_fail
 ;    2) Randomize P1.z
+x25519_full_masked_z_randomize:
     GRV         r18
     MOVI        r0,  0
     REDP        r18, r0,  r18
+    XORI        r0,  r18, 0     ; Z must not be 0
+    BRZ         x25519_full_masked_z_randomize
     MUL25519    r16, r16, r18
     MUL25519    r17, r17, r18
 ;    3) Mask the scalar s as s2 = s + r2 * #E
