@@ -178,9 +178,6 @@ def run_op(
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
 
-    if not main:
-        main = "src/main.s"
-
     cmd = iss
     if break_s or main:
         if not main:

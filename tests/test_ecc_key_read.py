@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     tc.write_int32(cmd_file, input_word, 0x4000)
 
-    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     tc.write_int32(cmd_file, input_word, 0x4000)
 
-    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     tc.write_int32(cmd_file, input_word, 0x4000)
 
-    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
