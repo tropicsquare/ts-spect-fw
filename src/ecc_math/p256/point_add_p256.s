@@ -4,7 +4,7 @@
 ;   Point Q0 = (r9, r10, r11)
 ;   Point Q1 = (r12, r13, r14)
 ; Output:
-;   Q1 = Q0 + Q1
+;   Q1 = Q0 + Q1 = (r12, r13, r14)
 ;
 ; Expects:
 ;   p256 prime in r31

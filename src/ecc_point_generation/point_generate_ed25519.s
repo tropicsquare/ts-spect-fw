@@ -22,7 +22,7 @@
 ed25519_point_generate:
     LD      r31, ca_p25519
     GRV     r2
-    CALL    hash_to_field_p25519                ; r0 = x in GF(2^255 - 19)
+    CALL    hash_to_field                       ; r0 = x in GF(2^255 - 19)
 
     CALL    map_to_curve_elligator2_curve25519  ; (r3, r7, r11, r8) = (xMn, xMd, yMn, 1)
     XORI    r30, r7, 0

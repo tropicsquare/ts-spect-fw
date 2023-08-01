@@ -70,8 +70,9 @@ eddsa_verify_input_message1 .eq 0xA0
 eddsa_verify_output_result .eq 0x1000
 ; ecdsa
 ecdsa_id .eq 0x70
-ecdsa_input_result .eq 0x0
+ecdsa_input_cmd_in .eq 0x0
 ecdsa_input_message .eq 0x10
+ecdsa_output_result .eq 0x0
 ; ecdsa_sign
 ecdsa_sign_id .eq 0x70
 ecdsa_sign_input_sch .eq 0xA0
@@ -101,3 +102,10 @@ x25519_dbg_output_r .eq 0x1020
 curve25519_rpg_id .eq 0xD0
 ; ed25519_rpg
 ed25519_rpg_id .eq 0xD1
+; p256_spm
+p256_spm_id .eq 0xD3
+p256_spm_input_gx .eq 0x0
+p256_spm_input_gy .eq 0x20
+p256_spm_input_gk .eq 0x40
+p256_spm_output_qx .eq 0x1000
+p256_spm_output_qy .eq 0x1020

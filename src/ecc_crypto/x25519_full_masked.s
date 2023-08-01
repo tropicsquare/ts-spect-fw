@@ -8,6 +8,7 @@
 ; Outputs:
 ;   X25519(k, u) in r11
 ;
+; Masking methods:
 ;   1) Random Projective Coordinates -- (x, 1) == (r * x, r)
 ;   2) Group Scalar Randomization -- k = k + r * #E (mod p)
 ;   3) Point Splitting -- k.P1 = k.P2 + k.P3 for P = P1 + P2
@@ -25,8 +26,6 @@
 ;   10) Recover sP3.y
 ;   11) Compute sP1 = sP2 - sP3
 ;   12) Transform sP1.x to affine coordinate system
-;
-; TODO: Check point integrity
 
 x25519_full_masked:
     LD          r31, ca_p25519
@@ -34,9 +33,12 @@ x25519_full_masked:
     CALL        get_y_curve25519
     BRNZ        x25519_pubkey_fail
 ;    2) Randomize P1.z
+x25519_full_masked_z_randomize:
     GRV         r18
     MOVI        r0,  0
     REDP        r18, r0,  r18
+    XORI        r0,  r18, 0     ; Z must not be 0
+    BRZ         x25519_full_masked_z_randomize
     MUL25519    r16, r16, r18
     MUL25519    r17, r17, r18
 ;    3) Mask the scalar s as s2 = s + r2 * #E

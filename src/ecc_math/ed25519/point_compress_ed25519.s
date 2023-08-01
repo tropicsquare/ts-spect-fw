@@ -16,4 +16,5 @@ point_compress_ed25519:
     ROL         r8,  r8
     OR          r8,  r8,  r7
     ROR         r8,  r8
+    SWE         r8,  r8
     RET

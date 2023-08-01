@@ -2,7 +2,7 @@
 import sys
 import binascii
 import hashlib
-import random
+import random as rn
 
 import test_common as tc
 
@@ -10,14 +10,19 @@ def sha512(s):
     return hashlib.sha512(s).digest()
 
 if __name__ == "__main__":
+
+    seed = rn.randint(0, 2**32-1)
+    rn.seed(seed)
+    print("seed:", seed)
+
     ops_cfg = tc.get_ops_config()
     test_name = "sha512"
 
     test_dir = tc.make_test_dir(test_name)
     cmd_file = tc.get_cmd_file(test_dir)
 
-    msg_bitlen = random.randint(2*128, 5*128)*8
-    message = int.to_bytes(random.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
+    msg_bitlen = rn.randint(2*128, 5*128)*8
+    message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
     digest_ref = sha512(message)
     digest_ref_int = int.from_bytes(digest_ref, 'little')
@@ -41,7 +46,8 @@ if __name__ == "__main__":
         cmd_file = tc.get_cmd_file(test_dir)
         tc.start(cmd_file)
         tc.write_bytes(cmd_file, m_blocks[i], 0x0010)
-        ctx = tc.run_op(cmd_file, "sha512_update", 0x0, 0x1, 128, ops_cfg, test_dir, run_id=i, old_context=ctx)
+        run_name = "sha512_update" + f"_{i}"
+        ctx = tc.run_op(cmd_file, "sha512_update", 0x0, 0x1, 128, ops_cfg, test_dir, run_name, old_context=ctx)
 
     tc.print_run_name("sha512_final")
     cmd_file = tc.get_cmd_file(test_dir)

@@ -10,14 +10,15 @@ if __name__ == "__main__":
 
     test_dir = tc.make_test_dir(test_name)
 
+    ret = 0
+
     #######################################################################################
     # Valid Signature
     #######################################################################################
 
-    run_id = 0
     cmd_file = tc.get_cmd_file(test_dir)
 
-    run_name = f"{test_name}_{run_id}"
+    run_name = f"{test_name}_valid"
     tc.print_run_name(run_name)
 
     R = "2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623a"
@@ -32,20 +33,21 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name)
 
     res = tc.read_output(test_dir, run_name, 0x1000, 1)
 
     if res != 1:
         tc.print_failed()
-        sys.exit(1)
+        ret = 1
+    else:
+        tc.print_passed()
 
     #######################################################################################
     # Invalid R
     #######################################################################################
 
-    run_id += 1
-    run_name = f"{test_name}_{run_id}"
+    run_name = f"{test_name}_invR"
     tc.print_run_name(run_name)
 
     cmd_file = tc.get_cmd_file(test_dir)
@@ -62,20 +64,21 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name)
 
     res = tc.read_output(test_dir, run_name, 0x1000, 1)
 
     if res != 0:
         tc.print_failed()
-        sys.exit(1)
+        ret = 1
+    else:
+        tc.print_passed()
 
     #######################################################################################
     # Invalid S
     #######################################################################################
-
-    run_id += 1
-    run_name = f"{test_name}_{run_id}"
+    
+    run_name = f"{test_name}_invS"
     tc.print_run_name(run_name)
 
     cmd_file = tc.get_cmd_file(test_dir)
@@ -92,20 +95,21 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name)
 
     res = tc.read_output(test_dir, run_name, 0x1000, 1)
 
     if res != 0:
         tc.print_failed()
-        sys.exit(1)
+        ret = 1
+    else:
+        tc.print_passed()
 
     #######################################################################################
     # Invalid A
     #######################################################################################
 
-    run_id += 1
-    run_name = f"{test_name}_{run_id}"
+    run_name = f"{test_name}_invA"
     tc.print_run_name(run_name)
 
     cmd_file = tc.get_cmd_file(test_dir)
@@ -122,20 +126,21 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name)
 
     res = tc.read_output(test_dir, run_name, 0x1000, 1)
 
     if res != 0:
         tc.print_failed()
-        sys.exit(1)
+        ret = 1
+    else:
+        tc.print_passed()
 
     #######################################################################################
     # Invalid M
     #######################################################################################
 
-    run_id += 1
-    run_name = f"{test_name}_{run_id}"
+    run_name = f"{test_name}_invM"
     tc.print_run_name(run_name)
 
     cmd_file = tc.get_cmd_file(test_dir)
@@ -152,13 +157,14 @@ if __name__ == "__main__":
     tc.write_string(cmd_file, A, 0x0060)
     tc.write_string(cmd_file, M1, 0x0080)
     tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_id=run_id)
+    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name)
 
     res = tc.read_output(test_dir, run_name, 0x1000, 1)
 
     if res != 0:
         tc.print_failed()
-        sys.exit(1)
+        ret = 1
+    else:
+        tc.print_passed()
 
-    tc.print_passed()
-    sys.exit(0)
+    sys.exit(ret)

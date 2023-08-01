@@ -18,20 +18,23 @@ ed25519_key_setup:
     ROR         r18, r18
     MOVI        r17, 0
     MOVI        r16, 256
+    SWE         r19, r19
     ; H = SHA512(k)
     HASH_IT
     HASH        r28, r16
     ; Mask H[255:0] to become scalar s
+    SWE         r29, r29
     MOVI        r0,  7
     MOVI        r1,  255
     SBIT        r0,  r0, r1
     NOT         r0,  r0
-    AND         r28, r0, r28
+    AND         r29, r0, r29
     MOVI        r1,  254
-    SBIT        r28, r28, r1
+    SBIT        r29, r29, r1
 
-    ST          r28, ca_ed25519_key_setup_internal_s
-    ST          r29, ca_ed25519_key_setup_internal_prefix
+    ST          r29, ca_ed25519_key_setup_internal_s
+    ST          r28, ca_ed25519_key_setup_internal_prefix
+    MOV         r28, r29
 
     ; Load base point G and check its validity
     LD          r31, ca_p25519
@@ -64,28 +67,28 @@ ed25519_key_setup:
     AND         r9,  r0,  r4        ; mask SPECT_OP_ID to r1[7:0]
     ROL8        r9,  r9
     ORI         r9,  r9,  ecc_type_ed25519
-    STK         r9,  r26, 0x400     ; store metadata
+    STK         r9,  r26, ecc_key_metadata     ; store metadata
     BRE         ed25519_key_setup_kbus_fail
     ; Store the pubkey to key slot
-    STK         r8,  r26, 0x400     ; store A
+    STK         r8,  r26, ecc_pub_key_Ax     ; store A
     BRE         ed25519_key_setup_kbus_fail
     
-    KBO         r26, 0x402          ; program
+    KBO         r26, ecc_kbus_program          ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r26, 0x405          ; flush
+    KBO         r26, ecc_kbus_flush          ; flush
     BRE         ed25519_key_setup_kbus_fail
 
     ; Store s and prefix to key slot
     LD          r28, ca_ed25519_key_setup_internal_s
     LD          r29, ca_ed25519_key_setup_internal_prefix
 
-    STK         r28, r25, 0x400     ; store s
+    STK         r28, r25, ecc_priv_key_1     ; store s
     BRE         ed25519_key_setup_kbus_fail
-    STK         r29, r25, 0x401     ; store prefix
+    STK         r29, r25, ecc_priv_key_2     ; store prefix
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, 0x402          ; program
+    KBO         r25, ecc_kbus_program          ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, 0x405          ; flush
+    KBO         r25, ecc_kbus_flush          ; flush
     BRE         ed25519_key_setup_kbus_fail
     ; Return success
     MOVI        r3,  0
