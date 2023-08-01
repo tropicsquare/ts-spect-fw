@@ -159,7 +159,7 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
 def run_op(
                 cmd_file,           op_name,
                 insrc,              outsrc,         data_in_size,
-                ops_cfg,            test_dir,       run_name=None,
+                ops_cfg,            test_dir,       main=None,      run_name=None,
                 old_context=None,   keymem=None,    break_s=None
             ):
 
@@ -178,9 +178,14 @@ def run_op(
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
 
+    if not main:
+        main = "src/main.s"
+
     cmd = iss
-    if break_s:
-        cmd += f" --program={TS_REPO_ROOT}/src/main.s"
+    if break_s or main:
+        if not main:
+            main = "src/main.s"
+        cmd += f" --program={TS_REPO_ROOT}/{main}"
     else:
         cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
     cmd += f" --first-address=0x8000"

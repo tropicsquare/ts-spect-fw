@@ -48,11 +48,11 @@ if __name__ == "__main__":
 
     tc.set_rng(test_dir, rng_list)
 
-    ctx = tc.run_op(cmd_file, test_name, 0x0, 0x1, 64, ops_cfg, test_dir)
+    ctx = tc.run_op(cmd_file, test_name, 0x0, 0x1, 64, ops_cfg, test_dir, main="muni/main.s")
 
     res_addr = tc.find_in_list("r", cmd_cfg["output"])["address"]
 
-    res_int = tc.read_output(test_dir, run_name, res_addr, 8)
+    res_int = tc.read_output(test_dir, run_name, (0x1 << 12) + res_addr, 8)
 
     print("Result:", int.to_bytes(res_int, 32, 'little').hex())
 
