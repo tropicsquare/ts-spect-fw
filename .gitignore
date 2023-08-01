@@ -1,3 +1,6 @@
 **/__pycache__
 build
 tests/test*/
+*.swp
+*.swo
+spect_ops_constants.h
