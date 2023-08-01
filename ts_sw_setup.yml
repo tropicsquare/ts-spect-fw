@@ -10,7 +10,7 @@ vivado 2019.2
 cmake 3.23.2
 memaker 202101.3.0
 ordt 230321.01
-ts-spect-compiler v0.1
+ts-spect-compiler v0.2
 ts-hw-scripts v0.27
 ts-common-blocks v0.30
 ts-common-ver v0.15
