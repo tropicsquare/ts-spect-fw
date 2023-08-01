@@ -2,3 +2,6 @@
 build
 tests/test*/
 **/logs/
+*.swp
+*.swo
+spect_ops_constants.h
