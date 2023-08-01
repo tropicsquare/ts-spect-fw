@@ -78,22 +78,25 @@ ecdsa_sign_tmac_padding_loop:
     REDP        r22, r0, r22
     XORI        r0, r22, 0
     BRZ         ecdsa_sign_fail_r
+    MOVI        r1,  3
 
 ecdsa_sign_mask_k:
-    GRV         r25             ; t
+    SUBI        r1,  r1, 1
+    BRZ         ecdsa_fail_k_mask
+    GRV         r25                     ; t
     MOVI        r0,  0
-    REDP        r25, r0, r25
+    REDP        r25, r0,  r25
     XORI        r25, r25, 0
-    BRZ         ecdsa_sign_mask_k   ; t must not be 0
+    BRZ         ecdsa_sign_mask_k       ; t must not be 0
     MULP        r1,  r25, r27
-    CALL        inv_q256        ; (kt)^(-1)
+    CALL        inv_q256                ; (kt)^(-1)
 
     LD          r18, ca_ecdsa_sign_internal_z
-    MULP        r10, r18, r25   ; zt
-    MULP        r11, r22, r25   ; rt
-    MULP        r11, r26, r11   ; rtd
-    ADDP        r10, r10, r11   ; zt + rtd
-    MULP        r10, r1,  r10   ; (zt + rtd) / (kt)
+    MULP        r10, r18, r25           ; zt
+    MULP        r11, r22, r25           ; rt
+    MULP        r11, r26, r11           ; rtd
+    ADDP        r10, r10, r11           ; zt + rtd
+    MULP        r10, r1,  r10           ; (zt + rtd) / (kt)
 
     XORI        r0, r10,  0
     BRZ         ecdsa_sign_fail_s
@@ -127,6 +130,9 @@ ecdsa_sign_fail_r:
     JMP         ecdsa_sign_fail
 ecdsa_sign_fail_s:
     MOVI        r3,  ret_ecdsa_err_inv_s
+    JMP         ecdsa_sign_fail
+ecdsa_fail_k_mask:
+    MOVI        r3,  ret_grv_err
     JMP         ecdsa_sign_fail
 ecdsa_sign_fail:
     MOVI        r2,  l3_result_fail
