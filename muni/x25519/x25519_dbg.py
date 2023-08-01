@@ -12,26 +12,18 @@ import tests.test_common as tc
 import muni.muni_common as mnc
 
 rng_lut = {
-    "pub_z_rng": 0,
-    "s_rng_1": 1,
-    "point_gen_rng": 2,
-    "s_rng_2" : 3
+    "pub_z_rng"     : {"idx": 0, "okzero" : False},
+    "s_rng_1"       : {"idx": 1, "okzero" : True},
+    "point_gen_rng" : {"idx": 2, "okzero" : True},
+    "s_rng_2"       : {"idx": 3, "okzero" : True}
 }
 
 if __name__ == "__main__":
-    ops_cfg = tc.get_ops_config()
-    test_name = "x25519_dbg"
-    run_name = test_name
-    cmd_cfg = tc.find_in_list(test_name, ops_cfg)
+    run_name = "x25519_dbg"
     tc.print_run_name(run_name)
+    cmd_cfg, data_cfg = mnc.get_cfg(run_name)
 
-    test_dir = os.getcwd() + "/logs"
-    os.system(f"rm -rf {test_dir}")
-    os.system(f"mkdir {test_dir}")
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    with open("x25519_dbg_data_cfg.yml", 'r') as data_file:
-        data_cfg = yaml.safe_load(data_file)
+    test_dir, cmd_file = mnc.run_init()
 
     tc.start(cmd_file)
 
@@ -43,9 +35,9 @@ if __name__ == "__main__":
 
     mnc.run(cmd_file, test_dir, cmd_cfg)
 
-    res_addr = tc.find_in_list("r", cmd_cfg["output"])["address"]
+    res_addr = mnc.get_output_address("r", cmd_cfg, "output")
 
-    res_int = tc.read_output(test_dir, run_name, (0x1 << 12) + res_addr, 8)
+    res_int = tc.read_output(test_dir, run_name, res_addr, 8)
 
     print("Result:", int.to_bytes(res_int, 32, 'little').hex())
 

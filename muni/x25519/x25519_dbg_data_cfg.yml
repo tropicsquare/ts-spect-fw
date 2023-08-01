@@ -1,6 +1,7 @@
 ########################################################################################
 #   Example configuration of X25519.
 #   Test vector from [https://datatracker.ietf.org/doc/html/rfc7748#section-6.1]
+#
 #   Expected result: 4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742
 ########################################################################################
 
@@ -14,10 +15,10 @@ input :
 rng :
   # z coordinate randomization of public key
   - name : pub_z_rng
-    value : 0x1234
-  # group randomization of scalar for first multiplication
+    value : 0x0
+  # group randomization of scalar for first multiplication with not forced value
   - name : s_rng_1
-    value : 0x5678
+    value :
   # group randomization of scalar for second multiplication
   - name : s_rng_2
     value : 0xeeee

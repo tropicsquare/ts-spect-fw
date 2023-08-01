@@ -106,8 +106,8 @@ ecdsa_sign_dbg_input_d .eq 0x40
 ecdsa_sign_dbg_input_w .eq 0x60
 ecdsa_sign_dbg_input_sch .eq 0xA0
 ecdsa_sign_dbg_input_scn .eq 0xC0
-ecdsa_sign_dbg_output_r .eq 0x1020
-ecdsa_sign_dbg_output_s .eq 0x1040
+ecdsa_sign_dbg_output_r .eq 0x1010
+ecdsa_sign_dbg_output_s .eq 0x1030
 ; eddsa_sign_dbg
 eddsa_sign_dbg_id .eq 0xBF
 eddsa_sign_dbg_input_cmd_in .eq 0x0

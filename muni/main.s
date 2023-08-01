@@ -49,7 +49,16 @@ op_x25519_dbg:
     JMP     set_res_word
 
 op_ecdsa_sign_dbg:
-    JMP     set_res_word
+    LD      r20, ecdsa_sign_dbg_input_w
+    SWE     r20, r20
+    LD      r26, ecdsa_sign_dbg_input_d
+    LD      r16, ecdsa_sign_dbg_input_sch
+    SWE     r16, r16
+    LD      r17, ecdsa_sign_dbg_input_scn
+    LD      r18, ecdsa_sign_dbg_input_z
+    SWE     r18, r18
+
+    JMP     ecdsa_sign
 
 op_eddsa_sign_dbg:
     JMP     set_res_word

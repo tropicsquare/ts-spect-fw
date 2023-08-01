@@ -11,17 +11,17 @@ Python scripts are used to configure `spect_iss` with all operation config word,
 
 To configure input data and random numbers used for masking and randomization, use the prepared `<sript name>_data_cfg.yml`. Structure of such YAML file is following:
 ```
-input :
+input : (mandatory)
   - name : <name of input variable> (string)
     value : <value of the input variable> (string or integer)
   ...
-rng :
+rng : (optional)
   - name : <name of random number> (string)
     value : <value of the random number> (integer)
   ...
 ```
 
-The `rng` field is used to force masks used in the particular algorithm. The `name` of the random number refer to particular mask, e.g. mask for group randomization of scalar. The python script than ensures that the masks are pushed into the GRV queue of `spect_iss` in the right order.
+The `rng` field is used to force masks used in the particular algorithm. The `name` of the random number refer to particular mask, e.g. mask for group randomization of scalar. The python script than ensures that the masks are pushed into the GRV queue of `spect_iss` in the right order. If the `rng` field is not specified or some particular mask is not specified, the script generates random number instate.
 
 ## Log Files
 
@@ -32,3 +32,7 @@ Log files are dumped into `<run dir>/logs` directory.
 - `<script name>_iss.log` : log file of the `spect_iss` run, that contains all of its actions (compilation, instruction execution details etc.)
 - `<script name>_out.hex` and `<script name>_emem_out.hex` : hexfile with contents of the 2 output memories.
 - `<script name>.ctx` : context dumped by `spect_iss` that contains content of GPR registers, flags, RAR stack pointer, SHA-512 context and memory contents.
+
+## Other
+
+Some masks used for side channel hardening must not be zero (e.g. z-coordinate randomization). Firmware detects such case and requests another random number. In such a case, the python scrypt checks, if for the particular mask zero value is allowed, and if not, generates alternative mask and puts it to the GRV queue behind the zero one.

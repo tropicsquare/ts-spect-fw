@@ -248,22 +248,30 @@
   id : 0xAF
   input :
     - name : cmd_in
-      address : 0x0000
+      address : 0x00
+      base : 0x0000
     - name : z
-      address : 0x0010
+      address : 0x10
+      base : 0x0000
     - name : d
-      address : 0x0040
+      address : 0x40
+      base : 0x0000
     - name : w
-      address : 0x0060
+      address : 0x60
+      base : 0x0000
     - name : sch
-      address : 0x00A0
+      address : 0xA0
+      base : 0x0000
     - name : scn
-      address : 0x00C0
+      address : 0xC0
+      base : 0x0000
   output :
     - name : r
-      address : 0x1020
+      address : 0x10
+      base : 0x1000
     - name : s
-      address : 0x1040
+      address : 0x30
+      base : 0x1000
 
 - name : eddsa_sign_dbg
   id : 0xBF
