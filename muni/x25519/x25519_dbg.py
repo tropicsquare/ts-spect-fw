@@ -3,11 +3,13 @@ import sys
 import binascii
 import os
 import yaml
+import random as rn
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 sys.path.append(TS_REPO_ROOT)
 
 import tests.test_common as tc
+import muni.muni_common as mnc
 
 rng_lut = {
     "pub_z_rng": 0,
@@ -33,22 +35,13 @@ if __name__ == "__main__":
 
     tc.start(cmd_file)
 
-    for input in data_cfg["input"]:
-        print("Setting input", input["name"])
-        addr = tc.find_in_list(input["name"], cmd_cfg["input"])["address"]
-        print("Found address", hex(addr))
-        tc.write_string(cmd_file, input["value"], addr)
+    mnc.write_input(cmd_file, cmd_cfg, data_cfg)
 
-    rng_list = [1 for i in range(len(rng_lut))]
-
-    for rng in data_cfg["rng"]:
-        print("Setting rng", rng["name"])
-        idx = rng_lut[rng["name"]]
-        rng_list[idx] = rng["value"]
+    rng_list = mnc.set_rng_list(data_cfg, rng_lut)
 
     tc.set_rng(test_dir, rng_list)
 
-    ctx = tc.run_op(cmd_file, test_name, 0x0, 0x1, 64, ops_cfg, test_dir, main="muni/main.s")
+    mnc.run(cmd_file, test_dir, cmd_cfg)
 
     res_addr = tc.find_in_list("r", cmd_cfg["output"])["address"]
 
