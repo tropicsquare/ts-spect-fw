@@ -28,7 +28,7 @@ point_check_ed25519:
     XOR         r3,  r3,  r0
     BRNZ        point_check_ed25519_ret
     MUL25519    r0,  r7,  r8        
-    MUL25519    r3,  r6,  r10
+    MUL25519    r3,  r9,  r10
     XOR         r3,  r3,  r0
 point_check_ed25519_ret:
     RET

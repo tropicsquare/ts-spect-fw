@@ -48,6 +48,7 @@ ed25519_key_setup:
     MOV         r7,  r11
     MOV         r8,  r12
     MOV         r9,  r13
+    MOV         r10, r14
 
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
