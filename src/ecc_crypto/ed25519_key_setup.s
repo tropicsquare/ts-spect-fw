@@ -96,7 +96,7 @@ ed25519_key_setup:
     RET
 
 ed25519_key_setup_spm_fail:
-    MOVI        r3, ret_spm_err
+    MOVI        r3, ret_point_integrity_err
     RET
 
 ed25519_key_setup_kbus_fail:

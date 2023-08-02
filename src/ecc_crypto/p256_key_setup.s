@@ -116,5 +116,5 @@ p256_key_setup_fail:
     MOVI    r3,  ret_key_err
     RET
 p256_key_setup_spm_fail:
-    MOVI    r3,  ret_spm_err
+    MOVI    r3,  ret_point_integrity_err
     RET

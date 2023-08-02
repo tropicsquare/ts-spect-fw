@@ -104,7 +104,7 @@ x25519_pubkey_fail:
     RET
 
 x25519_spm_fail:
-    MOVI        r0,  ret_spm_err
+    MOVI        r0,  ret_point_integrity_err
     RET
 
 x25519_full_masked_z_fail:

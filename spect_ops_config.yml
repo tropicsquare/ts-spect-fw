@@ -99,6 +99,8 @@
 - name : eddsa_set_context
   id : 0x41
   input :
+    - name : slot
+      address : 0x00
     - name : sch
       address : 0xA0
       base : 0x0000

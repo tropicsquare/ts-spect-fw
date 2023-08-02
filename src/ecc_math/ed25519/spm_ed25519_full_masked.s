@@ -2,7 +2,7 @@
 ;
 ; Inputs:
 ;   Scalar k in r27
-;   Point P in affine coordinates in (r21, r21)
+;   Point P in affine coordinates in (r21, r22)
 ;   DST_ID in r25
 ;
 ; Outputs:
@@ -137,7 +137,7 @@ spm_ed25519_full_masked_z_randomize:
     RET
 
 ed25519_spm_fail:
-    MOVI        r0,  ret_spm_err
+    MOVI        r0,  ret_point_integrity_err
     RET
 
 spm_ed25519_full_masked_z_fail:

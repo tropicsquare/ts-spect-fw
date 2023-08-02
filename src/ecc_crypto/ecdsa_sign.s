@@ -1,8 +1,8 @@
 ; ECDSA P-256 Sign
 ;
 ; Input:
-;   Private Key Part w in r20
-;   Private Key part d in 26
+;   Private Key part 'w' in r20
+;   Private Key part 'd' in 26
 ;   Secure Channel Hash in r16
 ;   Secure Channel Nonce in r17
 ;   Message Digest z in r18
