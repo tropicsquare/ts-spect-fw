@@ -1,13 +1,25 @@
 # User Guide
 
-## Python Scripts
+## Introduction
 
-Python scripts are used to configure `spect_iss` with all operation config word, input data and random numbers and run `spect_iss` with prepared spect firmware. The input data and random numbers are configured by YAML file `<sript name>_data_cfg.yml`. To run the script, simply run
+This repository contains firmware for SPECT - Secure Processor of Elliptic Curves for Tropic. SPECT is a 256-bit processor with custom ISA and hardware accelerated arithmetic in finite fields. Algorithms like ECDSA, EdDSA and X25519 are implemented in firmware. This firmware is developed and debugged using `spect_iss` - Instruction Set Simulator of SPECTs ISA, available in `spect_compiler` repository. An executable application loads the SPECT firmware together with other configuration, like random numbers to simulate external RNG on the chip.
+
+The `spect_iss` allows to write to SPECTs input memory and read from SPECTs output memory to simulate communication with host CPU (in case of Tropic01 the RISC-V CPU).
+
+SPECTs ISA contains `GRV` instruction, that requests 256 bit random number from external RNG. These numbers has to be preloaded to the `spect_iss` before start of firmware execution by prepared hexfile. Otherwise the RNG will always return zero. The prepared flow ensures that this condition is fulfilled.
+
+## Flow
+
+The goal of this flow is to shield the user from all implementation details of SPECTs firmware as well as the correct configuration of `spect_compiler` and `spect_isa`. It allows to configure input values of particular cryptographic algorithm as well as force mask values used for side-channel countermeasures via YAML configuration file.
+
+### Python Scripts
+
+Python scripts are used to configure `spect_iss` with all operation config word, input data and random numbers and run `spect_iss` with prepared SPECT firmware. The input data and random numbers are configured by YAML file `<sript name>_data_cfg.yml`. To run the script, simply run
 ```
 ./<script name>.py
 ```
 
-## Configuration YAML File
+### Configuration YAML File
 
 To configure input data and random numbers used for masking and randomization, use the prepared `<sript name>_data_cfg.yml`. Structure of such YAML file is following:
 ```
@@ -21,9 +33,9 @@ rng : (optional)
   ...
 ```
 
-The `rng` field is used to force masks used in the particular algorithm. The `name` of the random number refer to particular mask, e.g. mask for group randomization of scalar. The python script than ensures that the masks are pushed into the GRV queue of `spect_iss` in the right order. If the `rng` field is not specified or some particular mask is not specified, the script generates random number instate.
+The `rng` field is used to force masks used in the particular algorithm. The `name` of the random number refer to particular mask, e.g. mask for group randomization of scalar. The python script then ensures that the masks are delivered to `spect_iss` in right order. If the `rng` field is not specified or some particular mask is not specified, the script then generates random number instate.
 
-## Log Files
+### Log Files
 
 Log files are dumped into `<run dir>/logs` directory.
 
@@ -32,6 +44,6 @@ Log files are dumped into `<run dir>/logs` directory.
 - `<script name>_iss.log` : log file of the `spect_iss` run, that contains all of its actions (compilation, instruction execution details etc.)
 - `<script name>_out.hex` : hexfile with contents of the output memory.
 
-## Other
+### Other
 
-Some masks used for side channel hardening must not be zero (e.g. z-coordinate randomization). Firmware detects such case and requests another random number. In such a case, the python scrypt checks, if for the particular mask zero value is allowed, and if not, generates alternative mask and puts it to the GRV queue behind the zero one.
+Some masks used for side channel hardening must not be zero (e.g. z-coordinate randomization). Firmware detects such a case and requests another random number. In such a case, the python script checks, if for the particular mask zero value is allowed, and if not, generates alternative mask for the second request from firmware. Again, the python script ensures that the masks are delivered to `spect_iss` in right order.
