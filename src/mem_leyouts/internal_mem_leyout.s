@@ -1,5 +1,9 @@
 ; Internal Address Constants for intermediate values
 ca_addr_base .eq 0x0100
+ca_ed25519_smp_P2x .eq 0x0200
+ca_ed25519_smp_P2y .eq 0x0220
+ca_ed25519_smp_P2z .eq 0x0240
+ca_ed25519_smp_P2t .eq 0x0260
 ca_eddsa_verify_internal_SBx .eq 0x0120
 ca_eddsa_verify_internal_SBy .eq 0x0140
 ca_eddsa_verify_internal_SBz .eq 0x0160

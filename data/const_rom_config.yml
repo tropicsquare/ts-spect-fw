@@ -26,13 +26,13 @@ data:
     value : 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed
   - name : ca_q25519
     value : 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed
-  - name : ca_p8q25519
+  - name : ca_q25519_8
     value : 0x80000000000000000000000000000000a6f7cef517bce6b2c09318d2e7ae9f68
-  - name : ca_eddsa_d
+  - name : ca_ed25519_d
     value : 0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3
-  - name : ca_eddsa_xG
+  - name : ca_ed25519_xG
     value : 0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a
-  - name : ca_eddsa_yG
+  - name : ca_ed25519_yG
     value : 0x6666666666666666666666666666666666666666666666666666666666666658
   - name : ca_p25519_c3
     value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0

@@ -1,9 +1,10 @@
 ; Check if point P is a valid Ed25519 point
 ;
-;       (Y^2 - X^2)*Z^2 == Z^4 + d*X^2*Y^2
+;       (Y^2 - X^2)*Z^2 == Z^4 + d*X^2*Y^2 and
+;               (X * Y) == (Z * T)
 ;
 ; Inputs:
-;   Point P = (r7,  r8,  r9)
+;   Point P = (r7,  r8,  r9,  r10)
 ;
 ; Outputs:
 ;   Sets Z flag if point is valid
@@ -25,4 +26,9 @@ point_check_ed25519:
     ADDP        r0,  r0,  r2
 
     XOR         r3,  r3,  r0
+    BRNZ        point_check_ed25519_ret
+    MUL25519    r0,  r7,  r8        
+    MUL25519    r3,  r6,  r10
+    XOR         r3,  r3,  r0
+point_check_ed25519_ret:
     RET

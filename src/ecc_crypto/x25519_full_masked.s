@@ -46,7 +46,7 @@ x25519_full_masked_z_randomize:
     MUL25519    r17, r17, r18
 ;    3) Mask the scalar s as s2 = s + r2 * #E
     GRV         r30
-    LD          r31, ca_p8q25519
+    LD          r31, ca_q25519_8
     SCB         r28, r19, r30
 ;    4) Generate random point P2
     LD          r31, ca_p25519
@@ -70,7 +70,7 @@ x25519_full_masked_z_randomize:
     CALL        point_add_curve25519
 ;    8) Mask scalar s as s3 = s + r3 * #E
     GRV         r30
-    LD          r31, ca_p8q25519
+    LD          r31, ca_q25519_8
     SCB         r28, r19, r30
 ;    9) Compute sP3.x = s3.P3
     LD          r31, ca_p25519
