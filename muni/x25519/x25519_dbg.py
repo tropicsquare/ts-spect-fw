@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     mnc.run(cmd_file, test_dir, cmd_cfg)
 
-    res_addr = mnc.get_output_address("r", cmd_cfg, "output")
+    res_addr = mnc.get_address("r", cmd_cfg, "output")
 
     res_int = tc.read_output(test_dir, run_name, res_addr, 8)
 
