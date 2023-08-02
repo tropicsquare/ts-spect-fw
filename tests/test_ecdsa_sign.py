@@ -64,7 +64,7 @@ if __name__ == "__main__":
     #break_s = tc.dump_gpr_on(cmd_file, "ecdsa_sign_mask_k", [27, 26])
 
     # Run Op
-    ctx = tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name)
+    ctx = tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
 
     # Read result
     l3_result = tc.read_output(test_dir, run_name, outsrc<<12, 1)

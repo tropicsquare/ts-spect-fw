@@ -97,7 +97,7 @@ def parse_key_mem(test_dir, run_name):
 def set_key(cmd_file, key, ktype, slot, offset):
     val = [(key >> i*32) & 0xFFFFFFFF for i in range(8)]
     for w in range(len(val)):
-        cmd_file.write("set keymem[{}][{}][{}] {}\n".format(ktype, slot, offset+w, val[w]))
+        cmd_file.write("set keymem[{}][{}][{}] 0x{}\n".format(ktype, slot, offset+w, format(val[w], '08X')))
 
 def get_key(kmem_array, ktype, slot, offset) -> int:
     val = 0
@@ -146,7 +146,7 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
     elif mem == 0x5000:
         output_file = f"{test_dir}/{run_name}_emem_out.hex"
     else:
-        raise Exception(f"Address {addr} is invalid output address!")
+        raise Exception(f"Address {hex(addr)} is invalid output address!")
 
     with open(output_file, mode='r') as out:
         data = out.read().split('\n')
@@ -159,7 +159,7 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
 def run_op(
                 cmd_file,           op_name,
                 insrc,              outsrc,         data_in_size,
-                ops_cfg,            test_dir,       run_name=None,
+                ops_cfg,            test_dir,       main=None,      run_name=None,
                 old_context=None,   keymem=None,    break_s=None
             ):
 
@@ -179,8 +179,10 @@ def run_op(
     run_log = run_name+"_iss.log"
 
     cmd = iss
-    if break_s:
-        cmd += f" --program={TS_REPO_ROOT}/src/main.s"
+    if break_s or main:
+        if not main:
+            main = "src/main.s"
+        cmd += f" --program={TS_REPO_ROOT}/{main}"
     else:
         cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
     cmd += f" --first-address=0x8000"
