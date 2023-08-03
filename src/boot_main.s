@@ -1,14 +1,43 @@
 .include mem_leyouts/mem_leyouts_includes.s
-.include spect_ops_status.s
-
-; eddsa_verify
-eddsa_verify_id .eq 0x4B
-eddsa_verify_input_R .eq 0x20
-eddsa_verify_input_S .eq 0x40
-eddsa_verify_input_pubkey .eq 0x60
-eddsa_verify_input_message0 .eq 0x80
-eddsa_verify_input_message1 .eq 0xA0
-eddsa_verify_output_result .eq 0x1000
-
+.include constants/spect_ops_status.s
+.include constants/spect_ops_constants.s
+.include constants/spect_descriptors_constants.s
 _start:
-    JMP eddsa_verify
+    LD      r0, ca_spect_cfg_word
+    MOVI    r4, 0xFF
+    AND     r0, r0, r4
+
+    CMPI    r0, sha512_update_id
+    BRZ     op_sha512_update
+
+    CMPI    r0, sha512_init_id
+    BRZ     op_sha512_init
+
+    CMPI    r0, sha512_final_id
+    BRZ     op_sha512_final
+
+    CMPI    r0, eddsa_verify_id
+    BRZ     op_eddsa_verify
+
+    MOVI    r0, ret_op_id_err
+    MOVI    r1, 1
+
+set_res_word:
+    ROL8    r1, r1
+    ROL8    r1, r1
+    ADD     r0, r0, r1
+    ST      r0, ca_spect_res_word
+    END
+
+op_eddsa_verify:
+    JMP     eddsa_verify
+    JMP     set_res_word
+
+.include    ops/sha512_ops.s
+.include    ecc_crypto/eddsa_verify.s
+.include    ecc_math/ed25519/spm_ed25519_short.s
+.include    ecc_math/ed25519/point_add_ed25519.s
+.include    ecc_math/ed25519/point_dbl_ed25519.s
+.include    ecc_math/ed25519/point_compress_ed25519.s
+.include    ecc_math/ed25519/point_decompress_ed25519.s
+.include    field_math/25519/inv_p25519.s

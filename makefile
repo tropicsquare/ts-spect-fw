@@ -2,6 +2,7 @@ SRC_DIR = ${TS_REPO_ROOT}/src
 FIT_DIR = ${TS_REPO_ROOT}/fit
 BUILD_DIR = ${TS_REPO_ROOT}/build
 RELEASE_DIR = ${TS_REPO_ROOT}/release
+BOOT_DIR = ${TS_REPO_ROOT}/release_boot
 
 COMPILER = spect_compiler
 ISS = spect_iss
@@ -17,11 +18,15 @@ clear:
 
 const_rom:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
-	mv ${TS_REPO_ROOT}/data/const_rom_leyout.s ${SRC_DIR}/mem_leyouts/const_rom_leyout.s
+	mv ${TS_REPO_ROOT}/data/constants_leyout.s ${SRC_DIR}/mem_leyouts/constants_leyout.s
 
 data_ram_in_const:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
-	mv ${TS_REPO_ROOT}/data/data_ram_in_const_leyout.s ${SRC_DIR}/mem_leyouts/data_ram_in_const_leyout.s
+	mv ${TS_REPO_ROOT}/data/constants_leyout.s ${SRC_DIR}/mem_leyouts/constants_leyout.s
+
+data_ram_in_const_boot:
+	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_boot_config.yml
+	mv ${TS_REPO_ROOT}/data/constants_leyout.s ${SRC_DIR}/mem_leyouts/constants_leyout.s
 
 ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
@@ -34,14 +39,34 @@ compile: clear const_rom ops_constants
 	${SRC_DIR}/main.s > ${BUILD_DIR}/compile.log
 
 release: data_ram_in_const ops_constants
-	rm -rf ${TS_REPO_ROOT}/${RELEASE_DIR}
-	mkdir ${TS_REPO_ROOT}/${RELEASE_DIR}
-	mv ${TS_REPO_ROOT}/data/data_ram_in_const.hex ${RELEASE_DIR}/data_ram_in_const.hex
+	rm -rf ${RELEASE_DIR}
+	mkdir ${RELEASE_DIR}
+	cp ${TS_REPO_ROOT}/data/constants.hex ${RELEASE_DIR}/constants.hex
 	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--dump-program=${RELEASE_DIR}/program_dump.s \
 	--dump-symbols=${RELEASE_DIR}/symbols_dump.s \
 	${SRC_DIR}/main.s > ${RELEASE_DIR}/compile.log
+
+release_boot_mpw1: data_ram_in_const_boot ops_constants
+	rm -rf ${BOOT_DIR}
+	mkdir ${BOOT_DIR}
+	cp ${TS_REPO_ROOT}/data/constants.hex ${BOOT_DIR}/constants.hex
+	${COMPILER} --isa-version=1 --hex-format=1 --hex-file=${BOOT_DIR}/main.hex \
+	--first-address=${FW_BASE_ADDR} \
+	--dump-program=${BOOT_DIR}/program_dump.s \
+	--dump-symbols=${BOOT_DIR}/symbols_dump.s \
+	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/compile.log
+
+release_boot_mpw2: data_ram_in_const ops_constants
+	rm -rf ${BOOT_DIR}
+	mkdir ${BOOT_DIR}
+	cp ${TS_REPO_ROOT}/data/constants.hex ${BOOT_DIR}/constants.hex
+	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${BOOT_DIR}/main.hex \
+	--first-address=${FW_BASE_ADDR} \
+	--dump-program=${BOOT_DIR}/program_dump.s \
+	--dump-symbols=${BOOT_DIR}/symbols_dump.s \
+	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/compile.log
 
 fit_sources = x25519_nomask x25519_scalar_mask x25519_z_mask x25519_z_scalar_mask
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
+import os
 
 import test_common as tc
 import models.p256 as p256
@@ -81,4 +82,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
+
     sys.exit(0)

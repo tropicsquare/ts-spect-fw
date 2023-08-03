@@ -3,6 +3,7 @@ import sys
 import binascii
 import hashlib
 import random as rn
+import os
 
 import test_common as tc
 
@@ -62,5 +63,8 @@ if __name__ == "__main__":
         sys.exit(0)
 
     tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
 
     sys.exit(0)

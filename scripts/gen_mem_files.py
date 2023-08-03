@@ -27,6 +27,8 @@ if len(mem["data"]) > mem_size:
 
 mem_hex_name = os.path.join(os.path.dirname(sys.argv[1]), mem["name"] + ".hex")
 mem_leyout_name = os.path.join(os.path.dirname(sys.argv[1]), mem["name"] + "_leyout.s")
+print("hexfile -> ", mem_hex_name)
+print("leyout -> ", mem_leyout_name)
 mem_hex = open(mem_hex_name, "w")
 mem_leyout = open(mem_leyout_name, "w")
 

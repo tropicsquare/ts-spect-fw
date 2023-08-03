@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
+import os
 
 import test_common as tc
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         tc.print_failed()
         ret |= 1
 
@@ -59,19 +60,22 @@ if __name__ == "__main__":
     A = tc.read_output(test_dir, run_name, 0x5010, 8)
 
     if (l3_result != 0xc3):
-        print("L3 RESULT:", hex(l3_result))
+        #print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
         ret |= 1
 
     if not(curve == curve_ref and origin == origin_ref and A == A_ref):
-        print("curve:   ", hex(curve))
-        print("origin:  ", hex(origin))
-        print("A:       ", hex(A))
+        #print("curve:   ", hex(curve))
+        #print("origin:  ", hex(origin))
+        #print("A:       ", hex(A))
         tc.print_failed()
         ret |= 1
 
     if not(ret & 1):
         tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
 #   Curve = Ed25519
@@ -105,7 +109,7 @@ if __name__ == "__main__":
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         tc.print_failed()
         ret |= 2
 
@@ -118,20 +122,23 @@ if __name__ == "__main__":
     Ay = tc.read_output(test_dir, run_name, 0x5030, 8)
 
     if (l3_result != 0xc3):
-        print("L3 RESULT:", hex(l3_result))
+        #print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
         ret |= 2
 
     if not(curve == curve_ref and origin == origin_ref and A == A_ref):
-        print("curve:   ", hex(curve))
-        print("origin:  ", hex(origin))
-        print("Ax:      ", hex(Ax))
-        print("Ay:      ", hex(Ay))
+        #print("curve:   ", hex(curve))
+        #print("origin:  ", hex(origin))
+        #print("Ax:      ", hex(Ax))
+        #print("Ay:      ", hex(Ay))
         tc.print_failed()
         ret |= 2
 
     if not(ret & 2):
         tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
 #   Empty Slot
@@ -156,7 +163,7 @@ if __name__ == "__main__":
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS != 0xF2):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         tc.print_failed()
         ret |= 4
 
@@ -164,11 +171,14 @@ if __name__ == "__main__":
     l3_result = tmp & 0xFF
 
     if (l3_result != 0x3c):
-        print("L3 RESULT:", hex(l3_result))
+        #print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
         ret |= 4
 
     if not(ret & 4):
         tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
 
     sys.exit(ret)

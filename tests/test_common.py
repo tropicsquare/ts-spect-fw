@@ -160,7 +160,7 @@ def run_op(
                 cmd_file,           op_name,
                 insrc,              outsrc,         data_in_size,
                 ops_cfg,            test_dir,       main=None,      run_name=None,
-                old_context=None,   keymem=None,    break_s=None
+                old_context=None,   keymem=None,    break_s=None,   isa=2, dump=True
             ):
 
     op = find_in_list(op_name, ops_cfg)
@@ -186,18 +186,19 @@ def run_op(
     else:
         cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
     cmd += f" --first-address=0x8000"
-    cmd += f" --const-rom={TS_REPO_ROOT}/data/const_rom.hex"
+    cmd += f" --isa-version={isa}"
+    cmd += f" --const-rom={TS_REPO_ROOT}/data/constants.hex"
     cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --emem-out={test_dir}/{run_name}_emem_out.hex"
     cmd += f" --dump-keymem={test_dir}/{run_name}_keymem.hex"
+    cmd += f" --dump-context={test_dir}/{new_context}"
     if keymem:
         cmd += f" --load-keymem={keymem}"
     if old_context:
         cmd += f" --load-context={test_dir}/{old_context}"
-    cmd += f" --dump-context={test_dir}/{new_context}"
-    #cmd += f" --isa-version=1"
-    cmd += f" --shell --cmd-file={test_dir}/iss_cmd > {test_dir}/{run_log}"
+    cmd += f" --shell --cmd-file={test_dir}/iss_cmd"
+    cmd += f" > {test_dir}/{run_log}"
 
     if os.system(cmd):
         print("ISS FAILED")

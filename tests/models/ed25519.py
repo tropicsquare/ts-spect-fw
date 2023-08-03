@@ -130,7 +130,8 @@ def sign(secret, msg):
     Rs = point_compress(R)
     h = sha512_modq(Rs + A + msg)
     s = (r + h * a) % q
-    return Rs + int.to_bytes(s, 32, "little")
+    signature = Rs + int.to_bytes(s, 32, "little")
+    return signature, A
 
 ## And finally the verification function.
 

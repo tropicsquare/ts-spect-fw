@@ -140,13 +140,13 @@ point_decompress_ed25519_vx2_check2:
 .ifdef SPECT_ISA_VERSION_2
     MOVI r1, 0              ; r1 = flag
 
-    XOR     r30, r16, r20   ; v*x^2 == u
+    XOR  r30, r16, r20   ; v*x^2 == u
     BRNZ point_decompress_ed25519_vx2_check2
     MOV  r0, r18            ; res = x
     MOVI r1, 1
 point_decompress_ed25519_vx2_check2:
     MOVI r30, 0
-    SUBP r20, r30, r16
+    SUBP r20, r30, r20
     XOR  r30, r16, r20             ; v*x^2 == -u
     BRNZ point_decompress_ed25519_vx2_check_flag
     MOV  r0, r17            ; res = x * 2^((p-1)/4)
@@ -181,9 +181,10 @@ point_decompress_ed25519_check_x_is_0_and_X0_is_1:
 ; point_decompress_ed25519_add_parity
     MOVI r3, 0
     SUBP r3, r3, r0         ; r3 = -x
-    ANDI r1, r0, 1          ; r1 = x mod 2
+    MOVI r30, 1
+    AND  r1, r0, r30          ; r1 = x mod 2
     CMP r1, r22             ; x mod 2 == x0
-    BRZ point_decompress_ed25519_x_is_p_minus_x
+    BRNZ point_decompress_ed25519_x_is_p_minus_x
     MOV r11, r0
     JMP point_decompress_ed25519_success
 

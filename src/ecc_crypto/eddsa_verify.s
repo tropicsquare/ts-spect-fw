@@ -6,7 +6,7 @@
 ;   Pub key : 0x0080-0x00BF
 ;
 ; Outputs:
-;   Fail/Success : 0x
+;   Fail/Success : 0x0
 
 eddsa_verify:
     ; load and set needed parameters
@@ -64,8 +64,7 @@ bp_eddsa_verify_deca:
     CMPA        r1,  0
 .endif
 .ifdef SPECT_ISA_VERSION_2
-    MOVI        r30, 0
-    XOR         r1, r1, r30
+    XORI        r1, r1, 0
 .endif
     BRNZ        eddsa_verify_fail
     MOVI        r13, 1
