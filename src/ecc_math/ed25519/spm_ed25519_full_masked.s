@@ -64,7 +64,7 @@ spm_ed25519_full_masked_z_randomize:
 
     CALL        spm_ed25519_long
     CALL        point_check_ed25519
-    BRNZ        
+    BRNZ        ed25519_spm_fail
 
 ;   5) Compute P3 = P1 - P2
     LD          r11, ca_ed25519_smp_P2x
@@ -97,7 +97,7 @@ spm_ed25519_full_masked_z_randomize:
 
     CALL        spm_ed25519_long
     CALL        point_check_ed25519
-    BRNZ     
+    BRNZ        ed25519_spm_fail
 
 ;   8) Compute k.P = k2.P2 + k3.P3
     LD          r11, ca_ed25519_smp_P2x
@@ -112,7 +112,7 @@ spm_ed25519_full_masked_z_randomize:
     MOV         r9,  r13
     MOV         r10, r14
     CALL        point_check_ed25519
-    BRNZ
+    BRNZ        ed25519_spm_fail
 
 ;   9) Convert k.P to affine coordinates
     MOV         r1,  r13

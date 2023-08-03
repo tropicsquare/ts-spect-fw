@@ -19,7 +19,7 @@ eddsa_nonce_finish_loop_l2:
     CALL        eddsa_nonce_shift
 
     SUBI        r12, r12, 1
-    BRNZ        eddsa_nonce_ipdate_loop_l2
+    BRNZ        eddsa_nonce_update_loop_l2
 
     TMAC_UP     r1
 

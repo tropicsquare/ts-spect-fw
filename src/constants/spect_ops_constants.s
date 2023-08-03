@@ -38,6 +38,7 @@ eddsa_input_message .eq 0x0
 eddsa_output_result .eq 0x0
 ; eddsa_set_context
 eddsa_set_context_id .eq 0x41
+eddsa_set_context_input_slot .eq 0x0
 eddsa_set_context_input_sch .eq 0xA0
 eddsa_set_context_input_scn .eq 0xC0
 ; eddsa_nonce_init

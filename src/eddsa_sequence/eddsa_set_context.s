@@ -10,6 +10,16 @@
 
 ; TODO Integrity checks??
 
+; Overall EdDSA sequence context
+;   Public key 'A' --------------> ca_eddsa_sign_internal_A
+;   Private key part 's' --------> r26
+;   Private key part 'prefix' ---> r20
+;   Secure Channel Hash ---------> r16
+;   Secure Channel Nonce --------> r17
+;   Nonce 'r' -------------------> r27
+;   Signature part 'R' ----------> ca_eddsa_sign_internal_R
+;   SHA512(R || A || M) ---------> r16
+
 op_eddsa_set_context:
     CALL    get_input_base
     ADDI    r4,  r0,  eddsa_set_context_input_slot
