@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
+import os
 
 import test_common as tc
 
@@ -110,6 +111,8 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
 
 if __name__ == "__main__":
 
+    ret = 0
+
     seed = rn.randint(0, 2**32-1)
     rn.seed(seed)
     print("seed:", seed)
@@ -124,34 +127,47 @@ if __name__ == "__main__":
 # ===================================================================================
     if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, Ed25519_ID)):
         tc.print_failed()
-        sys.exit(1)
+        ret |= 1
 
     tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
 #   Curve = Ed25519, Command Buffer / Result Buffer
 # ===================================================================================
     if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, Ed25519_ID)):
         tc.print_failed()
-        sys.exit(1)
+        ret |= 2
 
     tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
 #   Curve = P256, DATA RAM IN / OUT
 # ===================================================================================
     if (test_process(test_dir, "p256_ram", 0x0, 0x1, P256_ID)):
         tc.print_failed()
-        sys.exit(1)
+        ret |= 4
 
     tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
 #   Curve = P 256, Command Buffer / Result Buffer
 # ===================================================================================
     if (test_process(test_dir, "p256_cpb", 0x4, 0x5, P256_ID)):
         tc.print_failed()
-        sys.exit(1)
+        ret |= 8
 
     tc.print_passed()
-    sys.exit(0)
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
+
+    sys.exit(ret)

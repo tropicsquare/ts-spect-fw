@@ -1,4 +1,4 @@
-name: const_rom
+name: constants
 start_addr: 0x3000
 end_addr:   0x37FF
 data:
