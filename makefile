@@ -58,6 +58,16 @@ release_boot_mpw1: data_ram_in_const_boot ops_constants
 	--dump-symbols=${BOOT_DIR}/symbols_dump.s \
 	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/compile.log
 
+release_boot_mpw2: data_ram_in_const ops_constants
+	rm -rf ${BOOT_DIR}
+	mkdir ${BOOT_DIR}
+	cp ${TS_REPO_ROOT}/data/constants.hex ${BOOT_DIR}/constants.hex
+	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${BOOT_DIR}/main.hex \
+	--first-address=${FW_BASE_ADDR} \
+	--dump-program=${BOOT_DIR}/program_dump.s \
+	--dump-symbols=${BOOT_DIR}/symbols_dump.s \
+	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/compile.log
+
 fit_sources = x25519_nomask x25519_scalar_mask x25519_z_mask x25519_z_scalar_mask
 
 release_fit: data_ram_in_const
