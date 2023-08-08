@@ -18,7 +18,7 @@
 ;   Secure Channel Nonce --------> r17
 ;   Nonce 'r' -------------------> r27
 ;   Signature part 'R' ----------> ca_eddsa_sign_internal_R
-;   SHA512(R || A || M) ---------> r16
+;   SHA512(R || A || M) ---------> r25
 
 op_eddsa_set_context:
     CALL    get_input_base
@@ -50,6 +50,7 @@ op_eddsa_set_context:
     BRE     eddsa_set_context_kbus_fail
 
     LD      r16, eddsa_set_context_input_sch
+    SWE     r16, r16
     LD      r17, eddsa_set_context_input_scn
 
     MOVI    r0,  ret_op_success

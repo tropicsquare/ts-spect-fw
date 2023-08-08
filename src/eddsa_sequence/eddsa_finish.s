@@ -1,13 +1,24 @@
 op_eddsa_finish:
     LD          r31, ca_q25519
-    ; Compute S = r * e*s1 + e*s2
+
+    MOVI        r0,  3
+eddsa_finish_s_randomize:
+    SUBI        r0,  r0,  1
+    BRZ         eddsa_finish_randomize_fail
     GRV         r1
+    MOVI        r0,  0
+    REDP        r1,  r0,  r1
+    XORI        r0,  r1,  0
+    BRZ         eddsa_finish_s_randomize
+
+    ; Compute S = r * e*s1 + e*s2
+
     SUBP        r2,  r26, r1
 
-    MULP        r1,  r1,  r16
-    MULP        r2,  r2,  r16
+    MULP        r1,  r1,  r25
+    MULP        r2,  r2,  r25
     ADDP        r3,  r27, r1
-    ADDP        r3,  r0,  r2
+    ADDP        r3,  r3,  r2
 
     ST          r3,  ca_eddsa_sign_internal_S
 
@@ -15,15 +26,15 @@ op_eddsa_finish:
     LD          r31, ca_p25519
     LD          r6,  ca_ed25519_d
     LD          r12, ca_eddsa_sign_internal_A
+    SWE         r12, r12
     CALL        point_decompress_ed25519
 
     XORI        r30, r1,  0
     BRNZ        eddsa_finish_fail
     MOVI        r13, 1
     MUL25519    r14, r11, r12
-
     ; Compute e.A
-    MOV         r28, r16
+    MOV         r28, r25
 
     CALL        spm_ed25519_short
 
@@ -31,7 +42,6 @@ op_eddsa_finish:
     ST          r8,  ca_eddsa_sign_internal_EAy
     ST          r9,  ca_eddsa_sign_internal_EAz
     ST          r10, ca_eddsa_sign_internal_EAt
-
     ; Compute S.G
     LD          r28, ca_eddsa_sign_internal_S
     LD          r11, ca_ed25519_xG
@@ -47,8 +57,8 @@ op_eddsa_finish:
     LD          r14, ca_eddsa_sign_internal_EAt
 
     MOVI        r0,  0
-    SUBP        r11, r11, r0
-    SUBP        r14, r14, r0
+    SUBP        r11, r0,  r11
+    SUBP        r14, r0,  r14
 
     CALL        point_add_ed25519
     MOV         r7,  r11
@@ -68,14 +78,24 @@ op_eddsa_finish:
 
     MOVI        r2,  l3_result_ok
     STR         r2,  r30
-    ADDI        r30, r0,  eddsa_finish_output_R
-    STR         r4,  r30
-    ADDI        r30, r0,  eddsa_finish_output_S
-    LD          r4,  ca_eddsa_sign_internal_S
+    ADDI        r30, r0,  eddsa_finish_output_signature
+    LD          r5,  ca_eddsa_sign_internal_S
+    SWE         r5,  r5
+    STR         r5,  r30
+    ADDI        r30, r30,  0x20
     STR         r4,  r30
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  48
+    JMP         set_res_word
+
+eddsa_finish_randomize_fail:
+    CALL        get_output_base
+    ADDI        r30, r0,  eddsa_output_result
+    MOVI        r2,  l3_result_fail
+    STR         r2,  r30
+    MOVI        r0,  ret_grv_err
+    MOVI        r1,  1
     JMP         set_res_word
 
 eddsa_finish_fail:

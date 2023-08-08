@@ -17,4 +17,5 @@ eddsa_nonce_update_loop_l2:
     BRNZ        eddsa_nonce_update_loop_l1
 
     MOVI        r0,  ret_op_success
+    MOVI        r1,  0
     JMP         set_res_word

@@ -8,12 +8,12 @@ op_eddsa_R_part:
     CALL        spm_ed25519_full_masked
 
     MOVI        r1,  1
-    AND         r22, r22, r1
-    ROR         r22, r22
-    OR          r21, r21, r22
-    SWE         r21, r21
+    AND         r21, r21, r1
+    ROR         r21, r21
+    OR          r22, r22, r21
+    SWE         r22, r22
 
-    ST          r21, ca_eddsa_sign_internal_R
+    ST          r22, ca_eddsa_sign_internal_R
 
     MOVI        r1,  0
     JMP         set_res_word

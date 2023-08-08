@@ -44,15 +44,19 @@
 ; EdDSA Sequence
 ; ====================================================
 
-.include    eddsa_sequence/eddsa_e_at_once.s
-.include    eddsa_sequence/eddsa_finish.s
-.include    eddsa_sequence/eddsa_nonce_finish.s
-.include    eddsa_sequence/eddsa_nonce_init.s
-.include    eddsa_sequence/eddsa_nonce_update.s
 .include    eddsa_sequence/eddsa_nonce_load_msg.s
 .include    eddsa_sequence/eddsa_nonce_shift.s
-.include    eddsa_sequence/eddsa_r_part.s
 .include    eddsa_sequence/eddsa_set_context.s
+.include    eddsa_sequence/eddsa_nonce_init.s
+.include    eddsa_sequence/eddsa_nonce_update.s
+.include    eddsa_sequence/eddsa_nonce_finish.s
+.include    eddsa_sequence/eddsa_r_part.s
+.include    eddsa_sequence/eddsa_e_load_msg.s
+.include    eddsa_sequence/eddsa_e_at_once.s
+.include    eddsa_sequence/eddsa_e_prep.s
+.include    eddsa_sequence/eddsa_e_update.s
+.include    eddsa_sequence/eddsa_e_finish.s
+.include    eddsa_sequence/eddsa_finish.s
 
 ; ====================================================
 ; ECC Point Generation

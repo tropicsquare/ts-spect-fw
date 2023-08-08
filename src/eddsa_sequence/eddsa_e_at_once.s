@@ -21,7 +21,7 @@ op_eddsa_e_at_once:
     ROL8        r15, r15
     ROL8        r15, r15
 
-    ; get size of message in bites
+    ; get size of message in bits
     LSL         r12, r11
     LSL         r12, r12
     LSL         r12, r12            ; bitsize of message
@@ -29,7 +29,7 @@ op_eddsa_e_at_once:
     ; init hash unit
     HASH_IT
 
-    ; prepare for LSB bits maski
+    ; prepare for LSB bits mask
     MOVI        r6, 0
     NOT         r5, r6
 
@@ -82,7 +82,9 @@ eddsa_e_at_once_next_block:
 
 eddsa_e_at_once_reduce:
     LD          r31, ca_q25519
-    REDP        r16, r17, r16
+    SWE         r16, r16            ; decode as little endian integer mod q
+    SWE         r17, r17
+    REDP        r16, r16, r17  
 
     MOVI        r0, ret_op_success
     MOVI        r1,  0

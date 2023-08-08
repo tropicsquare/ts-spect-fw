@@ -28,6 +28,7 @@ eddsa_nonce_finish_loop_l2:
 eddsa_nonce_finish_last_block:
 
     ADDI        r11, r11, 18        ; r11 = byte size of the last block
+    BRZ         eddsa_nonce_finish_exact
 
     MOVI        r12, 18
     SUB         r12, r12, r11       ; r12 = size of padding
@@ -50,7 +51,7 @@ eddsa_nonce_finish_padding_loop:
     SUBI        r12, r12, 1
     BRNZ        eddsa_nonce_finish_padding_loop
 
-    ORI         r1,  r1, 0x8000
+    ORI         r1,  r1, 0x80
     JMP         eddsa_nonce_finish_last_update
 
 eddsa_nonce_finish_exact:   ; message was exactly multiple of 18 bytes
@@ -72,6 +73,10 @@ eddsa_nonce_finish_last_update:
     TMAC_UP     r1
 
     TMAC_RD     r27
+
+    LD          r31, ca_q25519
+    MOVI        r0,  0
+    REDP        r27, r0, r27
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  0
