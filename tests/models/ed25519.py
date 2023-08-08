@@ -5,6 +5,7 @@
 ## First, some preliminaries that will be needed.
 
 import hashlib
+from .tmac import tmac
 
 def sha512(s):
     return hashlib.sha512(s).digest()
@@ -22,6 +23,9 @@ d = -121665 * modp_inv(121666) % p
 q = 2**252 + 27742317777372353535851937790883648493
 
 def sha512_modq(s):
+    digest = sha512(s)
+    print("e msg len", hex(len(s)*8))
+    print("e digest", digest.hex())
     return int.from_bytes(sha512(s), "little") % q
 
 ## Then follows functions to perform point operations.
@@ -122,16 +126,30 @@ def secret_to_public(secret):
 
 ## The signature function works as below.
 
-def sign(secret, msg):
-    a, prefix = secret_expand(secret)
-    A = point_compress(point_mul(a, G))
-    r = sha512_modq(prefix + msg)
+#def sign(secret, msg):
+#    a, prefix = secret_expand(secret)
+#    A = point_compress(point_mul(a, G))
+#    r = sha512_modq(prefix + msg)
+#    R = point_mul(r, G)
+#    Rs = point_compress(R)
+#    h = sha512_modq(Rs + A + msg)
+#    s = (r + h * a) % q
+#    signature = Rs + int.to_bytes(s, 32, "little")
+#    return signature, A
+#
+
+def sign(s, prefix, A, sch, scn, m):
+    r_bytes = tmac(prefix, sch + scn + m, b"\x0C")
+    r = int.from_bytes(r_bytes, byteorder='big') % q
     R = point_mul(r, G)
     Rs = point_compress(R)
-    h = sha512_modq(Rs + A + msg)
-    s = (r + h * a) % q
+    print("Rs:", Rs.hex())
+    h = sha512_modq(Rs + A + m)
+    print("em: ", (Rs + A + m).hex())
+    print("e:", hex(h))
+    s = (r + h * s) % q
     signature = Rs + int.to_bytes(s, 32, "little")
-    return signature, A
+    return signature
 
 ## And finally the verification function.
 

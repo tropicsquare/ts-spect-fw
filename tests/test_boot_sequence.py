@@ -61,7 +61,7 @@ def boot_sequence(signature, A, message, name, isa):
 
     return res == 1
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     ret = 0
 
     seed = rn.randint(0, 2**32-1)
