@@ -135,10 +135,8 @@
 - name : eddsa_finish
   id : 0x4A
   output :
-    - name : R
+    - name : signature
       address : 0x10
-    - name : S
-      address : 0x30
 
 - name : eddsa_verify
   id : 0x4B
