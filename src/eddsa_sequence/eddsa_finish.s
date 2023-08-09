@@ -68,11 +68,10 @@ eddsa_finish_s_randomize:
     ; ENC(Q)
     CALL        point_compress_ed25519
 
-    LD          r4,  ca_eddsa_sign_internal_R
-
     CALL        get_output_base
     ADDI        r30, r0,  eddsa_output_result
 
+    LD          r4,  ca_eddsa_sign_internal_R
     XOR         r2,  r8,  r4
     BRNZ        eddsa_finish_fail
 

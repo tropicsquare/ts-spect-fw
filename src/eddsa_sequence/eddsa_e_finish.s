@@ -11,24 +11,7 @@ op_eddsa_e_finish:
     CMPI        r11, 128
     BRZ         eddsa_e_finish_pad_in_next_block
 
-    ANDI        r9,  r11, 0x60          ; Mask bits 5 and 6 (chunk size // 32)
-    ANDI        r8,  r11, 0x1F          ; Mask bits 4:0 (chunk size mod 32)
-    MOVI        r7,  32
-    SUB         r8,  r7,  r8
-    MOV         r7,  r8
-    LSL         r7,  r7
-    LSL         r7,  r7
-    LSL         r7,  r7
-    SUBI        r7,  r7,  1             ; position of the '1' at the start of padding
-
-    ; prepare for padding bits mask
-    MOVI        r6, 0
-    NOT         r5, r6
-
-eddsa_e_finish_pad_mask_loop:
-    ROLIN       r5,  r5,  r6
-    SUBI        r8,  r8,  1
-    BRNZ        eddsa_e_finish_pad_mask_loop
+    CALL        eddsa_e_pad_mask
 
     CMPI        r9,  96
     BRZ         eddsa_e_finish_pad_in_r18
@@ -65,7 +48,6 @@ eddsa_e_finish_pad_in_r18:
     JMP         eddsa_e_finish_last_hash
 
 eddsa_e_finish_pad_in_r18_next_block:
-    
     HASH        r16, r18
     MOVI        r21, 0
     JMP         eddsa_e_finish_pad_next_block_continue

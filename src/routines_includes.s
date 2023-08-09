@@ -52,6 +52,7 @@
 .include    eddsa_sequence/eddsa_nonce_finish.s
 .include    eddsa_sequence/eddsa_r_part.s
 .include    eddsa_sequence/eddsa_e_load_msg.s
+.include    eddsa_sequence/eddsa_e_pad_mask.s
 .include    eddsa_sequence/eddsa_e_at_once.s
 .include    eddsa_sequence/eddsa_e_prep.s
 .include    eddsa_sequence/eddsa_e_update.s
@@ -76,10 +77,10 @@
 ; ECC Crypto
 ; ====================================================
 
-.include   ecc_crypto/p256_key_setup.s
+.include    ecc_crypto/p256_key_setup.s
 .include    ecc_crypto/ed25519_key_setup.s
-.include   ecc_crypto/ecdsa_sign.s
-.include   ecc_crypto/eddsa_verify.s
+.include    ecc_crypto/ecdsa_sign.s
+.include    ecc_crypto/eddsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
 
 ; ====================================================
