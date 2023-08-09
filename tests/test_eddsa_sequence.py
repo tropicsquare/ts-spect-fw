@@ -7,7 +7,17 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
+insrc_arr = [0x0, 0x4]
+outsrc_arr = [0x1, 0x5]
+
 def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
+
+    #insrc = insrc_arr[rn.randint(0,1)]
+    #outsrc = outsrc_arr[rn.randint(0,1)]
+
+    # Must be fixed now, because ISS does not support bigger EMEM
+    insrc = 0x0
+    outsrc = 0x1
 
     sign_ref = ed25519.sign(s, prefix, A, sch, scn, message)
     print("Msg size:", len(message))
@@ -271,9 +281,6 @@ if __name__ == "__main__":
 
     slot = rn.randint(0, 7)
 
-    insrc = 0x0
-    outsrc = 0x1
-
     ########################################################################################################
     #   Test message len >= 64
     ########################################################################################################
@@ -284,8 +291,8 @@ if __name__ == "__main__":
     if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_big"):
         tc.print_failed()
         ret = 1
-
-    tc.print_passed()
+    else:
+        tc.print_passed()
 
     ########################################################################################################
     #   Test message len < 64
@@ -297,7 +304,7 @@ if __name__ == "__main__":
     if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_small"):
         tc.print_failed()
         ret = 1
-
-    tc.print_passed()
+    else:
+        tc.print_passed()
 
     sys.exit(ret)
