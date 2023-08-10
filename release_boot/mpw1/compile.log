@@ -6,15 +6,26 @@ Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyout
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/constants_leyout.s
 Adding symbol: ca_p25519(512)
 Adding symbol: ca_q25519(544)
-Adding symbol: ca_eddsa_d(576)
-Adding symbol: ca_eddsa_xG(608)
-Adding symbol: ca_eddsa_yG(640)
+Adding symbol: ca_ed25519_d(576)
+Adding symbol: ca_ed25519_xG(608)
+Adding symbol: ca_ed25519_yG(640)
 Adding symbol: ca_p25519_c3(672)
 Adding symbol: ca_ffff(704)
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/mem_leyouts_includes.s
 Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/internal_mem_leyout.s
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/internal_mem_leyout.s
 Adding symbol: ca_addr_base(256)
+Adding symbol: ca_ed25519_smp_P2x(512)
+Adding symbol: ca_ed25519_smp_P2y(544)
+Adding symbol: ca_ed25519_smp_P2z(576)
+Adding symbol: ca_ed25519_smp_P2t(608)
+Adding symbol: ca_eddsa_sign_internal_A(768)
+Adding symbol: ca_eddsa_sign_internal_R(800)
+Adding symbol: ca_eddsa_sign_internal_S(832)
+Adding symbol: ca_eddsa_sign_internal_EAx(864)
+Adding symbol: ca_eddsa_sign_internal_EAy(896)
+Adding symbol: ca_eddsa_sign_internal_EAz(928)
+Adding symbol: ca_eddsa_sign_internal_EAt(960)
 Adding symbol: ca_eddsa_verify_internal_SBx(288)
 Adding symbol: ca_eddsa_verify_internal_SBy(320)
 Adding symbol: ca_eddsa_verify_internal_SBz(352)
@@ -24,6 +35,9 @@ Adding symbol: ca_ed25519_key_setup_internal_prefix(320)
 Adding symbol: ca_p256_key_setup_internal_d(288)
 Adding symbol: ca_p256_key_setup_internal_w(320)
 Adding symbol: ca_ecdsa_sign_internal_z(288)
+Adding symbol: ca_ecdsa_sign_internal_s(320)
+Adding symbol: ca_ecdsa_sign_internal_Ax(352)
+Adding symbol: ca_ecdsa_sign_internal_Ay(384)
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/mem_leyouts_includes.s
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
 Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_status.s
@@ -39,9 +53,11 @@ Adding symbol: ret_x25519_err_inv_pub_key(18)
 Adding symbol: ret_ecdsa_err_inv_nonce(33)
 Adding symbol: ret_ecdsa_err_inv_r(34)
 Adding symbol: ret_ecdsa_err_inv_s(35)
+Adding symbol: ret_ecdsa_err_final_verify(36)
 Adding symbol: ret_eddsa_err_inv_priv_key(52)
 Adding symbol: ret_eddsa_err_inv_pub_key(53)
-Adding symbol: ret_spm_err(65)
+Adding symbol: ret_eddsa_err_final_verify(54)
+Adding symbol: ret_point_integrity_err(65)
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
 Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_constants.s
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_constants.s
@@ -72,6 +88,7 @@ Adding symbol: eddsa_id(64)
 Adding symbol: eddsa_input_message(0)
 Adding symbol: eddsa_output_result(0)
 Adding symbol: eddsa_set_context_id(65)
+Adding symbol: eddsa_set_context_input_slot(0)
 Adding symbol: eddsa_set_context_input_sch(160)
 Adding symbol: eddsa_set_context_input_scn(192)
 Adding symbol: eddsa_nonce_init_id(66)
@@ -83,8 +100,7 @@ Adding symbol: eddsa_e_prep_id(71)
 Adding symbol: eddsa_e_update_id(72)
 Adding symbol: eddsa_e_finish_id(73)
 Adding symbol: eddsa_finish_id(74)
-Adding symbol: eddsa_finish_output_R(16)
-Adding symbol: eddsa_finish_output_S(48)
+Adding symbol: eddsa_finish_output_signature(16)
 Adding symbol: eddsa_verify_id(75)
 Adding symbol: eddsa_verify_input_R(32)
 Adding symbol: eddsa_verify_input_S(64)
@@ -241,7 +257,7 @@ Adding symbol: inv_p25519_loop_100(33928)
 Adding symbol: inv_p25519_loop_50_2(33952)
 Resolving symbol: inv_p25519(33972)
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
-Assembling program to: /projects/tropic01/work/vmasek/ts-spect-fw/release_boot/main.hex
+Assembling program to: /projects/tropic01/work/vmasek/ts-spect-fw/release_boot/mpw1/spect_boot_mpw1.hex
 ********************************************************************************
 [1;32mCompilation finished OK!
 [0m********************************************************************************
@@ -250,5 +266,5 @@ Last instruction address:  0x84d4
 Number of instructions:    310
 Program start address:     0x8000
 ********************************************************************************
-Dumping program to: /projects/tropic01/work/vmasek/ts-spect-fw/release_boot/program_dump.s
-Dumping symbols to: /projects/tropic01/work/vmasek/ts-spect-fw/release_boot/symbols_dump.s
+Dumping program to: /projects/tropic01/work/vmasek/ts-spect-fw/release_boot/mpw1/dump/program_dump.s
+Dumping symbols to: /projects/tropic01/work/vmasek/ts-spect-fw/release_boot/mpw1/dump/symbols_dump.s
