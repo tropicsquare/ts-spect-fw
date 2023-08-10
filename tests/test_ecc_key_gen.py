@@ -8,9 +8,6 @@ import test_common as tc
 import models.ed25519 as ed25519
 import models.p256 as p256
 
-Ed25519_ID = 0x02
-P256_ID = 0x01
-
 def test_process(test_dir, run_id, insrc, outsrc, key_type):
     cmd_file = tc.get_cmd_file(test_dir)
 
@@ -25,7 +22,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
 
     tc.print_run_name(run_name)
 
-    if key_type == Ed25519_ID:
+    if key_type == tc.Ed25519_ID:
         priv1_ref, priv2_ref = ed25519.secret_expand(k)
         pub1_ref = ed25519.secret_to_public(k)
         pub2_ref = 0
@@ -70,7 +67,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
     priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
     pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=8)
     pub2 = pub2_ref
-    if key_type == P256_ID:
+    if key_type == tc.P256_ID:
         pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=16)
 
     metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
@@ -125,7 +122,7 @@ if __name__ == "__main__":
 # ===================================================================================
 #   Curve = Ed25519, DATA RAM IN / OUT
 # ===================================================================================
-    if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, Ed25519_ID)):
+    if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, tc.Ed25519_ID)):
         tc.print_failed()
         ret |= 1
 
@@ -137,7 +134,7 @@ if __name__ == "__main__":
 # ===================================================================================
 #   Curve = Ed25519, Command Buffer / Result Buffer
 # ===================================================================================
-    if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, Ed25519_ID)):
+    if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, tc.Ed25519_ID)):
         tc.print_failed()
         ret |= 2
 
@@ -149,7 +146,7 @@ if __name__ == "__main__":
 # ===================================================================================
 #   Curve = P256, DATA RAM IN / OUT
 # ===================================================================================
-    if (test_process(test_dir, "p256_ram", 0x0, 0x1, P256_ID)):
+    if (test_process(test_dir, "p256_ram", 0x0, 0x1, tc.P256_ID)):
         tc.print_failed()
         ret |= 4
 
@@ -161,7 +158,7 @@ if __name__ == "__main__":
 # ===================================================================================
 #   Curve = P 256, Command Buffer / Result Buffer
 # ===================================================================================
-    if (test_process(test_dir, "p256_cpb", 0x4, 0x5, P256_ID)):
+    if (test_process(test_dir, "p256_cpb", 0x4, 0x5, tc.P256_ID)):
         tc.print_failed()
         ret |= 8
 
