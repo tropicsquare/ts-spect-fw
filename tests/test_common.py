@@ -7,6 +7,9 @@ import numpy as np
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 OPS_CONFIG = TS_REPO_ROOT+"/spect_ops_config.yml"
 
+Ed25519_ID = 0x02
+P256_ID = 0x01
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 

@@ -20,7 +20,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     outsrc = 0x1
 
     sign_ref = ed25519.sign(s, prefix, A, sch, scn, message)
-    print("Msg size:", len(message))
+    #print("Msg size:", len(message))
 
     ########################################################################################################
     #   Set Context
@@ -35,7 +35,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     tc.set_key(cmd_file, key=s,          ktype=0x04, slot=(slot<<1), offset=0)
     tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=8)
 
-    metadata = 0x02
+    metadata = tc.Ed25519_ID
     tc.set_key(cmd_file, key=metadata,  ktype=0x04, slot=(slot<<1)+1, offset=0)
     A_int = int.from_bytes(A, 'big')
     tc.set_key(cmd_file, key=A_int,     ktype=0x04, slot=(slot<<1)+1, offset=8)
@@ -249,13 +249,13 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     ########################################################################################################
 
     result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    print("result:", hex(result))
+    #print("result:", hex(result))
 
     sref_int = int.from_bytes(sign_ref, 'big')
-    print("signature_ref:", hex(sref_int))
+    #print("signature_ref:", hex(sref_int))
 
     signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16)
-    print("signature:    ", hex(signature))
+    #print("signature:    ", hex(signature))
 
     return sref_int == signature
 

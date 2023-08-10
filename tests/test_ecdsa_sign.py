@@ -25,7 +25,7 @@ if __name__ == "__main__":
     tc.set_rng(test_dir, rng)
 
     # Generate test vector
-    d, w, _, _ = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
+    d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
 
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
@@ -37,6 +37,8 @@ if __name__ == "__main__":
     #print("sch: ", sch.hex())
     #print("scn: ", scn.hex())
     #print("z:   ", z.hex())
+    #print("Ax:  ", hex(Ax))
+    #print("Ay:  ", hex(Ay))
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
     #print()
@@ -47,8 +49,11 @@ if __name__ == "__main__":
     slot = rn.randint(0, 7)
 
     wint = int.from_bytes(w, 'big')
-    tc.set_key(cmd_file, key=d,    ktype=0x04, slot=(slot<<1), offset=0)
-    tc.set_key(cmd_file, key=wint, ktype=0x04, slot=(slot<<1), offset=8)
+    tc.set_key(cmd_file, key=d,          ktype=0x04, slot=(slot<<1),   offset=0)
+    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1),   offset=8)
+    tc.set_key(cmd_file, key=tc.P256_ID, ktype=0x04, slot=(slot<<1)+1, offset=0)
+    tc.set_key(cmd_file, key=Ax,         ktype=0x04, slot=(slot<<1)+1, offset=8)
+    tc.set_key(cmd_file, key=Ay,         ktype=0x04, slot=(slot<<1)+1, offset=16)
 
     insrc = 0x4
     outsrc = 0x5
@@ -62,10 +67,18 @@ if __name__ == "__main__":
     tc.write_int32(cmd_file, input_word, (insrc<<12))
 
     # set breakpoints to dump GPR values
-    #break_s = tc.dump_gpr_on(cmd_file, "ecdsa_sign_mask_k", [27, 26])
+    break_s = tc.dump_gpr_on(cmd_file, "bp_ecdsa_sign_ver_after_u1G", [9, 10, 11])
+    break_s += tc.dump_gpr_on(cmd_file, "bp_ecdsa_sign_ver_after_u2A", [9, 10, 11])
 
     # Run Op
     ctx = tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
+
+    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+
+    if (SPECT_OP_STATUS):
+        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        tc.print_failed()
+        sys.exit(0)
 
     # Read result
     l3_result = tc.read_output(test_dir, run_name, outsrc<<12, 1)

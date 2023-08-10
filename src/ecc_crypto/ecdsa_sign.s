@@ -70,8 +70,9 @@ ecdsa_sign_tmac_padding_loop:
     MOVI        r25, 0xD8
 
     CALL        spm_p256_full_masked
-    XORI        r0,  r0,  0
-    BRNZ        ecdsa_sign_fail 
+    MOV         r3,  r0
+    CMPI        r0,  0
+    BRNZ        ecdsa_sign_fail
 
     LD          r31, ca_q256
     MOVI        r0, 0
@@ -81,7 +82,7 @@ ecdsa_sign_tmac_padding_loop:
     MOVI        r1,  3
 
 ecdsa_sign_mask_k:
-    SUBI        r1,  r1, 1
+    SUBI        r1,  r1,  1
     BRZ         ecdsa_fail_k_mask
     GRV         r25                     ; t
     MOVI        r0,  0
@@ -101,6 +102,65 @@ ecdsa_sign_mask_k:
     XORI        r0, r10,  0
     BRZ         ecdsa_sign_fail_s
 
+; Verify the signature
+    ST          r10, ca_ecdsa_sign_internal_s
+    MOV         r1,  r10
+    CALL        inv_q256        ; r1 = s^(-1)
+
+    MULP        r28, r18, r1    ; r2 = e s^(-1) = u1
+    MULP        r27, r22, r1    ; r3 = r s^(-1) = u2
+
+    LD          r31, ca_p256
+    ; P1 = u1.G to (r15, r16, r17)
+    LD          r12, ca_p256_xG
+    LD          r13, ca_p256_yG
+    MOVI        r14, 1
+
+    CALL        spm_p256_short
+
+    MOV         r15, r9
+    MOV         r16, r10
+    MOV         r17, r11
+
+    ; P1 = u2.A to (r9, r10, r11)
+    LD          r12, ca_ecdsa_sign_internal_Ax
+    LD          r13, ca_ecdsa_sign_internal_Ay
+    MOVI        r14, 1
+
+    MOV         r28, r27
+    CALL        spm_p256_short
+
+    ; check if P1x == P2x
+    MUL256      r2,  r15, r11
+    MUL256      r3,  r9,  r17
+    XOR         r0,  r2,  r3
+    BRNZ        eddsa_sign_verify_continue_add
+    MUL256      r2,  r16, r11
+    MUL256      r3,  r10, r17
+    XOR         r0,  r2,  r3
+    BRNZ        ecdsa_fail_verify
+
+eddsa_sign_verify_continue_dbl:
+    ; TODO
+
+eddsa_sign_verify_continue_add:
+    MOV         r12, r15
+    MOV         r13, r16
+    MOV         r14, r17
+
+    CALL        point_add_p256
+
+    MOV         r1,  r14
+    CALL        inv_p256
+    MUL256      r12, r12, r1
+
+    LD          r31, ca_q256
+    MOVI        r0,  0
+    REDP        r12, r0,  r12
+
+    XOR         r1,  r12, r22
+    BRNZ        ecdsa_fail_verify
+
     MOVI        r3,  ret_op_success
     MOVI        r1,  48
 
@@ -116,6 +176,7 @@ ecdsa_sign_end:
     STR         r22, r30
 
     ADDI        r30, r0,  ecdsa_sign_output_S
+    LD          r10, ca_ecdsa_sign_internal_s
     STR         r10, r30
 
 ecdsa_sign_end_not_store:
@@ -133,6 +194,9 @@ ecdsa_sign_fail_s:
     JMP         ecdsa_sign_fail
 ecdsa_fail_k_mask:
     MOVI        r3,  ret_grv_err
+    JMP         ecdsa_sign_fail
+ecdsa_fail_verify:
+    MOVI        r3,  ret_ecdsa_err_final_verify
     JMP         ecdsa_sign_fail
 ecdsa_sign_fail:
     MOVI        r2,  l3_result_fail
