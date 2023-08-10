@@ -19,6 +19,8 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     insrc = 0x0
     outsrc = 0x1
 
+    smodq = s % ed25519.q
+
     sign_ref = ed25519.sign(s, prefix, A, sch, scn, message)
     #print("Msg size:", len(message))
 
@@ -34,6 +36,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     prefix_int = int.from_bytes(prefix, 'big')
     tc.set_key(cmd_file, key=s,          ktype=0x04, slot=(slot<<1), offset=0)
     tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=8)
+    tc.set_key(cmd_file, key=smodq      ,ktype=0x04, slot=(slot<<1), offset=16)
 
     metadata = tc.Ed25519_ID
     tc.set_key(cmd_file, key=metadata,  ktype=0x04, slot=(slot<<1)+1, offset=0)

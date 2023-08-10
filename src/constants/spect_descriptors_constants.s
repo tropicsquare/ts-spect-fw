@@ -4,6 +4,7 @@ ecc_type_ed25519 .eq 0x02
 ecc_type_p256 .eq 0x01
 ecc_priv_key_1 .eq 0x400
 ecc_priv_key_2 .eq 0x401
+ecc_priv_key_3 .eq 0x402
 ecc_key_metadata .eq 0x400
 ecc_pub_key_Ax .eq 0x401
 ecc_pub_key_Ay .eq 0x402
