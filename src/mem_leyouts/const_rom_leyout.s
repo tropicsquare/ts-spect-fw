@@ -10,10 +10,10 @@ ca_p256_c2 .eq 0x3100
 ca_p256_Z .eq 0x3120
 ca_p25519 .eq 0x3140
 ca_q25519 .eq 0x3160
-ca_p8q25519 .eq 0x3180
-ca_eddsa_d .eq 0x31A0
-ca_eddsa_xG .eq 0x31C0
-ca_eddsa_yG .eq 0x31E0
+ca_q25519_8 .eq 0x3180
+ca_ed25519_d .eq 0x31A0
+ca_ed25519_xG .eq 0x31C0
+ca_ed25519_yG .eq 0x31E0
 ca_p25519_c3 .eq 0x3200
 ca_x25519_a24 .eq 0x3220
 ca_ffff .eq 0x3240

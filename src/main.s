@@ -14,9 +14,9 @@ op_id_check_clear:
     CMPI r4, clear_id
     BRZ  op_clear
 
-op_id_check_sha512:
-    CMPI r4, sha512_id
-    BRZ  op_sha512
+;op_id_check_sha512:
+;    CMPI r4, sha512_id
+;    BRZ  op_sha512
 
 op_id_check_ecc_key:
     CMPI r4, ecc_key_id
@@ -41,23 +41,17 @@ op_id_debug:
     END
 
 ; ============================================================
-op_clear:
-    MOVI    r30, ret_op_success
-    ST      r30, ca_spect_res_word
-    MOVI    r30, clear_id
-    JMP     set_res_word
-; ============================================================
-op_sha512:
-    CMPI    r1, sha512_init_id
-    BRZ     op_sha512_init
-
-    CMPI    r1, sha512_update_id
-    BRZ     op_sha512_update
-
-    CMPI    r1, sha512_final_id
-    BRZ     op_sha512_final
-
-    JMP     invalid_op_id
+;op_sha512:
+;    CMPI    r1, sha512_init_id
+;    BRZ     op_sha512_init
+;
+;    CMPI    r1, sha512_update_id
+;    BRZ     op_sha512_update
+;
+;    CMPI    r1, sha512_final_id
+;    BRZ     op_sha512_final
+;
+;    JMP     invalid_op_id
 ; ============================================================
 op_ecc_key:
     CMPI    r1, ecc_key_gen_id
@@ -122,8 +116,8 @@ op_eddsa:
     CMPI    r1, eddsa_finish_id
     BRZ     op_eddsa_finish
 
-    CMPI    r1, eddsa_verify_id
-    BRZ     op_eddsa_verify
+ ;   CMPI    r1, eddsa_verify_id
+ ;   BRZ     op_eddsa_verify
 
     JMP     invalid_op_id
 
@@ -133,72 +127,43 @@ op_ecdsa:
     BRZ     op_ecdsa_sign
 
     JMP     invalid_op_id
-
-; ============================================================
-
-
-; ============================================================
-; Curve25519 Random Point Generation
-;next_cmd_4:
-;    CMPI r0, curve25519_rpg_id
-;    BRNZ next_cmd_5
-;    LD      r1, ca_dst_template
-;    LD      r2, 0x0020              ; DST ID
-;    OR      r1, r1, r2
-;    ROL8    r1, r1
-;    CALL    curve25519_point_generate
-;    ST      r11, 0x1000 
-;    ST      r13, 0x1020
-;    ST      r12, 0x1040
-;    END 
-; ============================================================
-; ============================================================
-; Ed25519 Random Point Generation
-;next_cmd_5:
-;    CMPI r0, ed25519_rpg_id
-;    BRNZ next_cmd_end
-;    LD      r1, ca_dst_template
-;    LD      r2, 0x0020              ; DST ID
-;    OR      r1, r1, r2
-;    ROL8    r1, r1
-;    CALL    ed25519_point_generate
-;    ST      r10, 0x1000 
-;    ST      r11, 0x1020
-;    ST      r12, 0x1040
-;    END 
 ; ============================================================
 
 invalid_op_id:
-    MOVI    r0, ret_op_id_err
-    ST      r0, ca_spect_res_word
+    MOVI    r2,  l3_result_invalid_cmd
+    CALL    get_output_base
+    STR     r2,  r0
+    MOVI    r1,  0
+    MOVI    r0,  ret_op_id_err
+    JMP     set_res_word
 
 ; ============================================================
 ; Routines for geting fields from SPECT_CFG_WORD
 ; ============================================================
 get_input_base:
-    LD      r0, ca_spect_cfg_word
-    MOVI    r1, 0xF0
-    ROL8    r1, r1
-    AND     r0, r0, r1
+    LD      r0,  ca_spect_cfg_word
+    MOVI    r1,  0xF0
+    ROL8    r1,  r1
+    AND     r0,  r0,  r1
     RET
 get_output_base:
-    LD      r0, ca_spect_cfg_word
-    MOVI    r1, 0xF0
-    ROL8    r1, r1
-    LSL     r0, r0
-    LSL     r0, r0
-    LSL     r0, r0
-    LSL     r0, r0
-    AND     r0, r0, r1
+    LD      r0,  ca_spect_cfg_word
+    MOVI    r1,  0xF0
+    ROL8    r1,  r1
+    LSL     r0,  r0
+    LSL     r0,  r0
+    LSL     r0,  r0
+    LSL     r0,  r0
+    AND     r0,  r0,  r1
     RET
 get_data_in_size:
-    LD      r0, ca_spect_cfg_word
-    ROR8    r0, r0
-    ROR8    r0, r0
-    MOVI    r1, 0xFF
-    ROL8    r1, r1
-    ORI     r1, r1, 0xFF
-    AND     r0, r0, r1
+    LD      r0,  ca_spect_cfg_word
+    ROR8    r0,  r0
+    ROR8    r0,  r0
+    MOVI    r1,  0xFF
+    ROL8    r1,  r1
+    ORI     r1,  r1,  0xFF
+    AND     r0,  r0,  r1
     RET
 
 ; ============================================================
@@ -206,10 +171,10 @@ get_data_in_size:
 ; ============================================================
 set_res_word:
     ST      r30, 0x1120
-    ROL8    r1, r1
-    ROL8    r1, r1
-    ADD     r0, r0, r1
-    ST      r0, ca_spect_res_word
+    ROL8    r1,  r1
+    ROL8    r1,  r1
+    ADD     r0,  r0,  r1
+    ST      r0,  ca_spect_res_word
     END
 
 .include    routines_includes.s

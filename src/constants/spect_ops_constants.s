@@ -38,6 +38,7 @@ eddsa_input_message .eq 0x0
 eddsa_output_result .eq 0x0
 ; eddsa_set_context
 eddsa_set_context_id .eq 0x41
+eddsa_set_context_input_slot .eq 0x0
 eddsa_set_context_input_sch .eq 0xA0
 eddsa_set_context_input_scn .eq 0xC0
 ; eddsa_nonce_init
@@ -58,8 +59,7 @@ eddsa_e_update_id .eq 0x48
 eddsa_e_finish_id .eq 0x49
 ; eddsa_finish
 eddsa_finish_id .eq 0x4A
-eddsa_finish_output_R .eq 0x10
-eddsa_finish_output_S .eq 0x30
+eddsa_finish_output_signature .eq 0x10
 ; eddsa_verify
 eddsa_verify_id .eq 0x4B
 eddsa_verify_input_R .eq 0x20

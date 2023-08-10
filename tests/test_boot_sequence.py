@@ -61,7 +61,7 @@ def boot_sequence(signature, A, message, name, isa):
 
     return res == 1
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     ret = 0
 
     seed = rn.randint(0, 2**32-1)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     digest_ref = sha512(message)
 
-    signature, A = ed25519.sign(secret, digest_ref)
+    signature, A = ed25519.sign_standard(secret, digest_ref)
 
     #print("Digest ref:", digest_ref.hex())
     #print("A:         ", A.hex())

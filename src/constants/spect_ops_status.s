@@ -11,4 +11,5 @@ ret_ecdsa_err_inv_r .eq 0x22
 ret_ecdsa_err_inv_s .eq 0x23
 ret_eddsa_err_inv_priv_key .eq 0x34
 ret_eddsa_err_inv_pub_key .eq 0x35
-ret_spm_err .eq 0x41
+ret_eddsa_err_final_verify .eq 0x36
+ret_point_integrity_err .eq 0x41

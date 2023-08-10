@@ -9,8 +9,8 @@
 ;   k.P in affine coordinates in (r22, r23)
 ;
 ; Masking methods:
-;   1) Random Projective Coordinates -- (x, 1) == (r * x, r)
-;   2) Group Scalar Randomization -- k = k + r * #E (mod p)
+;   1) Random Projective Coordinates -- (x, y, z) == (rx, ry, rz)
+;   2) Group Scalar Randomization -- k' = k + r * #E
 ;   3) Point Splitting -- k.P1 = k.P2 + k.P3 for P = P1 + P2
 ;
 ; Full algorithm:
@@ -31,7 +31,7 @@ spm_p256_full_masked:
     LD      r31, ca_p256
     MOVI    r1,  3
 spm_p256_full_masked_z_randomize:
-    SUBI    r1,  r1, 1
+    SUBI    r1,  r1,  1
     BRZ     spm_p256_full_masked_z_fail
     GRV     r24
     MOVI    r0,  0

@@ -41,7 +41,7 @@ x25519:
     SWE r28, r28
     ANDI r28, r28, 0xFF8
     
-    LD r31, ca_eddsa_8q
+    LD r31, ca_ed25519_8q
     GRV r3
     SCB r28, r28, r3
 

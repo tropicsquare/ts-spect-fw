@@ -12,9 +12,9 @@ eddsa_verify:
     ; load and set needed parameters
     LD          r28, eddsa_verify_input_S
     LD          r31, ca_p25519
-    LD          r6,  ca_eddsa_d
-    LD          r11, ca_eddsa_xG
-    LD          r12, ca_eddsa_yG
+    LD          r6,  ca_ed25519_d
+    LD          r11, ca_ed25519_xG
+    LD          r12, ca_ed25519_yG
     MOVI        r13, 1
     MUL25519    r14, r11, r12
 

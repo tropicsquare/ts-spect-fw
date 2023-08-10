@@ -42,7 +42,7 @@ spm_ed25519_long_loop_511_256:
     CSWAP r10, r14
 
     SUBI r30, r30, 1
-    BRNZ spm_ed25519_loop_511_256
+    BRNZ spm_ed25519_long_loop_511_256
 
     MOVI r30, 256
 
@@ -63,7 +63,7 @@ spm_ed25519_long_loop_255_0:
     CSWAP r10, r14
 
     SUBI r30, r30, 1
-    BRNZ spm_ed25519_loop_255_0
+    BRNZ spm_ed25519_long_loop_255_0
 
     RET
     

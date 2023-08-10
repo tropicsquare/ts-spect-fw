@@ -38,16 +38,17 @@ ed25519_key_setup:
 
     ; Load base point G and check its validity
     LD          r31, ca_p25519
-    LD          r11, ca_eddsa_xG
-    LD          r12, ca_eddsa_yG
+    LD          r11, ca_ed25519_xG
+    LD          r12, ca_ed25519_yG
     MOVI        r13, 1
     MUL25519    r14, r11, r12
 
-    LD          r6,  ca_eddsa_d
+    LD          r6,  ca_ed25519_d
 
     MOV         r7,  r11
     MOV         r8,  r12
     MOV         r9,  r13
+    MOV         r10, r14
 
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
@@ -95,7 +96,7 @@ ed25519_key_setup:
     RET
 
 ed25519_key_setup_spm_fail:
-    MOVI        r3, ret_spm_err
+    MOVI        r3, ret_point_integrity_err
     RET
 
 ed25519_key_setup_kbus_fail:
