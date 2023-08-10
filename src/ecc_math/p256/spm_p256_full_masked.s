@@ -30,6 +30,7 @@ spm_p256_full_masked:
 ;   1) Convert P to randomized projective coordinates
     LD      r31, ca_p256
     MOVI    r1,  3
+
 spm_p256_full_masked_z_randomize:
     SUBI    r1,  r1,  1
     BRZ     spm_p256_full_masked_z_fail
@@ -46,6 +47,13 @@ spm_p256_full_masked_z_randomize:
     OR      r1, r1, r25
     ROL8    r1, r1
     CALL    p256_point_generate
+
+    MOV     r9,  r17
+    MOV     r10, r18
+    MOV     r11, r19
+
+    CALL    point_check_p256
+    BRNZ    spm_p256_integrity_fail
     
 ;   3) Mask scalar k as k2 = k + rng2 * #E
     LD      r31, ca_q256
@@ -60,6 +68,8 @@ spm_p256_full_masked_z_randomize:
     MOV     r14, r19
 
     CALL    spm_p256_long
+    CALL    point_check_p256
+    BRNZ    spm_p256_integrity_fail 
 
 ;   5) Compute P3 = P1 - P2
     XOR     r0,  r0,  r0
@@ -82,6 +92,8 @@ spm_p256_full_masked_z_randomize:
 ;   7) Compute k3.P3
     LD      r31, ca_p256
     CALL    spm_p256_long
+    CALL    point_check_p256
+    BRNZ    spm_p256_integrity_fail
 
 ;   8) Compute k.P = k2.P2 + k3.P3
     MOV     r12, r22
@@ -89,6 +101,12 @@ spm_p256_full_masked_z_randomize:
     MOV     r14, r24
 
     CALL    point_add_p256
+
+    MOV     r9,  r12
+    MOV     r10, r13
+    MOV     r11, r14
+    CALL    point_check_p256
+    BRNZ    spm_p256_integrity_fail
 
 ;   9) Convert k.P to affine coordinates
     MOV     r1,  r14
@@ -98,6 +116,10 @@ spm_p256_full_masked_z_randomize:
 
     MOVI    r0,  0
 
+    RET
+
+spm_p256_integrity_fail:
+    MOVI    r0,  ret_point_integrity_err
     RET
 
 spm_p256_full_masked_z_fail:
