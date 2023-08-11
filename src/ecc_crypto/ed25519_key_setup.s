@@ -5,7 +5,7 @@
 ;   slot to write the key to in r25
 ;
 ; Outputs:
-;   Writes the key trio (s, prefix, A) to ECC key slot via KBUS
+;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
 ;   spect status in r3
 ;
 ; Expects:
@@ -82,11 +82,16 @@ ed25519_key_setup:
     ; Store s and prefix to key slot
     LD          r28, ca_ed25519_key_setup_internal_s
     LD          r29, ca_ed25519_key_setup_internal_prefix
+    MOVI        r0,  0
+    LD          r31, ca_q25519
+    REDP        r30, r0,  r28
 
     STK         r28, r25, ecc_priv_key_1     ; store s
     BRE         ed25519_key_setup_kbus_fail
     STK         r29, r25, ecc_priv_key_2     ; store prefix
-    BRE         ed25519_key_setup_kbus_fail
+    BRE         ed25519_key_setup_kbus_fail 
+    STK         r30, r25, ecc_priv_key_3     ; store s mod q
+    BRE         ed25519_key_setup_kbus_fail 
     KBO         r25, ecc_kbus_program          ; program
     BRE         ed25519_key_setup_kbus_fail
     KBO         r25, ecc_kbus_flush          ; flush

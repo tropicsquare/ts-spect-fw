@@ -26,8 +26,8 @@ op_eddsa_set_context:
     LDR     r1,  r4
     ROR8    r1,  r1
 
-    LSL     r20, r1         ; priv key slot
-    ADDI    r21, r20, 1     ; pub key slot
+    LSL     r22, r1         ; priv key slot
+    ADDI    r21, r22, 1     ; pub key slot
 
     MOVI    r1,  0
 
@@ -44,10 +44,13 @@ op_eddsa_set_context:
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
-    LDK     r26, r20, ecc_priv_key_1
+    LDK     r26, r22, ecc_priv_key_1
     BRE     eddsa_set_context_kbus_fail
-    LDK     r20, r20, ecc_priv_key_2
+    LDK     r20, r22, ecc_priv_key_2
     BRE     eddsa_set_context_kbus_fail
+    LDK     r30, r22, ecc_priv_key_3
+    BRE     eddsa_set_context_kbus_fail
+    ST      r30, ca_eddsa_sign_internal_smodq
 
     LD      r16, eddsa_set_context_input_sch
     SWE     r16, r16

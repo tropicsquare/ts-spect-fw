@@ -28,12 +28,14 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
         pub2_ref = 0
         priv2_ref = int.from_bytes(priv2_ref, 'big')
         pub1_ref = int.from_bytes(pub1_ref, 'big')
+        priv3_ref = priv1_ref % ed25519.q
         #print("s:       ", hex(priv1_ref))
         #print("prefix:  ", hex(priv2_ref))
         #print("A:       ", hex(pub1_ref))
     else:
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
         priv2_ref = int.from_bytes(priv2_ref, 'big')
+        priv3_ref = 0
         #print("d:   ", hex(priv1_ref))
         #print("w:   ", hex(priv2_ref))
         #print("Ax:  ", hex(pub1_ref))
@@ -66,9 +68,14 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
     priv1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
     priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
     pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=8)
+
     pub2 = pub2_ref
     if key_type == tc.P256_ID:
         pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=16)
+
+    priv3 = priv3_ref
+    if key_type == tc.Ed25519_ID:
+        priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
 
     metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
 
@@ -98,6 +105,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
     if (not(
         priv1 == priv1_ref and
         priv2 == priv2_ref and
+        priv3 == priv3_ref and
         pub1 == pub1_ref and
         pub2 == pub2_ref and
         metadata & 0xFF==key_type)
@@ -125,8 +133,8 @@ if __name__ == "__main__":
     if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, tc.Ed25519_ID)):
         tc.print_failed()
         ret |= 1
-
-    tc.print_passed()
+    else:
+        tc.print_passed()
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
@@ -137,8 +145,8 @@ if __name__ == "__main__":
     if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, tc.Ed25519_ID)):
         tc.print_failed()
         ret |= 2
-
-    tc.print_passed()
+    else:
+        tc.print_passed()
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
@@ -149,8 +157,8 @@ if __name__ == "__main__":
     if (test_process(test_dir, "p256_ram", 0x0, 0x1, tc.P256_ID)):
         tc.print_failed()
         ret |= 4
-
-    tc.print_passed()
+    else:
+        tc.print_passed()
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
@@ -161,8 +169,8 @@ if __name__ == "__main__":
     if (test_process(test_dir, "p256_cpb", 0x4, 0x5, tc.P256_ID)):
         tc.print_failed()
         ret |= 8
-
-    tc.print_passed()
+    else:
+        tc.print_passed()
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm -r {test_dir}")

@@ -12,7 +12,7 @@ eddsa_finish_s_randomize:
     BRZ         eddsa_finish_s_randomize
 
     ; Compute S = r * e*s1 + e*s2
-
+    LD          r26, ca_eddsa_sign_internal_smodq
     SUBP        r2,  r26, r1
 
     MULP        r1,  r1,  r25
