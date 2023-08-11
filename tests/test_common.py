@@ -10,6 +10,12 @@ OPS_CONFIG = TS_REPO_ROOT+"/spect_ops_config.yml"
 Ed25519_ID = 0x02
 P256_ID = 0x01
 
+RAR_STACK_DEPTH = 5
+DATA_RAM_IN_DEPTH = 512
+DATA_RAM_OUT_DEPTH = 128
+
+SHA_CTX_INIT = binascii.unhexlify("6a09e667f3bcc908bb67ae8584caa73b3c6ef372fe94f82ba54ff53a5f1d36f1510e527fade682d19b05688c2b3e6c1f1f83d9abfb41bd6b5be0cd19137e2179")
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 
@@ -64,6 +70,97 @@ def get_res_word(test_dir, run_name):
     SPECT_OP_STATUS = res_word & 0xFF
     SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFF
     return SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE
+
+def parse_context(test_dir, run_name):
+    ctx_file = f"{test_dir}/{run_name}.ctx"
+    ctx_dict = {
+        "GPR"           : [],
+        "SHA"           : b'',
+        "TMAC"          : b'',
+        "RAR STACK"     : [],
+        "RAR POINTER"   : 0,
+        "FLAGS"         : {"Z" : 0, "C" : 0, "E" : 0},
+        "DATA RAM IN"   : [],
+        "DATA RAM OUT"  : []
+    }
+
+    with open(ctx_file, 'r') as ctx:
+        data = ctx.read().split('\n')
+        for i in range(len(data)):
+            line = data[i]
+            if not line:
+                continue
+            if line[0] == "*":
+                continue
+            
+            if line == "GPR registers:":
+                i += 1  # skip next "**..**" line
+                for j in range(32):
+                    i += 1
+                    line = data[i]
+                    r = int.from_bytes(binascii.unhexlify(line), 'big')
+                    ctx_dict["GPR"].append(r)
+            
+            if line == "SHA 512 context:":
+                i += 1  # skip next "**..**" line
+                for j in range(8):
+                    i += 1
+                    line = data[i]
+                    ctx_dict["SHA"] += binascii.unhexlify(line)
+                continue
+                
+            if line[:4] == "TMAC":
+                i += 1
+                for j in range(5):
+                    i += 1
+                    line = data[i]
+                    ctx_dict["TMAC"] += binascii.unhexlify(line)
+                i += 3  # skip rate, byteIOIndex and squeezing
+                continue
+            
+            if line == "RAR stack:":
+                i += 1  # skip next "**..**" line
+                for j in range(RAR_STACK_DEPTH):
+                    i +=1
+                    line = data[i]
+                    val = int.from_bytes(binascii.unhexlify(line), 'big')
+                    ctx_dict["RAR STACK"].append(val)
+                continue
+            if line == "RAR stack pointer:":
+                i += 2
+                line = data[i]
+                ctx_dict["RAR POINTER"] = int.from_bytes(binascii.unhexlify(line), 'big')
+                continue
+
+            if line == "FLAGS (Z, C, E):":
+                i += 2
+                line = data[i]
+                ctx_dict["FLAGS"]["Z"] = int(line)
+                i += 1
+                line = data[i]
+                ctx_dict["FLAGS"]["C"] = int(line)
+                i += 1
+                line = data[i]
+                ctx_dict["FLAGS"]["E"] = int(line)
+                continue
+
+            if line == "Data RAM In:":
+                i += 1
+                for j in range(DATA_RAM_IN_DEPTH):
+                    i += 1
+                    line = data[i]
+                    val = int.from_bytes(binascii.unhexlify(line), 'big')
+                    ctx_dict["DATA RAM IN"].append(val)
+
+            if line == "Data RAM Out:":
+                i += 1
+                for j in range(DATA_RAM_OUT_DEPTH):
+                    i += 1
+                    line = data[i]
+                    val = int.from_bytes(binascii.unhexlify(line), 'big')
+                    ctx_dict["DATA RAM OUT"].append(val)
+
+    return ctx_dict
 
 def parse_key_mem(test_dir, run_name):
     kmem_file = f"{test_dir}/{run_name}_keymem.hex"

@@ -48,4 +48,7 @@ data_out_loop:
     MOV     r30, r0
     MOV     r31, r0
 
+    TMAC_IT r0
+    TMAC_UP r0
+
     END
