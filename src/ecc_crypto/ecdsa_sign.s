@@ -173,10 +173,12 @@ ecdsa_sign_end:
     BRNZ        ecdsa_sign_end_not_store
 
     ADDI        r30, r0,  ecdsa_sign_output_R
+    SWE         r22, r22
     STR         r22, r30
 
     ADDI        r30, r0,  ecdsa_sign_output_S
     LD          r10, ca_ecdsa_sign_internal_s
+    SWE         r10, r10
     STR         r10, r30
 
 ecdsa_sign_end_not_store:

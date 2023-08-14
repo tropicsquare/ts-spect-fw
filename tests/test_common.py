@@ -239,7 +239,7 @@ def set_rng(test_dir: str, rng: list):
             for i in range(8):
                 rng_hex.write(format((r >> i*32) & 0xffffffff, '08X') + "\n")
 
-def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
+def read_output(test_dir: str, run_name: str, addr: int, count: int, string=False):
     mem = addr & 0xF000
     if mem == 0x1000:
         output_file = f"{test_dir}/{run_name}_out.hex"
@@ -248,13 +248,22 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int) -> int:
     else:
         raise Exception(f"Address {hex(addr)} is invalid output address!")
 
-    with open(output_file, mode='r') as out:
-        data = out.read().split('\n')
-        idx = (addr - mem) // 4
-        val = 0
-        for i in range(count):
-            val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
-        return val
+    if not string:
+        with open(output_file, mode='r') as out:
+            data = out.read().split('\n')
+            idx = (addr - mem) // 4
+            val = 0
+            for i in range(count):
+                val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'big') << i*32
+            return val
+    else:
+        with open(output_file, mode='r') as out:
+            data = out.read().split('\n')
+            idx = (addr - mem) // 4
+            val = b''
+            for i in range(count):
+                val += int.from_bytes(binascii.unhexlify(data[idx+i].split(' ')[1]), 'little').to_bytes(4, 'big')
+            return val
     
 def run_op(
                 cmd_file,           op_name,
