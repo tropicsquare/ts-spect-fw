@@ -11,7 +11,7 @@ _start:
     ANDI    r4, r1, 0xF0            ; get only op type id
 
 op_id_check_clear:
-    CMPI r4, clear_id
+    CMPI r1, clear_id
     BRZ  op_clear
 
 ;op_id_check_sha512:
@@ -35,10 +35,7 @@ op_id_check_ecdsa:
     BRZ  op_ecdsa
 
 ; ============================================================
-op_id_debug:
-    MOVI    r30, 0
-    ST      r30, ca_spect_res_word
-    END
+    JMP     invalid_op_id
 
 ; ============================================================
 ;op_sha512:
@@ -170,7 +167,6 @@ get_data_in_size:
 ; Routine for setting  SPECT_RES_WORD field
 ; ============================================================
 set_res_word:
-    ST      r30, 0x1120
     ROL8    r1,  r1
     ROL8    r1,  r1
     ADD     r0,  r0,  r1
