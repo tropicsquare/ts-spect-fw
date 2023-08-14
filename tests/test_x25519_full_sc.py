@@ -6,7 +6,6 @@ import os
 
 import test_common as tc
 
-import models.random_point_generate_25519_model as rpg
 import models.x25519
 
 if __name__ == "__main__":

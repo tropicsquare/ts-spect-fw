@@ -8,16 +8,15 @@ _start:
     ADDI    r0, r0, 0               ; force bits [255:32] to 0
     MOVI    r4, 0xFF
     AND     r1, r0, r4              ; mask SPECT_OP_ID to r1[7:0]
-    ANDI    r4, r1, 0xF0            ; get only op type id
 
-    CMPI r1, x25519_dbg_id
-    BRZ  op_x25519_dbg
+    CMPI    r1, x25519_dbg_id
+    BRZ     op_x25519_dbg
 
-    CMPI r1, eddsa_set_context_dbg_id
-    BRZ  op_eddsa_set_context_dbg
+    CMPI    r1, eddsa_set_context_dbg_id
+    BRZ     op_eddsa_set_context_dbg
 
-    CMPI r1, ecdsa_sign_dbg_id
-    BRZ  op_ecdsa_dbg
+    CMPI    r1, ecdsa_sign_dbg_id
+    BRZ     op_ecdsa_dbg
 
     CMPI    r1, eddsa_nonce_init_id
     BRZ     op_eddsa_nonce_init
@@ -58,7 +57,8 @@ get_input_base:
     MOVI    r0,  0
     RET
 get_output_base:
-    MOVI    r0,  1
+    MOVI    r0,  0x10
+    ROL8    r0,  r0
     RET
 
 get_data_in_size:
