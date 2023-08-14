@@ -79,10 +79,10 @@ eddsa_finish_s_randomize:
     STR         r2,  r30
     ADDI        r30, r0,  eddsa_finish_output_signature
     LD          r5,  ca_eddsa_sign_internal_S
-    SWE         r5,  r5
-    STR         r5,  r30
-    ADDI        r30, r30,  0x20
+    SWE         r4,  r4
     STR         r4,  r30
+    ADDI        r30, r30,  0x20
+    STR         r5,  r30
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  48

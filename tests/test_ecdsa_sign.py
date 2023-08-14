@@ -41,6 +41,8 @@ if __name__ == "__main__":
     #print("Ay:  ", hex(Ay))
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
+
+    signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')
     #print()
     #print("r_ref:", hex(r_ref))
     #print("s_ref:", hex(s_ref))
@@ -84,13 +86,12 @@ if __name__ == "__main__":
     l3_result = tc.read_output(test_dir, run_name, outsrc<<12, 1)
     l3_result &= 0xFF
 
-    r = tc.read_output(test_dir, run_name, (outsrc<<12) + 0x10, 8)
-    s = tc.read_output(test_dir, run_name, (outsrc<<12) + 0x30, 8)
+    signature = tc.read_output(test_dir, run_name, (outsrc<<12) + 0x10, 16, string=True)
 
-    #print("r    :", hex(r))
-    #print("s    :", hex(s))
+    print(signature_ref.hex())
+    print(signature.hex())
 
-    if not(r == r_ref and s == s_ref):
+    if not(signature_ref == signature):
         tc.print_failed()
         sys.exit(1)
 
@@ -99,4 +100,4 @@ if __name__ == "__main__":
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm -r {test_dir}")
 
-    sys.exit(0)
+    sys.exit(0), 
