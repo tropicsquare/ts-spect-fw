@@ -14,6 +14,9 @@ tests=(\
     "ecc_key_erase" \
     "ecdsa_sign" \
     "eddsa_sequence" \
+    "x25519_dbg" \
+    "eddsa_dbg" \
+    "ecdsa_dbg"
 )
 
 declare -i ret_val=0

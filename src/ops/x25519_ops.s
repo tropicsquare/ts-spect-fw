@@ -45,7 +45,7 @@ op_x25519_sc_et_eh:
 
     CMPI    r0,  0
     BRNZ    op_x25519_end
-    ST      r11, x25519_sc_et_eh_output_x1
+    ST      r11, x25519_sc_et_eh_output_r1
     JMP     op_x25519_end
 
 ; ======================================================

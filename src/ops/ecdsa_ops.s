@@ -36,8 +36,6 @@ op_ecdsa_sign:
     SWE     r16, r16
     LD      r17, ecdsa_sign_input_scn
 
-
-
     JMP     ecdsa_sign
 
 ecdsa_sign_curve_type_fail:

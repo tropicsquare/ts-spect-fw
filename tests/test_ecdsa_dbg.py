@@ -13,7 +13,7 @@ if __name__ == "__main__":
     print("seed:", seed)
 
     ops_cfg = tc.get_ops_config()
-    test_name = "ecdsa_sign"
+    test_name = "ecdsa_sign_dbg"
     run_name = test_name
 
     tc.print_run_name(run_name)
@@ -51,14 +51,13 @@ if __name__ == "__main__":
     slot = rn.randint(0, 7)
 
     wint = int.from_bytes(w, 'big')
-    tc.set_key(cmd_file, key=d,          ktype=0x04, slot=(slot<<1),   offset=0)
-    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1),   offset=8)
-    tc.set_key(cmd_file, key=tc.P256_ID, ktype=0x04, slot=(slot<<1)+1, offset=0)
-    tc.set_key(cmd_file, key=Ax,         ktype=0x04, slot=(slot<<1)+1, offset=8)
-    tc.set_key(cmd_file, key=Ay,         ktype=0x04, slot=(slot<<1)+1, offset=16)
+    tc.write_int256(cmd_file, d, 0x0040)
+    tc.write_int256(cmd_file, wint, 0x0060)
+    tc.write_int256(cmd_file, Ax, 0x0160)
+    tc.write_int256(cmd_file, Ay, 0x0180)
 
-    insrc = 0x4
-    outsrc = 0x5
+    insrc = 0x0
+    outsrc = 0x1
 
     tc.write_bytes(cmd_file, z, (insrc<<12) + 0x10)
     tc.write_bytes(cmd_file, sch, 0x00A0)
@@ -68,12 +67,8 @@ if __name__ == "__main__":
 
     tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    # set breakpoints to dump GPR values
-    break_s = tc.dump_gpr_on(cmd_file, "bp_ecdsa_sign_ver_after_u1G", [9, 10, 11])
-    break_s += tc.dump_gpr_on(cmd_file, "bp_ecdsa_sign_ver_after_u2A", [9, 10, 11])
-
     # Run Op
-    ctx = tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
+    ctx = tc.run_op(cmd_file, "ecdsa_sign_dbg", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name, main="src/main_debug.s")
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 

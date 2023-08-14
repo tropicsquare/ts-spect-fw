@@ -24,7 +24,7 @@ x25519_kpair_gen_output_etpub .eq 0x1020
 ; x25519_sc_et_eh
 x25519_sc_et_eh_id .eq 0x12
 x25519_sc_et_eh_input_ehpub .eq 0x20
-x25519_sc_et_eh_output_x1 .eq 0x1020
+x25519_sc_et_eh_output_r1 .eq 0x1020
 ; x25519_sc_et_sh
 x25519_sc_et_sh_id .eq 0x13
 x25519_sc_et_sh_input_slot .eq 0x20
@@ -77,8 +77,7 @@ ecdsa_output_result .eq 0x0
 ecdsa_sign_id .eq 0x70
 ecdsa_sign_input_sch .eq 0xA0
 ecdsa_sign_input_scn .eq 0xC0
-ecdsa_sign_output_R .eq 0x10
-ecdsa_sign_output_S .eq 0x30
+ecdsa_sign_output_signature .eq 0x10
 ; sha512
 sha512_id .eq 0x50
 sha512_input_data0 .eq 0x10
@@ -100,32 +99,12 @@ x25519_dbg_input_pub .eq 0x40
 x25519_dbg_output_r .eq 0x1020
 ; ecdsa_sign_dbg
 ecdsa_sign_dbg_id .eq 0xAF
-ecdsa_sign_dbg_input_cmd_in .eq 0x0
 ecdsa_sign_dbg_input_z .eq 0x10
 ecdsa_sign_dbg_input_d .eq 0x40
 ecdsa_sign_dbg_input_w .eq 0x60
-ecdsa_sign_dbg_input_sch .eq 0xA0
-ecdsa_sign_dbg_input_scn .eq 0xC0
 ecdsa_sign_dbg_output_r .eq 0x1010
 ecdsa_sign_dbg_output_s .eq 0x1030
-; eddsa_sign_dbg
-eddsa_sign_dbg_id .eq 0xBF
-eddsa_sign_dbg_input_cmd_in .eq 0x0
-eddsa_sign_dbg_input_m .eq 0x10
-eddsa_sign_dbg_input_s .eq 0x40
-eddsa_sign_dbg_input_prefix .eq 0x60
-eddsa_sign_dbg_input_sch .eq 0xA0
-eddsa_sign_dbg_input_scn .eq 0xC0
-eddsa_sign_dbg_output_r .eq 0x1020
-eddsa_sign_dbg_output_s .eq 0x1040
-; curve25519_rpg
-curve25519_rpg_id .eq 0xD0
-; ed25519_rpg
-ed25519_rpg_id .eq 0xD1
-; p256_spm
-p256_spm_id .eq 0xD3
-p256_spm_input_gx .eq 0x0
-p256_spm_input_gy .eq 0x20
-p256_spm_input_gk .eq 0x40
-p256_spm_output_qx .eq 0x1000
-p256_spm_output_qy .eq 0x1020
+; eddsa_set_context_dbg
+eddsa_set_context_dbg_id .eq 0xBF
+eddsa_set_context_dbg_input_s .eq 0x40
+eddsa_set_context_dbg_input_prefix .eq 0x60

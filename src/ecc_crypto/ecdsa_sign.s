@@ -172,11 +172,11 @@ ecdsa_sign_end:
     CMPI        r3,  ret_op_success
     BRNZ        ecdsa_sign_end_not_store
 
-    ADDI        r30, r0,  ecdsa_sign_output_R
+    ADDI        r30, r0,  ecdsa_sign_output_signature
     SWE         r22, r22
     STR         r22, r30
 
-    ADDI        r30, r0,  ecdsa_sign_output_S
+    ADDI        r30, r30, 0x20
     LD          r10, ca_ecdsa_sign_internal_s
     SWE         r10, r10
     STR         r10, r30
