@@ -19,9 +19,9 @@
 .include constants/spect_ops_status.s
 _start:
     LD      r0, ca_spect_cfg_word
-    ADDI    r0, r0, 0               ; force bits [255:32] to 0
+    ADDI    r0, r0, 0                           ; force bits [255:32] to 0
     MOVI    r4, 0xFF
-    AND     r1, r0, r4              ; mask SPECT_OP_ID to r1[7:0]
+    AND     r1, r0, r4                          ; mask SPECT_OP_ID to r1[7:0]
 
     CMPI    r1, x25519_dbg_id
     BRZ     op_x25519_dbg

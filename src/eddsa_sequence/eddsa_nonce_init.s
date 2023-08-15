@@ -20,7 +20,7 @@ op_eddsa_nonce_init:
     GRV         r4
     TMAC_IT     r1
 
-    TMAC_IS     r20, 0xC
+    TMAC_IS     r20, tmac_dst_eddsa_sign
 
     CALL        tmac_sch_scn
 

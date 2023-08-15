@@ -26,7 +26,6 @@ p256_point_generate:
     CALL    hash_to_field
 
     CALL    map_to_curve_simple_swu
-bp_p256_point_generate_after_swu:
     XORI    r30, r19, 0
     BRZ     p256_point_generate
 

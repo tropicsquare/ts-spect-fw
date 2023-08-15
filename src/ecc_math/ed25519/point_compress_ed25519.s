@@ -17,10 +17,13 @@
 ; ==============================================================================
 
 point_compress_ed25519:
+    ; back to affine coordinates
     MOV         r1,  r9
     CALL        inv_p25519
     MUL25519    r7,  r7,  r1
     MUL25519    r8,  r8,  r1
+
+    ; ENC(r7, r8)
     MOVI        r1,  1
     AND         r7,  r7,  r1
     ROL         r8,  r8

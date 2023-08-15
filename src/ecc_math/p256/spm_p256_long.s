@@ -27,45 +27,50 @@
 ; ==============================================================================
 
 spm_p256_long:
-    MOVI r9,  0 ;\
-    MOVI r10, 1 ;|-> (r9, r10, r11) = Q0 = "point at infinity O"
-    MOVI r11, 0 ;/
+    ; (r9, r10, r11) = Q0 = "point at infinity O"
+    MOVI    r9,  0
+    MOVI    r10, 1 
+    MOVI    r11, 0
 
-    MOVI r30, 256
+    MOVI    r30, 256
+
+    ; scalar bits 511 downto 256
 spm_p256_long_loop_511_256:
-    ROL r29, r29
+    ROL     r29, r29
 
-    CSWAP r9,  r12
-    CSWAP r10, r13
-    CSWAP r11, r14
+    CSWAP   r9,  r12
+    CSWAP   r10, r13
+    CSWAP   r11, r14
 
-    CALL point_add_p256
-    CALL point_dbl_p256
+    CALL    point_add_p256
+    CALL    point_dbl_p256
 
-    CSWAP r9,  r12
-    CSWAP r10, r13
-    CSWAP r11, r14
+    CSWAP   r9,  r12
+    CSWAP   r10, r13
+    CSWAP   r11, r14
 
-    SUBI r30, r30, 1
-    BRNZ spm_p256_long_loop_511_256
+    SUBI    r30, r30, 1
+    BRNZ    spm_p256_long_loop_511_256
 
-    MOVI r30, 256
+    MOVI    r30, 256
+
+    ; scalar bits 255 downto 0
 spm_p256_long_loop_255_0:
-    ROL r28, r28
+    ROL     r28, r28
 
-    CSWAP r9,  r12
-    CSWAP r10, r13
-    CSWAP r11, r14
+    CSWAP   r9,  r12
+    CSWAP   r10, r13
+    CSWAP   r11, r14
 
-    CALL point_add_p256
-    CALL point_dbl_p256
+    CALL    point_add_p256
+    CALL    point_dbl_p256
 
-    CSWAP r9,  r12
-    CSWAP r10, r13
-    CSWAP r11, r14
+    CSWAP   r9,  r12
+    CSWAP   r10, r13
+    CSWAP   r11, r14
 
-    SUBI r30, r30, 1
-    BRNZ spm_p256_long_loop_255_0
+    SUBI    r30, r30, 1
+    BRNZ    spm_p256_long_loop_255_0
 
     RET
     

@@ -24,30 +24,30 @@
 ; ==============================================================================
 _start:
     LD      r0, ca_spect_cfg_word
-    ADDI    r0, r0, 0               ; force bits [255:32] to 0
+    ADDI    r0, r0, 0                           ; force bits [255:32] to 0
     MOVI    r4, 0xFF
-    AND     r1, r0, r4              ; mask SPECT_OP_ID to r1[7:0]
-    ANDI    r4, r1, 0xF0            ; get only op type id
+    AND     r1, r0, r4                          ; mask SPECT_OP_ID to r1[7:0]
+    ANDI    r4, r1, 0xF0                        ; get only op type id
 
 op_id_check_clear:
-    CMPI r1, clear_id
-    BRZ  op_clear
+    CMPI    r1, clear_id
+    BRZ     op_clear
 
 op_id_check_ecc_key:
-    CMPI r4, ecc_key_id
-    BRZ  op_ecc_key
+    CMPI    r4, ecc_key_id
+    BRZ     op_ecc_key
 
 op_id_check_x25519:
-    CMPI r4, x25519_id
-    BRZ  op_x25519
+    CMPI    r4, x25519_id
+    BRZ     op_x25519
 
 op_id_check_eddsa:
-    CMPI r4, eddsa_id
-    BRZ  op_eddsa
+    CMPI    r4, eddsa_id
+    BRZ     op_eddsa
 
 op_id_check_ecdsa:
-    CMPI r4, ecdsa_id
-    BRZ  op_ecdsa
+    CMPI    r4, ecdsa_id
+    BRZ     op_ecdsa
 
     JMP     invalid_op_id
 

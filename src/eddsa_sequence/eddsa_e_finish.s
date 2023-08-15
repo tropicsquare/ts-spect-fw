@@ -10,11 +10,11 @@
 
 op_eddsa_e_finish:
     CALL        get_data_in_size
-    MOV         r11, r0             ; number of bytes in the last chunk of message
+    MOV         r11, r0                         ; number of bytes in the last chunk of message
     ADD         r29, r29, r11
     LSL         r29, r29
     LSL         r29, r29
-    LSL         r29, r29            ; message size in bits for the sha512 padding rule
+    LSL         r29, r29                        ; message size in bits for the sha512 padding rule
 
     CALL        eddsa_e_load_message
 
@@ -23,6 +23,7 @@ op_eddsa_e_finish:
 
     CALL        eddsa_e_pad_mask
 
+    ; Check start of the padding
     CMPI        r9,  96
     BRZ         eddsa_e_finish_pad_in_r18
     MOV         r18, r29
@@ -52,7 +53,8 @@ eddsa_e_finish_pad_in_r19:
 eddsa_e_finish_pad_in_r18:
     AND         r18, r18, r5
     SBIT        r18, r18, r7
-    ANDI        r8,  r11, 0x10          ; mask bit 4 of msg size to check if new block is needed
+    ; mask bit 4 of msg size to check if new block is needed
+    ANDI        r8,  r11, 0x10
     BRNZ        eddsa_e_finish_pad_in_r18_next_block
     OR          r18, r18, r29
     JMP         eddsa_e_finish_last_hash
@@ -75,7 +77,8 @@ eddsa_e_finish_pad_next_block_continue:
 eddsa_e_finish_last_hash:
     LD          r31, ca_q25519
     HASH        r16, r18
-    SWE         r16, r16            ; decode as little endian integer mod q
+    ; decode as little endian integer mod q
+    SWE         r16, r16
     SWE         r17, r17
     REDP        r25, r16, r17   
 

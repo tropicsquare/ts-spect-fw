@@ -33,7 +33,7 @@
 ; ==============================================================================
 
 spm_p256_full_masked:
-;   1) Convert P to randomized projective coordinates
+    ; 1) Convert P to randomized projective coordinates
     LD      r31, ca_p256
     MOVI    r1,  3
 
@@ -48,7 +48,7 @@ spm_p256_full_masked_z_randomize:
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24
 
-;   2) Generate randpom point P2 (See str2point.md)
+    ; 2) Generate randpom point P2 (See str2point.md)
     LD      r1, ca_dst_template
     OR      r1, r1, r25
     ROL8    r1, r1
@@ -61,11 +61,11 @@ spm_p256_full_masked_z_randomize:
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
     
-;   3) Mask scalar k as k2 = k + rng2 * #E
+    ; 3) Mask scalar k as k2 = k + rng2 * #E
     LD      r31, ca_q256
     GRV     r30
     SCB     r28, r27, r30
-;   4) Compute k2.P2
+    ; 4) Compute k2.P2
     LD      r31, ca_p256
     LD      r8,  ca_p256_b
 
@@ -77,7 +77,7 @@ spm_p256_full_masked_z_randomize:
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail 
 
-;   5) Compute P3 = P1 - P2
+    ; 5) Compute P3 = P1 - P2
     XOR     r0,  r0,  r0
     ZSWAP   r9,  r22
     ZSWAP   r10, r23
@@ -90,18 +90,18 @@ spm_p256_full_masked_z_randomize:
 
     CALL    point_add_p256  ; r9.. = P1, r12.. = P3, r22.. = k2.P2
     
-;   6) Mask scalar k as k3 = k + rng3 * #E
+    ; 6) Mask scalar k as k3 = k + rng3 * #E
     LD      r31, ca_q256
     GRV     r30
     SCB     r28, r27, r30
 
-;   7) Compute k3.P3
+    ; 7) Compute k3.P3
     LD      r31, ca_p256
     CALL    spm_p256_long
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
 
-;   8) Compute k.P = k2.P2 + k3.P3
+    ; 8) Compute k.P = k2.P2 + k3.P3
     MOV     r12, r22
     MOV     r13, r23
     MOV     r14, r24
@@ -114,7 +114,7 @@ spm_p256_full_masked_z_randomize:
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
 
-;   9) Convert k.P to affine coordinates
+    ; 9) Convert k.P to affine coordinates
     MOV     r1,  r14
     CALL    inv_p256
     MUL256  r22, r12, r1

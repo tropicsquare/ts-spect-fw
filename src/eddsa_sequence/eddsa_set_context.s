@@ -28,32 +28,32 @@
 ;
 ; ==============================================================================
 
-
-
 op_eddsa_set_context:
     CALL    get_input_base
     ADDI    r4,  r0,  eddsa_set_context_input_slot
     LDR     r1,  r4
     ROR8    r1,  r1
 
-    LSL     r22, r1         ; priv key slot
-    ADDI    r21, r22, 1     ; pub key slot
+    LSL     r22, r1                             ; priv key slot
+    ADDI    r21, r22, 1                         ; pub key slot
 
     MOVI    r1,  0
 
-    LDK     r16, r21, ecc_key_metadata
+    LDK     r16, r21, ecc_key_metadata          ; load slot metadata
     BRE     eddsa_set_context_kbus_fail
     MOVI    r0,  0xFF
     AND     r16, r16, r0
-    CMPI    r16, ecc_type_ed25519
+    CMPI    r16, ecc_type_ed25519               ; check curve type
     BRNZ    eddsa_set_context_curve_type_fail
 
+    ; load public key
     LDK     r25, r21, ecc_pub_key_Ax
     BRE     eddsa_set_context_kbus_fail
     ST      r25, ca_eddsa_sign_internal_A
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
+    ; load private keys
     LDK     r26, r22, ecc_priv_key_1
     BRE     eddsa_set_context_kbus_fail
     LDK     r20, r22, ecc_priv_key_2
@@ -62,6 +62,7 @@ op_eddsa_set_context:
     BRE     eddsa_set_context_kbus_fail
     ST      r30, ca_eddsa_sign_internal_smodq
 
+    ; load secure channel nonce + hash
     LD      r16, eddsa_set_context_input_sch
     SWE     r16, r16
     LD      r17, eddsa_set_context_input_scn

@@ -55,8 +55,8 @@ point_dbl_p256:
     SUBP    r5,  r5,  r7
     MUL256  r7,  r0,  r1
     ADDP    r7,  r7,  r7
-    ADDP    r7, r7,  r7
-    MOV     r9, r5
+    ADDP    r7,  r7,  r7
+    MOV     r9,  r5
     MOV     r10, r6
     MOV     r11, r7
     RET

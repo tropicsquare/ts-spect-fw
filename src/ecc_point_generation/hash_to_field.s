@@ -28,7 +28,7 @@
 hash_to_field:
     CALL    compose_exp_tag
     MOVI    r0,  0x601
-    ROR     r0,  r0
+    ROR     r0,  r0                             ; padding = 10...030
     HASH_IT
     HASH    r0,  r0
     REDP    r0,  r1,  r0

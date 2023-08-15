@@ -24,9 +24,10 @@
 
 curve25519_point_generate:
     GRV         r2
-    CALL        hash_to_field                       ; r0 = x in GF(2^255 - 19)
+    CALL        hash_to_field                   ; r0 = x in GF(2^255 - 19)
 
-    CALL        map_to_curve_elligator2_curve25519  ; (r3, r7, r11, r8) = (xn, xd, y, 1)
+    CALL        map_to_curve_elligator2_curve25519
+    ; (r3, r7, r11, r8) = (xn, xd, y, 1)
     XORI        r30, r7, 0
     BRZ         curve25519_point_generate
 
