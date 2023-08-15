@@ -1,3 +1,12 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_load_msg.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Loads 128B EdDSA message chunk into (r18, r19, r20, r21) for e computation.
+;
+; ==============================================================================
 eddsa_e_load_message:
     CALL        get_input_base
     ADDI        r30, r0,  eddsa_input_message

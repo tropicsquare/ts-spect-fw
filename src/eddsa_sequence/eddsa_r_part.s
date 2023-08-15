@@ -1,5 +1,14 @@
+; ==============================================================================
+;  file    src/eddsa_sequence/eddsa_r_part.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Computes R = r.G for EdDSA
+;
+; ==============================================================================
+
 op_eddsa_R_part:
-    ; Load base point G
     LD          r31, ca_p25519
     LD          r21, ca_ed25519_xG
     LD          r22, ca_ed25519_yG
@@ -7,6 +16,7 @@ op_eddsa_R_part:
 
     CALL        spm_ed25519_full_masked
 
+    ; Encode R
     MOVI        r1,  1
     AND         r21, r21, r1
     ROR         r21, r21

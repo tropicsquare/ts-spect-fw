@@ -1,6 +1,17 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_nonce_finish.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Finish EdDSA deterministic nonce derivation.
+; Process the last chunk of the message with TMAC
+;
+; ==============================================================================
+
 op_eddsa_nonce_finish:
     CALL        get_data_in_size
-    MOV         r11, r0             ; number of bytes in the last chunk
+    MOV         r11, r0                         ; number of bytes in the last chunk
 
     CALL        eddsa_nonce_load_msg
 
@@ -11,7 +22,7 @@ op_eddsa_nonce_finish:
 
 eddsa_nonce_finish_loop_l1:
     SUBI        r11, r11, 18
-    AND         r16, r11, r15       ; check for underflow
+    AND         r16, r11, r15                   ; check for underflow
     BRNZ        eddsa_nonce_finish_last_block
 
     MOVI        r12, 18
@@ -27,11 +38,11 @@ eddsa_nonce_finish_loop_l2:
 
 eddsa_nonce_finish_last_block:
 
-    ADDI        r11, r11, 18        ; r11 = byte size of the last block
+    ADDI        r11, r11, 18                    ; r11 = byte size of the last block
     BRZ         eddsa_nonce_finish_exact
 
     MOVI        r12, 18
-    SUB         r12, r12, r11       ; r12 = size of padding
+    SUB         r12, r12, r11                   ; r12 = size of padding
 
 eddsa_nonce_finish_last_loop:
     CALL        eddsa_nonce_shift
@@ -54,7 +65,7 @@ eddsa_nonce_finish_padding_loop:
     ORI         r1,  r1, 0x80
     JMP         eddsa_nonce_finish_last_update
 
-eddsa_nonce_finish_exact:   ; message was exactly multiple of 18 bytes
+eddsa_nonce_finish_exact:                       ; message was exactly multiple of 18 bytes
     MOVI        r1,  0
     MOVI        r3,  138
     SBIT        r1,  r1,  r3

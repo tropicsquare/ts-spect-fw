@@ -1,7 +1,16 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_at_once.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Computes e = SHA512(R, A, M) mod q at once in case of len(M) < 64 bytes
+;
+; ==============================================================================
 op_eddsa_e_at_once:
     ; Load all data
     CALL        get_data_in_size
-    MOV         r11, r0             ; number of bytes in message
+    MOV         r11, r0                         ; r11 = number of bytes in message
 
     CALL        get_input_base
     ADDI        r30, r0,  eddsa_input_message
@@ -19,14 +28,13 @@ op_eddsa_e_at_once:
     ADDI        r29, r11, 64
     LSL         r29, r29
     LSL         r29, r29
-    LSL         r29, r29            ; bitsize of message
+    LSL         r29, r29                        ; r29 = bitsize of message
 
-    ; init hash unit
     HASH_IT
 
     CALL        eddsa_e_pad_mask
 
     CMPI        r9, 32
-    BRZ         eddsa_e_finish_pad_in_r18   ; Use the code from e_finish
+    BRZ         eddsa_e_finish_pad_in_r18       ; Use the code from e_finish
     MOV         r18, r29
     JMP         eddsa_e_finish_pad_in_r19 

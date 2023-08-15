@@ -1,3 +1,18 @@
+; ==============================================================================
+;  file    ops/ecc_key_ops.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; ECC Key Ops:
+;   - ECC Key Generate
+;   - ECC Key Store
+;   - ECC Key Read
+;   - ECC Key Erase
+;
+; ==============================================================================
+
+; ECC Key Generate/Store
 op_ecc_key_gen_store:
     CALL    ecc_key_parse_input
     CMPI    r4,  ecc_type_ed25519
@@ -9,6 +24,51 @@ op_ecc_key_gen_store:
     MOVI    r2, l3_result_fail
     JMP     op_key_setup_end
 
+ecc_key_get_k:
+    CMPI    r1, ecc_key_gen_id
+    BRZ     ecc_key_generate_k
+    ADDI    r4,  r0,  ecc_key_store_input_k
+    LDR     r19, r4
+    RET
+
+ecc_key_generate_k:
+    GRV     r19
+    RET
+
+ecc_key_gen_ed25519_call:
+    CALL    ecc_key_get_k
+    CALL    ed25519_key_setup
+    CMPI    r3,  0
+    BRZ     ecc_key_gen_ed25519_call_ok
+    MOVI    r2,  l3_result_fail
+    JMP     op_key_setup_end
+
+ecc_key_gen_ed25519_call_ok:
+    MOVI    r2,  l3_result_ok
+    JMP     op_key_setup_end
+
+ecc_key_gen_p256_call:
+    CALL    ecc_key_get_k
+    CALL    p256_key_setup
+    CMPI    r3,  0
+    BRZ     ecc_key_gen_p256_call_ok
+    MOVI    r2,  l3_result_fail
+    JMP     op_key_setup_end
+    
+ecc_key_gen_p256_call_ok:
+    MOVI    r2,  l3_result_ok
+    JMP     op_key_setup_end
+
+op_key_setup_end:
+    CALL    get_output_base
+    ADDI    r0,  r0,  ecc_key_output_result
+    MOVI    r1,  0
+    STR     r2,  r0
+    MOV     r0,  r3
+    JMP     set_res_word
+
+
+; ECC Key Read from slot
 op_ecc_key_read:
     CALL    get_output_base
     MOV     r20, r0
@@ -54,6 +114,7 @@ op_key_read_end:
     MOVI    r0,  ret_op_success
     JMP     set_res_word
 
+; ECC Key Erase from slot
 op_ecc_key_erase:
     CALL    ecc_key_parse_input
     LSL     r25, r25
@@ -82,13 +143,7 @@ op_ecc_key_erase:
     MOVI    r0,  ret_op_success
     JMP     set_res_word
 
-op_key_setup_end:
-    CALL    get_output_base
-    ADDI    r0,  r0,  ecc_key_output_result
-    MOVI    r1,  0
-    STR     r2,  r0
-    MOV     r0,  r3
-    JMP     set_res_word
+
 
 ecc_key_parse_input:
     CALL    get_input_base
@@ -101,35 +156,3 @@ ecc_key_parse_input:
     AND     r25, r25, r2         ; SLOT
     AND     r4,  r4,  r2         ; CURVE
     RET
-
-ecc_key_get_k:
-    CMPI    r1, ecc_key_gen_id
-    BRZ     ecc_key_generate_k
-    ADDI    r4,  r0,  ecc_key_store_input_k
-    LDR     r19, r4
-    RET
-ecc_key_generate_k:
-    GRV     r19
-    RET
-ecc_key_gen_ed25519_call:
-    CALL    ecc_key_get_k
-    CALL    ed25519_key_setup
-    CMPI    r3,  0
-    BRZ     ecc_key_gen_ed25519_call_ok
-    MOVI    r2,  l3_result_fail
-    JMP     op_key_setup_end
-ecc_key_gen_ed25519_call_ok:
-    MOVI    r2,  l3_result_ok
-    JMP     op_key_setup_end
-
-ecc_key_gen_p256_call:
-    CALL    ecc_key_get_k
-    CALL    p256_key_setup
-    CMPI    r3,  0
-    BRZ     ecc_key_gen_p256_call_ok
-    MOVI    r2,  l3_result_fail
-    JMP     op_key_setup_end
-ecc_key_gen_p256_call_ok:
-    MOVI    r2,  l3_result_ok
-    JMP     op_key_setup_end
-

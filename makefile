@@ -18,15 +18,15 @@ clear:
 
 const_rom:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_leyout.s ${SRC_DIR}/mem_leyouts/constants_leyout.s
+	mv ${TS_REPO_ROOT}/data/constants_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
 
 data_ram_in_const:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_leyout.s ${SRC_DIR}/mem_leyouts/constants_leyout.s
+	mv ${TS_REPO_ROOT}/data/constants_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
 
 data_ram_in_const_boot:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_boot_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_leyout.s ${SRC_DIR}/mem_leyouts/constants_leyout.s
+	mv ${TS_REPO_ROOT}/data/constants_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
 
 ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
@@ -76,7 +76,7 @@ fit_sources = x25519_nomask x25519_scalar_mask x25519_z_mask x25519_z_scalar_mas
 
 release_fit: data_ram_in_const
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
-	mv ${TS_REPO_ROOT}/data/data_ram_in_const_leyout.s ${FIT_DIR}/data_ram_in_const_leyout.s
+	mv ${TS_REPO_ROOT}/data/data_ram_in_const_layout.s ${FIT_DIR}/data_ram_in_const_layout.s
 	mv ${TS_REPO_ROOT}/data/data_ram_in_const.hex ${FIT_DIR}/data_ram_in_const.hex
 	$(foreach src, ${fit_sources}, ${COMPILER} --hex-format=1 --hex-file=${FIT_DIR}/${src}.hex --first-address=${FW_BASE_ADDR} ${FIT_DIR}/${src}.s > ${FIT_DIR}/log/${src}.compile.log;)
 

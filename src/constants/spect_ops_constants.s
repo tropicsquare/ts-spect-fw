@@ -1,3 +1,10 @@
+; ==============================================================================
+;   file    constants/spect_ops_constants.s
+;   author  tropicsquare s. r. o.
+;   license TODO
+;
+;   generated from spect_ops_config.yml
+; ==============================================================================
 ; clear
 clear_id .eq 0x00
 ; ecc_key

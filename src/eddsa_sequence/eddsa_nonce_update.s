@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    src/eddsa_sequence/eddsa_nonce_update.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Updaes EdDSA nonce derivation with next 144B chunk of the message.
+;
+; ==============================================================================
+
 op_eddsa_nonce_update:
     CALL        eddsa_nonce_load_msg
 

@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    routines_includes.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Includes of all source files for Application Firmware
+;
+; ==============================================================================
+
 ; ====================================================
 ; Field Math
 ; ====================================================
@@ -80,7 +90,6 @@
 .include    ecc_crypto/p256_key_setup.s
 .include    ecc_crypto/ed25519_key_setup.s
 .include    ecc_crypto/ecdsa_sign.s
-;.include    ecc_crypto/eddsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
 
 ; ====================================================
@@ -89,8 +98,6 @@
 
 .include    ops/ecc_key_ops.s
 .include    ops/ecdsa_ops.s
-;.include    ops/eddsa_ops.s
-;.include    ops/sha512_ops.s
 .include    ops/x25519_ops.s
 .include    ops/clear.s
 

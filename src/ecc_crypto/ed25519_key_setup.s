@@ -1,4 +1,17 @@
+; ==============================================================================
+;  file    ecc_crypto/ed25519_key_setup.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Key setup for curve Ed25519 (EdDSA)
+;
+; Algorithm:
+;   1) H = SHA512(k)
+;   2) H[0,1,2,255] = 0 and H[254] = 1
+;   3) s = H[255:0]
+;   4) prefix = H[511:256]
+;   5) A = ENC(s.G)
 ;
 ; Inputs:
 ;   seed k in r19
@@ -8,9 +21,9 @@
 ;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
 ;   spect status in r3
 ;
-; Expects:
-;   --
+; See doc/ecc_key_layout.md for placement of the key values into physical slots.
 ;
+; ==============================================================================
 
 ed25519_key_setup:
     ; Add padding to k
@@ -19,9 +32,11 @@ ed25519_key_setup:
     MOVI        r17, 0
     MOVI        r16, 256
     SWE         r19, r19
+
     ; H = SHA512(k)
     HASH_IT
     HASH        r28, r16
+    
     ; Mask H[255:0] to become scalar s
     SWE         r29, r29
     MOVI        r0,  7
@@ -52,31 +67,37 @@ ed25519_key_setup:
 
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
+
     ; Calculate A = s.G and check validity of the result
     CALL        spm_ed25519_short
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
+
     ; Transform A back to affine coordinates
     CALL        point_compress_ed25519
+
     ; Get private key slot
     LSL         r25, r25
+
     ; Get pubkey slot
     ADDI        r26, r25, 1
+
     ; Compose kpair metadata (origin, curve)
     LD          r0,  ca_spect_cfg_word
     MOVI        r4,  0xFF
-    AND         r9,  r0,  r4        ; mask SPECT_OP_ID to r1[7:0]
+    AND         r9,  r0,  r4                    ; mask SPECT_OP_ID to r1[7:0]
     ROL8        r9,  r9
     ORI         r9,  r9,  ecc_type_ed25519
-    STK         r9,  r26, ecc_key_metadata     ; store metadata
+    STK         r9,  r26, ecc_key_metadata      ; store metadata
     BRE         ed25519_key_setup_kbus_fail
+
     ; Store the pubkey to key slot
-    STK         r8,  r26, ecc_pub_key_Ax     ; store A
+    STK         r8,  r26, ecc_pub_key_Ax        ; store A
     BRE         ed25519_key_setup_kbus_fail
     
-    KBO         r26, ecc_kbus_program          ; program
+    KBO         r26, ecc_kbus_program           ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r26, ecc_kbus_flush          ; flush
+    KBO         r26, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
 
     ; Store s and prefix to key slot
@@ -86,16 +107,17 @@ ed25519_key_setup:
     LD          r31, ca_q25519
     REDP        r30, r0,  r28
 
-    STK         r28, r25, ecc_priv_key_1     ; store s
+    STK         r28, r25, ecc_priv_key_1        ; store s
     BRE         ed25519_key_setup_kbus_fail
-    STK         r29, r25, ecc_priv_key_2     ; store prefix
+    STK         r29, r25, ecc_priv_key_2        ; store prefix
     BRE         ed25519_key_setup_kbus_fail 
-    STK         r30, r25, ecc_priv_key_3     ; store s mod q
+    STK         r30, r25, ecc_priv_key_3        ; store s mod q
     BRE         ed25519_key_setup_kbus_fail 
-    KBO         r25, ecc_kbus_program          ; program
+    KBO         r25, ecc_kbus_program           ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, ecc_kbus_flush          ; flush
+    KBO         r25, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
+
     ; Return success
     MOVI        r3,  0
     RET

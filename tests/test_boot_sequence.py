@@ -59,7 +59,7 @@ def boot_sequence(signature, A, message, name, isa):
 
     res = tc.read_output(test_dir, run_name, 0x1000, 1)
 
-    return res == 1
+    return res == 0
 
 if __name__ == "__main__":
     ret = 0

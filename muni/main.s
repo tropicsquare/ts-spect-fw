@@ -1,4 +1,4 @@
-.include ../src/mem_leyouts/mem_leyouts_includes.s
+.include ../src/mem_layouts/mem_layouts_includes.s
 .include ../src/constants/spect_ops_constants.s
 .include ../src/constants/spect_descriptors_constants.s
 .include ../src/constants/l3_result_const.s

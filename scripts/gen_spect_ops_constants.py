@@ -11,6 +11,16 @@ with open(f"{TS_REPO_ROOT}/spect_ops_config.yml", 'r') as cfg_file:
 
 cfg_file = open(f"{TS_REPO_ROOT}/src/constants/spect_ops_constants.s", 'w')
 
+cfg_file.write(
+    "; ==============================================================================\n"
+    ";   file    constants/spect_ops_constants.s\n"
+    ";   author  tropicsquare s. r. o.\n"
+    ";   license TODO\n"
+    ";\n"
+    ";   generated from spect_ops_config.yml\n"
+    "; ==============================================================================\n"
+)
+
 for op in cfg:
     cfg_file.write("; " + op["name"] + '\n' )
     cfg_file.write("{} .eq 0x{}\n".format(op["name"]+"_id", format(op["id"], '02X')))

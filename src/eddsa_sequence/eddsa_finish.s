@@ -1,3 +1,16 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_finish.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Finish EdDSA signature
+;
+;   1) Compute S = r + e*rng + e*(s - rng)
+;   2) Verify the computed signature
+;
+; ==============================================================================
+
 op_eddsa_finish:
     LD          r31, ca_q25519
 
@@ -33,6 +46,7 @@ eddsa_finish_s_randomize:
     BRNZ        eddsa_finish_fail
     MOVI        r13, 1
     MUL25519    r14, r11, r12
+
     ; Compute e.A
     MOV         r28, r25
 
@@ -42,6 +56,7 @@ eddsa_finish_s_randomize:
     ST          r8,  ca_eddsa_sign_internal_EAy
     ST          r9,  ca_eddsa_sign_internal_EAz
     ST          r10, ca_eddsa_sign_internal_EAt
+
     ; Compute S.G
     LD          r28, ca_eddsa_sign_internal_S
     LD          r11, ca_ed25519_xG
@@ -72,6 +87,8 @@ eddsa_finish_s_randomize:
     ADDI        r30, r0,  eddsa_output_result
 
     LD          r4,  ca_eddsa_sign_internal_R
+    
+    ; ENC(Q) == ENC(R)
     XOR         r2,  r8,  r4
     BRNZ        eddsa_finish_fail
 

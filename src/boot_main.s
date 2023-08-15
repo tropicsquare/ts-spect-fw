@@ -1,4 +1,19 @@
-.include mem_leyouts/mem_leyouts_includes.s
+; ==============================================================================
+;  file    boot_main.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Top source for SPECT Boot Firmware
+;
+;   - sha512_init
+;   - sha512_update
+;   - sha512_final
+;   - eddsa_verify
+;
+; ==============================================================================
+
+.include mem_layouts/mem_layouts_includes.s
 .include constants/spect_ops_status.s
 .include constants/spect_ops_constants.s
 .include constants/spect_descriptors_constants.s

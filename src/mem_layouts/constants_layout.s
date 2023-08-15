@@ -1,3 +1,10 @@
+; ==============================================================================
+;   file    mem_layouts/constants_layout.s
+;   author  tropicsquare s. r. o.
+;   license TODO
+;
+;   generated from const_rom_config.yml
+; ==============================================================================
 ca_p256 .eq 0x3000
 ca_q256 .eq 0x3020
 ca_ecdsa_exp_low .eq 0x3040
