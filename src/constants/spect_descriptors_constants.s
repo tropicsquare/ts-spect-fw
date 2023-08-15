@@ -1,3 +1,16 @@
+; ==============================================================================
+;  file    
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+;   Descriptor constants
+;   - config and result word address
+;   - ECC type values
+;   - KBUS immediates
+;
+; ==============================================================================
+
 ca_spect_cfg_word .eq 0x0100
 ca_spect_res_word .eq 0x1100
 ecc_type_ed25519 .eq 0x02

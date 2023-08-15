@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_finish.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Finishes computation of e = SHA512(R, A, M) mod q
+;
+; ==============================================================================
+
 op_eddsa_e_finish:
     CALL        get_data_in_size
     MOV         r11, r0             ; number of bytes in the last chunk of message

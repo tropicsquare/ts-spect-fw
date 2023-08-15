@@ -1,4 +1,25 @@
+; ==============================================================================
+;  file    ecc_math/point_dbl_ed25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Point Doubling on curve Ed25519
+; Follows algorithm from https://datatracker.ietf.org/doc/rfc8032/ Section 5.1.4.
+;
+; Algorithm:
+;   A = X1^2
+;   B = Y1^2
+;   C = 2*Z1^2
+;   H = A+B
+;   E = H-(X1+Y1)^2
+;   G = A-B
+;   F = C+G
+;   X3 = E*F
+;   Y3 = G*H
+;   T3 = E*H
+;   Z3 = F*G
+;
 ; Input:
 ;               X    Y    Z    T
 ;   Point Q1 = (r7,  r8,  r9,  r10)
@@ -11,27 +32,8 @@
 ;
 ; Intermediate value registers:
 ;   r0-4
-
-;   https://datatracker.ietf.org/doc/rfc8032/
-;   
-;      For point doubling, the following method is recommended.  A point
-;      (x,y) is represented in extended homogeneous coordinates (X, Y, Z,
-;      T), with x = X/Z, y = Y/Z, x * y = T/Z.
-;   
-;      The neutral point is (0,1), or equivalently in extended homogeneous
-;      coordinates (0, Z, Z, 0) for any non-zero Z.
-;   
-;                A = X1^2
-;                B = Y1^2
-;                C = 2*Z1^2
-;                H = A+B
-;                E = H-(X1+Y1)^2
-;                G = A-B
-;                F = C+G
-;                X3 = E*F
-;                Y3 = G*H
-;                T3 = E*H
-;                Z3 = F*G
+;
+; ==============================================================================
 
 point_dbl_ed25519:
     MUL25519    r0,  r7,  r7    ; r0 = X1^2     r0 = A

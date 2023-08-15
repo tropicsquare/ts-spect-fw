@@ -1,3 +1,16 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_finish.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Finish EdDSA signature
+;
+;   1) Compute S = r + e*rng + e*(s - rng)
+;   2) Verify the computed signature
+;
+; ==============================================================================
+
 op_eddsa_finish:
     LD          r31, ca_q25519
 

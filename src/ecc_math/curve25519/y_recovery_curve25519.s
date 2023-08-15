@@ -1,11 +1,17 @@
-; Y_Coordinate recovery for Curve25519
+; ==============================================================================
+;  file    ecc_math/curve25519/y_recovery_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Y-Coordinate recovery for Curve25519
 ; Based on https://eprint.iacr.org/2017/212.pdf Algorithm 5
 ; Modified to work with P in projective coordinates (ZP != 1)
 ;
-;   Recovers y-coordinate of point Q = k.P based on:
-;       Point P in projective coordinates (XP, ZP, YP)
-;       point Q in x only coordinates (XQ, ZQ)
-;       point R = (k+1).P in x only coordinates (XR, ZR)
+; Recovers y-coordinate of point Q = k.P based on:
+;   - point P in projective coordinates (XP, ZP, YP)
+;   - point Q in x-only coordinates (XQ, ZQ)
+;   - point R = (k+1).P in x-only coordinates (XR, ZR)
 ;
 ; Inputs:
 ;   Point P = (r11, r12, r13)
@@ -25,6 +31,8 @@
 ;   X0 = F * C % p
 ;   Y0 = ((C + D + G) * (XP * XQ + E) - G * E) * ZR - (C - D)**2 * XR
 ;   Z0 = F * E
+;
+; ==============================================================================
 
 y_recovery_curve25519:
     MUL25519    r0,  r7,  r12 ; C

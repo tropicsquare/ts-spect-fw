@@ -1,6 +1,12 @@
-; Point Addition on Curve25519
+; ==============================================================================
+;  file    ecc_math/curve25519/point_add_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; General point addition on Curve25519
 ; Uses Algorithm 1 from https://eprint.iacr.org/2015/1060.pdf with 
-; birrational mapping between Curve25519 and W-25519
+; birrational mapping Curve25519 <-> W-25519
 ;
 ; Inputs:
 ;               X    Z    Y
@@ -13,6 +19,7 @@
 ; Expects:
 ;   Curve25519 prime in r31
 ;
+; ==============================================================================
 
 point_add_curve25519:
     LD          r20, ca_w25519_a

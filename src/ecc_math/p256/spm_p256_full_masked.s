@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_math/p256/spm_p256_full_masked.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Fully masked scalar point multiplication on NIST curve P-256
 ;
 ; Inputs:
@@ -23,8 +29,8 @@
 ;   7) Compute k3.P3
 ;   8) Compute k.P = k2.P2 + k3.P3
 ;   9) Convert k.P to affine coordinates
-
-; TODO integrity checks
+;
+; ==============================================================================
 
 spm_p256_full_masked:
 ;   1) Convert P to randomized projective coordinates

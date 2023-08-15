@@ -1,7 +1,19 @@
-; Inversion modulo q256
-; input Z in register r1
-; output z^(-1) mod q256 in register r1
-; used registers : r1-x
+; ==============================================================================
+;  file    field_math/256/inv_q256.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Inversion in GF(q256) where q256 = order of NIST P-256.
+; Uses Little Fermat's Theorem - Z^(-1) = Z^(p-2) mod p
+;
+; Inputs:
+;   Z in register r1
+;
+; Outputs:
+;   Z^(-1) mod q256 in register r1
+;
+; ==============================================================================
 
 inv_q256:
     MULP r2, r1, r1   ; e = 2

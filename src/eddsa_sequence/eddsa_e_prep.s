@@ -1,3 +1,14 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_prep.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Prepares for e = SHA512(R, A, M) calculation.
+; Process R, A and first 64 byte of the massage.
+;
+; ==============================================================================
+
 op_eddsa_e_prep:
     CALL        get_input_base
     ADDI        r30, r0,  eddsa_input_message

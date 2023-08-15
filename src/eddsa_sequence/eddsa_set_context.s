@@ -1,15 +1,21 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_set_context.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Sets context for EdDSA sequence
 ;
-;   Loads keys from slot, loads Secure ChanelHash and Nonce.
+; Loads keys from slot, loads Secure Chanel Hash and Nonce.
 ;
 ;   Public key A ----------------> ca_eddsa_sign_internal_A
 ;   Private key part 's' --------> r26
 ;   Private key part 'prefix' ---> r20
 ;   Secure Channel Hash ---------> r16
 ;   Secure Channel Nonce --------> r17
-
-; TODO Integrity checks??
-
+;
+; ==============================================================================
+;
 ; Overall EdDSA sequence context
 ;   Public key 'A' --------------> ca_eddsa_sign_internal_A
 ;   Private key part 's' --------> r26
@@ -18,7 +24,11 @@
 ;   Secure Channel Nonce --------> r17
 ;   Nonce 'r' -------------------> r27
 ;   Signature part 'R' ----------> ca_eddsa_sign_internal_R
-;   SHA512(R || A || M) ---------> r25
+;   SHA512(R, A, M) -------------> r25
+;
+; ==============================================================================
+
+
 
 op_eddsa_set_context:
     CALL    get_input_base

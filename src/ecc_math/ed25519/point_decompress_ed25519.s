@@ -1,23 +1,11 @@
-;   https://datatracker.ietf.org/doc/rfc8032/
+; ==============================================================================
+;  file    ecc_math/point_decompress_ed25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
 ;
-;   For advice on how to implement arithmetic modulo p = 2^255 - 19
-;   efficiently and securely, see Curve25519 [CURVE25519].  For inversion
-;   modulo p, it is recommended to use the identity x^-1 = x^(p-2) (mod
-;   p).  Inverting zero should never happen, as it would require invalid
-;   input, which would have been detected before, or would be a
-;   calculation error.
-;
-;   For point decoding or "decompression", square roots modulo p are
-;   needed.  They can be computed using the Tonelli-Shanks algorithm or
-;   the special case for p = 5 (mod 8).  To find a square root of a,
-;   first compute the candidate root x = a^((p+3)/8) (mod p).  Then there
-;   are three cases:
-;
-;      x^2 = a (mod p).  Then x is a square root.
-;
-;      x^2 = -a (mod p).  Then 2^((p-1)/4) * x is a square root.
-;
-;      a is not a square modulo p.
+; Point Decompress on Ed25519
+; Follows algorithm from https://datatracker.ietf.org/doc/rfc8032/ Section 5.1.3.
 ;
 ;   1.  First, interpret the string as an integer in little-endian
 ;       representation.  Bit 255 of this number is the least significant
@@ -51,18 +39,21 @@
 ;   4.  Finally, use the x_0 bit to select the right square root.  If
 ;       x = 0, and x_0 = 1, decoding fails.  Otherwise, if x_0 != x mod
 ;       2, set x <-- p - x.  Return the decoded point (x,y).
-
+;
 ; Expects:
 ;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
-
+;
 ; Input:
 ;   compressed point with Y coordinate in r12
+;
 ; Output:
 ;   decompresd point (X, Y) = (r11, r12)
 ;
 ; Used registers (other than IN/OUT):
 ;   r0-5, r16-22
+;
+; ==============================================================================
 
 point_decompress_ed25519:
     MOV r16, r12

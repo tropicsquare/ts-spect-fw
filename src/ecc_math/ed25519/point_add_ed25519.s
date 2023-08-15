@@ -1,8 +1,31 @@
+; ==============================================================================
+;  file    ecc_math/ed25519/point_add.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Point Addition on curve Ed25519
+; Follows algorithm from https://datatracker.ietf.org/doc/rfc8032/ Section 5.1.4.
+;
+; Algorithm:
+;   A = (Y1-X1)*(Y2-X2)
+;   B = (Y1+X1)*(Y2+X2)
+;   C = T1*2*d*T2
+;   D = Z1*2*Z2
+;   E = B-A
+;   F = D-C
+;   G = D+C
+;   H = B+A
+;   X3 = E*F
+;   Y3 = G*H
+;   T3 = E*H
+;   Z3 = F*G
+;
 ; Input:
 ;               X    Y    Z    T
 ;   Point Q1 = (r7,  r8,  r9,  r10)
 ;   Point Q2 = (r11, r12, r13, r14)
+;
 ; Output:
 ;   Q2 = Q1 + Q2 = (r11, r12, r13, r14)
 ;
@@ -12,28 +35,8 @@
 ;
 ; Intermediate value registers:
 ;   r0-4
-
-;   https://datatracker.ietf.org/doc/rfc8032/
 ;   
-;      For point addition, the following method is recommended.  A point
-;      (x,y) is represented in extended homogeneous coordinates (X, Y, Z,
-;      T), with x = X/Z, y = Y/Z, x * y = T/Z.
-;   
-;      The neutral point is (0,1), or equivalently in extended homogeneous
-;      coordinates (0, Z, Z, 0) for any non-zero Z.
-;   
-;                    A = (Y1-X1)*(Y2-X2)
-;                    B = (Y1+X1)*(Y2+X2)
-;                    C = T1*2*d*T2
-;                    D = Z1*2*Z2
-;                    E = B-A
-;                    F = D-C
-;                    G = D+C
-;                    H = B+A
-;                    X3 = E*F
-;                    Y3 = G*H
-;                    T3 = E*H
-;                    Z3 = F*G
+; ==============================================================================
 
 point_add_ed25519:
     SUBP        r0,  r8,  r7    ; r0 = Y1 - X1

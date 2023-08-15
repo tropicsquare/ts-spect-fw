@@ -1,4 +1,10 @@
-; Check if point P is a valid P256 point
+; ==============================================================================
+;  file    ecc_math/p256/point_check_p256.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Check if point P is a valid P-256 point
 ;
 ;       Y^2*Z = X^3 + a*X*Z^2 + b*Z^3
 ;
@@ -10,6 +16,8 @@
 ;
 ; Expects:
 ;   P256 prime in r31
+;
+; ==============================================================================
 
 point_check_p256:
     LD      r0,  ca_p256_a

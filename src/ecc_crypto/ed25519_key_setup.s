@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_crypto/ed25519_key_setup.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Key setup for curve Ed25519 (EdDSA)
 ;
 ; Inputs:
@@ -8,9 +14,9 @@
 ;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
 ;   spect status in r3
 ;
-; Expects:
-;   --
+; See doc/ecc_key_layout.md for placement of the key values into physical slots.
 ;
+; ==============================================================================
 
 ed25519_key_setup:
     ; Add padding to k

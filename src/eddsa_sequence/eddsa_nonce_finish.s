@@ -1,3 +1,14 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_nonce_finish.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Finish EdDSA deterministic nonce derivation.
+; Process the last chunk of the message with TMAC
+;
+; ==============================================================================
+
 op_eddsa_nonce_finish:
     CALL        get_data_in_size
     MOV         r11, r0             ; number of bytes in the last chunk

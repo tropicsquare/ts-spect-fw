@@ -1,5 +1,11 @@
+; ==============================================================================
+;  file    ecc_point_generation/map_to_curve_simple_swu.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Map to curve algorithm using Simplified Shallue-van de Woestijne-Ulas method
-; [https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#section-6.6.2]
+; [https://www.rfc-editor.org/rfc/rfc9380.html#name-simplified-swu-method]
 ; 
 ; Input:
 ;   u, an element of GF(p256) in r0
@@ -10,34 +16,7 @@
 ; Expects:
 ;   P-256 prime in r31
 ;
-; Algorithm:
-;
-;                   1.  tv1 = u^2
-;                   2.  tv1 = Z * tv1
-;                   3.  tv2 = tv1^2
-;                   4.  tv2 = tv2 + tv1
-;                   5.  tv3 = tv2 + 1
-;                   6.  tv3 = B * tv3
-;                   7.  tv4 = CMOV(Z, -tv2, tv2 != 0)
-;                   8.  tv4 = A * tv4
-;                   9.  tv2 = tv3^2
-;                   10. tv6 = tv4^2
-;                   11. tv5 = A * tv6
-;                   12. tv2 = tv2 + tv5
-;                   13. tv2 = tv2 * tv3
-;                   14. tv6 = tv6 * tv4
-;                   15. tv5 = B * tv6
-;                   16. tv2 = tv2 + tv5
-;                   17.   x = tv1 * tv3
-;                   18. (is_gx1_square, y1) = sqrt_ratio(tv2, tv6)
-;                   19.   y = tv1 * u
-;                   20.   y = y * y1
-;                   21.   x = CMOV(x, tv3, is_gx1_square)
-;                   22.   y = CMOV(y, y1, is_gx1_square)
-;                   23.  e1 = sgn0(u) == sgn0(y)
-;                   24.   y = CMOV(-y, y, e1)
-;                   25.   y = y * tv4
-;                   26. return (x, y, tv4)
+; ==============================================================================
 
 map_to_curve_simple_swu:
     MOV     r20, r0

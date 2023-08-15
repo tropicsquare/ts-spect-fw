@@ -1,6 +1,17 @@
+; ==============================================================================
+;  file    ecc_point_generation/map_to_curve_elligator2_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Map to curve elligator algorithm for Curve25519
+; Follows algorithm https://www.rfc-editor.org/rfc/rfc9380.html#name-curve25519-q-5-mod-8-k-1
+;
 ; Input: u, an element of GF(2^255-19).
 ; Output: (xn, xd, yn, yd) such that (xn / xd, yn / yd) is a point on curve25519.
 ;         return (r3, r7, r11, r8) = (xn, xd, y, 1)
+;
+; ==============================================================================
 
 map_to_curve_elligator2_curve25519:
 ; r0    u, y2

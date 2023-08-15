@@ -1,3 +1,11 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_pad_mask.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Compose mask for SHA padding
+;
 ; Inputs:
 ;   chunk size in r11
 ;
@@ -5,6 +13,9 @@
 ;   Pad mask in r5
 ;   first 1 bit position in r7
 ;   chunk size // 32 in r9
+;
+; ==============================================================================
+
 
 eddsa_e_pad_mask:
     ; prepare for padding bits mask

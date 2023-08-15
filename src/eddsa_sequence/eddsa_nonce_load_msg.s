@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_nonce_load_msg.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Loads 144B EdDSA message chunk into (r2, .., r6) for EdDSA nonce derivation.
+;
+; ==============================================================================
+
 eddsa_nonce_load_msg:
     CALL        get_input_base
     ADDI        r30, r0,  eddsa_input_message

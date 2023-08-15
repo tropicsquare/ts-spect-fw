@@ -1,4 +1,10 @@
-; Point Generate on Curve25519
+; ==============================================================================
+;  file    ecc_point_generation/point_generate_ed25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Point Generate on Ed25519
 ;
 ; Input:
 ;   0x02 || DST || 0x1E in r1
@@ -6,18 +12,12 @@
 ; Output:
 ;   Random point (x, y, z, t) on Ed25519 -- (r11, r12, r13, r14)
 ;
-; Expects:
-;   /
-;
 ; Intermediate value registers:
 ;   r0,..,r14
-;
-
-; Using eligator method for hashing a field element to a point on Curve25519 and birational
-; mapping to Ed25519 
-; https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#name-elligator-2
 ; 
 ; See spect_fw/str2point.md for detailed description.
+;
+; ==============================================================================
 
 ed25519_point_generate:
     LD      r31, ca_p25519

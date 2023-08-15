@@ -1,5 +1,12 @@
+; ==============================================================================
+;  file    ecc_math/curve25519/spm_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Scalar Point Multiplication on Curve25519 with 512 bit scalar
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
+; Uses diferential x-coordinate only addition/doubling
 ; 
 ; Inputs:
 ;               X    Z
@@ -14,6 +21,8 @@
 ; 
 ; Expects:
 ;   Curve25519 prime in r31
+;
+; ==============================================================================
 
 spm_curve25519:
     LD      r6,  ca_curve25519_a2d4

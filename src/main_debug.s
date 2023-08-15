@@ -1,4 +1,18 @@
-.include mem_leyouts/mem_leyouts_includes.s
+; ==============================================================================
+;  file    main_debug.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Top source for debug firmware.
+;
+;   - x25519_dbg
+;   - ecdsa_sign_dbg
+;   - eddsa_set_context_dbg + rest of EdDSA sequence
+;
+; ==============================================================================
+
+.include mem_layouts/mem_layouts_includes.s
 .include constants/spect_ops_constants.s
 .include constants/spect_descriptors_constants.s
 .include constants/l3_result_const.s

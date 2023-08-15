@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_math/p256/spm_p256_short.s 
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Scalar Point Multiplication on curve P-256
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
 ;
@@ -18,6 +24,8 @@
 ;   r8 -> parameter b
 ;   (r9, r10, r11) -> Q0
 ;   r30 -> counter
+;
+; =============================================================================
 
 spm_p256_short:
     MOVI r9,  0 ;\

@@ -26,11 +26,21 @@ if len(mem["data"]) > mem_size:
     print("Memory size error")
 
 mem_hex_name = os.path.join(os.path.dirname(sys.argv[1]), mem["name"] + ".hex")
-mem_leyout_name = os.path.join(os.path.dirname(sys.argv[1]), mem["name"] + "_leyout.s")
+mem_layout_name = os.path.join(os.path.dirname(sys.argv[1]), mem["name"] + "_layout.s")
 print("hexfile -> ", mem_hex_name)
-print("leyout -> ", mem_leyout_name)
+print("layout -> ", mem_layout_name)
 mem_hex = open(mem_hex_name, "w")
-mem_leyout = open(mem_leyout_name, "w")
+mem_layout = open(mem_layout_name, "w")
+
+mem_layout.write(
+    "; ==============================================================================\n"
+    f";   file    mem_layouts/{mem_layout_name.split('/')[-1]}\n"
+    ";   author  tropicsquare s. r. o.\n"
+    ";   license TODO\n"
+    ";\n"
+    f";   generated from {config_name.split('/')[-1]}\n"
+    "; ==============================================================================\n"
+)
 
 data = np.empty(mem_size, dtype=dict)
 
@@ -69,7 +79,7 @@ for d in data:
         for i in range(8):
             mem_hex.write(format((d["value"] >> i*32) & 0xffffffff, '08X') + "\n")
 
-        mem_leyout.write("{} .eq 0x{}\n".format(d["name"], format(d["address"], '04X')))
+        mem_layout.write("{} .eq 0x{}\n".format(d["name"], format(d["address"], '04X')))
 
 mem_hex.close()
-mem_leyout.close()
+mem_layout.close()

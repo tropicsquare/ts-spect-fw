@@ -1,4 +1,10 @@
-; Differential x-coordinate only addition on Curve25519 -- xADD
+; ==============================================================================
+;  file    ecc_math/curve25519/point_xadd_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Differential x-coordinate only addition on Curve25519
 ; Follows Algorithm 1 from https://eprint.iacr.org/2017/212.pdf
 ;
 ; Input:
@@ -26,6 +32,8 @@
 ;       V4 = V4 ** 2
 ;       XQ = ZR * V3
 ;       ZQ = XR * V4
+;
+; ==============================================================================
 
 point_xadd_curve25519:
     ADDP        r0,  r7,  r8    ;   V0 = XP + ZP

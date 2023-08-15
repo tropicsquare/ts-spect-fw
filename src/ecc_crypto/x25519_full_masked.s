@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_crypto/x25519_full_masked.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Fully masked and randomized X25519 algorithm
 ;
 ; Inputs:
@@ -26,6 +32,8 @@
 ;   10) Recover sP3.y
 ;   11) Compute sP1 = sP2 - sP3
 ;   12) Transform sP1.x to affine coordinate system
+;
+; ==============================================================================
 
 x25519_full_masked:
     LD          r31, ca_p25519

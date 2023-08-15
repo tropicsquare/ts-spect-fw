@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_point_generation/point_generate_p256.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Point Generate on NIST curve P-256
 ;
 ; Input:
@@ -12,9 +18,9 @@
 ; Intermediate registers:
 ;   r0, ..., r
 ;
-; Using Simplified Shallue-van de Woestijne-Ulas method 
-; [https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#section-6.6.2]
-
+; See spect_fw/str2point.md for detailed description.
+;
+; ==============================================================================
 p256_point_generate:
     GRV     r2
     CALL    hash_to_field

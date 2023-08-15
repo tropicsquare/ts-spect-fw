@@ -1,4 +1,10 @@
-; Scalar Point Multiplication on curve Ed25519 with 512 bit scalar
+; ==============================================================================
+;  file    ecc_math/ed25519/spm_ed25519_long.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Scalar point multiplication on curve Ed25519 with 512 bit scalar
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
 ;
 ; Inputs:
@@ -17,6 +23,8 @@
 ;   r6 -> parameter d
 ;   (r7,  r8,  r9,  r10) -> Q0
 ;   r30 -> counter
+;
+; ==============================================================================
 
 spm_ed25519_long:
     MOVI r7,  0 ;\

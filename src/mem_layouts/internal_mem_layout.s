@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    mem_layouts/internal_mem_layout.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Momory constants (layout) for inernal intermediate values.
+;
+; ==============================================================================
+
 ; Internal Address Constants for intermediate values
 ca_addr_base .eq 0x0100
 ca_ed25519_smp_P2x .eq 0x0200

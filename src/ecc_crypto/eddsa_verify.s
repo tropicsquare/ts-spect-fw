@@ -1,12 +1,21 @@
+; ==============================================================================
+;  file    ecc_crypto/eddsa_verify.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Routine for EdDSA signature verification for boot-up firmware.
+; Only 64 byte message is supported
 ;
 ; Inputs:
-;   R part  : 0x0020-0x003F
-;   S part  : 0x0040-0x005F
-;   Pub key : 0x0060-0x007F
-;   Pub key : 0x0080-0x00BF
+;   Signature (R,S) : 0x0020-0x005F
+;   Public key      : 0x0060-0x007F
+;   Message         : 0x0080-0x00BF
 ;
 ; Outputs:
-;   Fail/Success : 0x0
+;   Fail/Success : 0x0 (0: Verified, else fail)
+;
+; ==============================================================================
 
 eddsa_verify:
     ; load and set needed parameters
@@ -106,11 +115,11 @@ bp_eddsa_verify_encq:
 .endif
     BRZ         eddsa_verify_success
 eddsa_verify_fail:
-    MOVI        r2,  0
+    MOVI        r2,  1
     ST          r2,  eddsa_verify_output_result
     JMP         set_res_word
 
 eddsa_verify_success:
-    MOVI        r2,  1
+    MOVI        r2,  0
     ST          r2,  eddsa_verify_output_result
     JMP         set_res_word

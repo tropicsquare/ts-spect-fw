@@ -1,3 +1,12 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_at_once.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Computes e = SHA512(R, A, M) mod q at once in case of len(M) < 64 bytes
+;
+; ==============================================================================
 op_eddsa_e_at_once:
     ; Load all data
     CALL        get_data_in_size

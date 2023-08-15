@@ -3,8 +3,8 @@
 ; input u -> 0x0000
 ; output u -> 0x1000
 
-.include data_ram_in_const_leyout.s
-.include x25519_mem_leyout.s
+.include data_ram_in_const_layout.s
+.include x25519_mem_layout.s
 
 _start:
 x25519:

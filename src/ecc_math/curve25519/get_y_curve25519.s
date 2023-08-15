@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_math/curve25519/get_y_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Compute y coordinate from x coordinate for Curve25519
 ; Solve y = sqrt(x*(x^2 + A*x + 1))
 ;
@@ -13,6 +19,8 @@
 ;
 ; Expects:
 ;   Curve25519 prime in R31
+;
+; ==============================================================================
 
 get_y_curve25519:
     LD          r0,  ca_curve25519_a

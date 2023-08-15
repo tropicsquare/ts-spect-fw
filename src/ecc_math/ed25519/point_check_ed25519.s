@@ -1,4 +1,10 @@
-; Check if point P is a valid Ed25519 point
+; ==============================================================================
+;  file    ecc_math/ed25519/point_check_ed25519.s  
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Check if point P in extended coordinates is a valid Ed25519 point
 ;
 ;       (Y^2 - X^2)*Z^2 == Z^4 + d*X^2*Y^2 and
 ;               (X * Y) == (Z * T)
@@ -12,6 +18,8 @@
 ; Expects:
 ;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
+;
+; ==============================================================================
 
 point_check_ed25519:
     MUL25519    r0,  r7,  r7    ; X^2

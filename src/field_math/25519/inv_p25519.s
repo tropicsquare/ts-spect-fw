@@ -1,9 +1,19 @@
-; Inversion in GF(p25519)
-; input Z in register r1
-; output Z^-1 mod p25519 in register r1
-; 
-; Used registers:
-;   r1-5
+; ==============================================================================
+;  file    field_math/25519/inv_p25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Inversion in GF(p25519) where p25519 = Ed25519 prime.
+; Uses Little Fermat's Theorem - Z^(-1) = Z^(p-2) mod p
+;
+; Inputs:
+;   Z in register r1
+;
+; Outputs:
+;   Z^(-1) mod p25519 in register r1
+;
+; ==============================================================================
 
 inv_p25519_250:
     MUL25519 r2, r1, r1

@@ -1,7 +1,19 @@
-; Inversion in GF(p256)
-; input Z in register r1
-; output z^(-1) mod p256 in register r1
-; used registers : r1-5
+; ==============================================================================
+;  file    field_math/256/inv_p256.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Inversion in GF(p256) where p256 = NIST P-256 prime.
+; Uses Little Fermat's Theorem - Z^(-1) = Z^(p-2) mod p
+;
+; Inputs:
+;   Z in register r1
+;
+; Outputs:
+;   Z^(-1) mod p256 in register r1
+;
+; ==============================================================================
 
 inv_p256_c1:
     MUL256  r3, r1, r1

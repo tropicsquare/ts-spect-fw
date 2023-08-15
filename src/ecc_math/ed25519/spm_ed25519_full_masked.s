@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_math/ed25519/spm_edd25519_full_masked.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Fully masked scalar point multiplication on Twisted Edwards curve Ed25519
 ;
 ; Inputs:
@@ -23,8 +29,8 @@
 ;   7) Compute k3.P3
 ;   8) Compute k.P = k2.P2 + k3.P3
 ;   9) Convert k.P to affine coordinates
-
-; TODO integrity checks
+;
+; ==============================================================================
 
 spm_ed25519_full_masked:
 ;   1) Convert P to randomized extended coordinates

@@ -1,5 +1,11 @@
+; ==============================================================================
+;  file    
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Square root ratio algorithm for GF(p) where p = 3 mod 4
-; Follows algorithm [https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#appendix-F.2.1.2]
+; [https://www.rfc-editor.org/rfc/rfc9380.html#name-optimized-sqrt_ratio-for-q-]
 ;
 ; Inputs:
 ;   u, v alements of GF(p) in r12, r16, where p = P-256 prime
@@ -19,11 +25,11 @@
 ;
 ; Algorithm:
 ;
-;           Constants:
+;       Constants:
 ;           1. c1 = (q - 3) / 4     # Integer arithmetic
 ;           2. c2 = sqrt(-Z)
 ;           
-;           Procedure:
+;       Procedure:
 ;           1. tv1 = v^2
 ;           2. tv2 = u * v
 ;           3. tv1 = tv1 * tv2
@@ -35,6 +41,8 @@
 ;           9. isQR = tv3 == u
 ;           10. y = CMOV(y2, y1, isQR)
 ;           11. return (isQR, y)
+;
+; ==============================================================================
 
 sqrt_ratio_3mod4:
 ; y1 -> r9

@@ -1,12 +1,23 @@
-; ECDSA P-256 Key Setup
+; ==============================================================================
+;  file    ecc_crypto/p256_key_setup.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Key setup for curve NIST P-156 (ECDSA)
 ;
 ; Input:
 ;   seed k in r19
 ;   slot to write the key to in r25
 ;
 ; Outputs:
-;   Writes the key trio (d, w, A) to ECC key slot via KBUS
+;   Writes the key set (d, w, A) to ECC key slot via KBUS
 ;   spect status in r3
+;
+; See doc/ecc_key_layout.md for placement of the key values into physical slots.
+;
+; ==============================================================================
+
 
 p256_key_setup:
     LD r31, ca_q256

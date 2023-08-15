@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    constants/spect_op_values.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+;   SPECT_OP_STATUS field values 
+;
+; ==============================================================================
+
 ret_op_success .eq 0x00
 ret_ctx_err .eq 0xf1
 ret_key_err .eq 0xf2

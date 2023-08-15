@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_math/p256/point_add_p256.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Point Addition on curve P-256
 ; Uses Algorithm 4 from https://eprint.iacr.org/2015/1060.pdf
 ; Input:
@@ -9,10 +15,13 @@
 ; Expects:
 ;   p256 prime in r31
 ;   P-256 parameter b in r8
-;       (b = 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b)
 ;
 ; Intermediate value registers:
 ;   r0-7
+;
+; ==============================================================================
+
+
 
 point_add_p256:
     MUL256  r0,  r9,  r12

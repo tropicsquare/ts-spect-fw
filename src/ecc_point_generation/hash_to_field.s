@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_point_generation/hash_to_field.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Hash arbitrary 256-bit string in to an element of GF(2^255 - 19)
 ;
 ; The hashing function uses expand tag (EXP_TAG) and
@@ -10,11 +16,14 @@
 ;
 ; Input:
 ;   x in r2
+;
 ; Output:
 ;   a, an element of GF(2^255 - 19) in r0
 ; 
 ; Expects:
 ;   p in r31
+;
+; ==============================================================================
 
 hash_to_field:
     CALL    compose_exp_tag

@@ -1,3 +1,9 @@
+; ==============================================================================
+;  file    ecc_point_generation/point_generate_curve25519.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
 ; Point Generate on Curve25519
 ;
 ; Input:
@@ -11,12 +17,10 @@
 ;
 ; Intermediate value registers:
 ;   r0,..,r14
-;
-
-; Using eligator method for hashing a field element to a point on Curve25519
-; https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#name-elligator-2
 ; 
 ; See str2point.md for detailed description.
+;
+; ==============================================================================
 
 curve25519_point_generate:
     GRV         r2

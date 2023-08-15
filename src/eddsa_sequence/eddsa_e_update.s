@@ -1,3 +1,13 @@
+; ==============================================================================
+;  file    eddsa_sequence/eddsa_e_update.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Updates e = SHA512(R, A, M) calculation with next 128 bytes of the message.
+;
+; ==============================================================================
+
 op_eddsa_e_update:
     CALL        eddsa_e_load_message
 

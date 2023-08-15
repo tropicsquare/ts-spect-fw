@@ -1,8 +1,27 @@
-.include mem_leyouts/mem_leyouts_includes.s
+; ==============================================================================
+;  file    main.s
+;  author  vit.masek@tropicsquare.com
+;  license TODO
+; ==============================================================================
+;
+; Top source of Application Firmware
+;
+;   - ECC Key Ops
+;   - X25519 Ops
+;   - ECDSA Ops
+;   - EdDSA Sequence
+;
+; ==============================================================================
+; Constants Includes
+; ==============================================================================
+.include mem_layouts/mem_layouts_includes.s
 .include constants/spect_ops_constants.s
 .include constants/spect_descriptors_constants.s
 .include constants/l3_result_const.s
 .include constants/spect_ops_status.s
+; ==============================================================================
+; Op ID decoding 
+; ==============================================================================
 _start:
     LD      r0, ca_spect_cfg_word
     ADDI    r0, r0, 0               ; force bits [255:32] to 0
@@ -13,10 +32,6 @@ _start:
 op_id_check_clear:
     CMPI r1, clear_id
     BRZ  op_clear
-
-;op_id_check_sha512:
-;    CMPI r4, sha512_id
-;    BRZ  op_sha512
 
 op_id_check_ecc_key:
     CMPI r4, ecc_key_id
@@ -34,22 +49,9 @@ op_id_check_ecdsa:
     CMPI r4, ecdsa_id
     BRZ  op_ecdsa
 
-; ============================================================
     JMP     invalid_op_id
 
-; ============================================================
-;op_sha512:
-;    CMPI    r1, sha512_init_id
-;    BRZ     op_sha512_init
-;
-;    CMPI    r1, sha512_update_id
-;    BRZ     op_sha512_update
-;
-;    CMPI    r1, sha512_final_id
-;    BRZ     op_sha512_final
-;
-;    JMP     invalid_op_id
-; ============================================================
+; ==============================================================================
 op_ecc_key:
     CMPI    r1, ecc_key_gen_id
     BRZ     op_ecc_key_gen_store
@@ -65,7 +67,7 @@ op_ecc_key:
 
     JMP     invalid_op_id
 
-; ============================================================
+; ==============================================================================
 op_x25519:
     CMPI    r1, x25519_kpair_gen_id
     BRZ     op_x25519_kpair_gen
@@ -81,7 +83,7 @@ op_x25519:
 
     JMP     invalid_op_id
 
-; ============================================================
+; ==============================================================================
 op_eddsa:
     CMPI    r1, eddsa_set_context_id
     BRZ     op_eddsa_set_context
@@ -113,18 +115,15 @@ op_eddsa:
     CMPI    r1, eddsa_finish_id
     BRZ     op_eddsa_finish
 
- ;   CMPI    r1, eddsa_verify_id
- ;   BRZ     op_eddsa_verify
-
     JMP     invalid_op_id
 
-; ============================================================
+; ==============================================================================
 op_ecdsa:
     CMPI    r1, ecdsa_sign_id
     BRZ     op_ecdsa_sign
 
     JMP     invalid_op_id
-; ============================================================
+; ==============================================================================
 
 invalid_op_id:
     MOVI    r2,  l3_result_invalid_cmd
@@ -134,9 +133,9 @@ invalid_op_id:
     MOVI    r0,  ret_op_id_err
     JMP     set_res_word
 
-; ============================================================
+; ==============================================================================
 ; Routines for geting fields from SPECT_CFG_WORD
-; ============================================================
+; ==============================================================================
 get_input_base:
     LD      r0,  ca_spect_cfg_word
     MOVI    r1,  0xF0
@@ -163,14 +162,15 @@ get_data_in_size:
     AND     r0,  r0,  r1
     RET
 
-; ============================================================
+; ==============================================================================
 ; Routine for setting  SPECT_RES_WORD field
-; ============================================================
+; ==============================================================================
 set_res_word:
     ROL8    r1,  r1
     ROL8    r1,  r1
     ADD     r0,  r0,  r1
     ST      r0,  ca_spect_res_word
     END
+; ==============================================================================
 
 .include    routines_includes.s
