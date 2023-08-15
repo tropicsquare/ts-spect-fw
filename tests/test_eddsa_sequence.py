@@ -254,10 +254,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     #print("result:", hex(result))
 
-    print("signature_ref:", sign_ref.hex())
+    #print("signature_ref:", sign_ref.hex())
 
     signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16, string=True)
-    print("signature:    ", signature.hex())
+    #print("signature:    ", signature.hex())
 
     return sign_ref == signature
 
