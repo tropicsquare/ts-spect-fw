@@ -12,9 +12,33 @@
 ;
 ; ==============================================================================
 
+ecc_key_parse_input:
+    CALL    get_input_base
+    ADDI    r4,  r0,  ecc_key_input_cmd_in
+    LDR     r4,  r4
+    MOVI    r2,  0xFF
+    AND     r1,  r4,  r2
+    ROR8    r25, r4
+    ROR8    r4,  r25
+    AND     r25, r25, r2                    ; SLOT
+    AND     r4,  r4,  r2                    ; CURVE
+    RET
+
 ; ECC Key Generate/Store
 op_ecc_key_gen_store:
     CALL    ecc_key_parse_input
+    LSL     r25, r25                        ; physical priv key slot
+
+    ; check if priv key slot is empty
+    KBO     r25, ecc_kbus_verify_erase
+    BRE     op_key_fail
+    
+    ADDI    r26, r25, 1                     ; physical pub key slot
+
+    ; check if priv key slot is empty
+    KBO     r26, ecc_kbus_verify_erase
+    BRE     op_key_fail
+
     CMPI    r4,  ecc_type_ed25519
     BRZ     ecc_key_gen_ed25519_call
     CMPI    r4,  ecc_type_p256
@@ -76,33 +100,41 @@ op_ecc_key_read:
     CALL    ecc_key_parse_input
     LSL     r25, r25
     ADDI    r25, r25, 1
+
     ; load kpair metadata
-    LDK     r2,  r25, 0x400
+    LDK     r2,  r25, ecc_key_metadata
     BRE     op_key_fail
+
     ; mask curve
     MOVI    r30, 0xFF
     AND     r30, r30, r2
+
     ; load pubkey
-    LDK     r16, r25, 0x401     ; load pubkey
+    LDK     r16, r25, ecc_pub_key_Ax
     BRE     op_key_fail
 
     CMPI    r30,  ecc_type_p256
     BRNZ    ecc_key_read_skip_second_read
+
     ; load rest of p256 pubkey
-    LDK     r16, r25, 0x402     ; load pubkey
+    LDK     r16, r25, ecc_pub_key_Ay
     BRE     op_key_fail
+
 ecc_key_read_skip_second_read:
-    KBO     r25, 0x405          ; flush
+    KBO     r25, ecc_kbus_flush
     BRE     op_key_fail
+
     ; compose return value
     ROL8    r2,  r2
     ORI     r2,  r2,  l3_result_ok
     MOVI    r0,  0
     JMP     op_key_read_end
+
 op_key_fail:
     MOVI    r2,  l3_result_fail
     STR     r2,  r21
     MOVI    r1,  1
+    KBO     r25, ecc_kbus_flush
     MOVI    r0,  ret_key_err
     JMP     set_res_word
 
@@ -118,20 +150,24 @@ op_key_read_end:
 op_ecc_key_erase:
     CALL    ecc_key_parse_input
     LSL     r25, r25
-    ADDI    r26, r25, 1
 
     CALL    get_output_base
     ADDI    r21, r0,  ecc_key_output_result
 
-    LDK     r2,  r26, 0x400     ; load kpair metadata
+    ; Erase priv key slot
+    KBO     r25, ecc_kbus_erase
     BRE     op_key_fail
-    KBO     r25, 0x403          ; erase privkey slot
+    KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
-    KBO     r25, 0x404          ; verify erase privkey slot
+
+    ADDI    r25, r25, 1
+
+    ; Erase pub key slot
+    LDK     r2,  r25, ecc_key_metadata
     BRE     op_key_fail
-    KBO     r26, 0x403          ; erase pubkey slot
+    KBO     r25, ecc_kbus_erase
     BRE     op_key_fail
-    KBO     r26, 0x404          ; verify erase pubkey slot
+    KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
 
     ROL8    r2,  r2
@@ -142,17 +178,3 @@ op_ecc_key_erase:
     MOVI    r1,  3
     MOVI    r0,  ret_op_success
     JMP     set_res_word
-
-
-
-ecc_key_parse_input:
-    CALL    get_input_base
-    ADDI    r4,  r0,  ecc_key_input_cmd_in
-    LDR     r4,  r4
-    MOVI    r2,  0xFF
-    AND     r1,  r4,  r2
-    ROR8    r25, r4
-    ROR8    r4,  r25
-    AND     r25, r25, r2         ; SLOT
-    AND     r4,  r4,  r2         ; CURVE
-    RET
