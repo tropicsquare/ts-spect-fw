@@ -3,6 +3,7 @@ variables:
 
 stages:
   - test
+  - test_tag
 
 ###################################################################################################
 # Run tests
@@ -16,3 +17,17 @@ run_test:
     - cd tests
     - ./run_tests.sh
     - ./run_test_boot.sh
+
+run_test_tag:
+  stage: test_tag
+  tags:
+    - shell
+  only:
+    - tags
+  when: always
+  script:
+    - source ./setup_env
+    - cd tests
+    - ./run_tests.sh
+    - ./run_test_boot.sh
+    - ./run_test_release.sh
