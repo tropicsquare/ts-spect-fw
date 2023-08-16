@@ -17,7 +17,7 @@ declare -i ret_val=0
 
 echo ${1}
 
-#export TS_SPECT_FW_TEST_DONT_DUMP=""
+export TS_SPECT_FW_TEST_DONT_DUMP=""
 export TS_SPECT_FW_TEST_RELEASE=""
 
 for test in ${tests[@]}; do
@@ -32,7 +32,7 @@ done
 
 echo "Failed $ret_val"
 
-#unset -f TS_SPECT_FW_TEST_DONT_DUMP
+unset -f TS_SPECT_FW_TEST_DONT_DUMP
 unset -f TS_SPECT_FW_TEST_RELEASE
 
 exit $ret_val

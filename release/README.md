@@ -1,4 +1,4 @@
-# SPECT Production Firmware for MPW2, ISA v0.2
+# SPECT Production Firmware for MPW2, ISA v0.2, No parity
 
 `start_address = 0x8000`
 
