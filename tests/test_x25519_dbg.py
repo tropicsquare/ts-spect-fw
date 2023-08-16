@@ -35,7 +35,7 @@ if __name__ == "__main__":
     tc.write_int256(cmd_file, priv_scalar, 0x0020)
     tc.write_int256(cmd_file, pub, 0x0040)
 
-    ctx = tc.run_op(cmd_file, run_name, 0x0, 0x1, 32, ops_cfg, test_dir, main="src/main_debug.s")
+    ctx = tc.run_op(cmd_file, run_name, 0x0, 0x1, 32, ops_cfg, test_dir, main="src/main_debug.s", tag="Debug")
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -53,5 +53,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
 
     sys.exit(0)

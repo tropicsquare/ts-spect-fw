@@ -38,16 +38,23 @@ compile: clear const_rom ops_constants
 	--dump-symbols=${BUILD_DIR}/symbols_dump.s \
 	${SRC_DIR}/main.s > ${BUILD_DIR}/compile.log
 
-release: data_ram_in_const ops_constants
+release: const_rom ops_constants
 	rm -rf ${RELEASE_DIR}
 	mkdir ${RELEASE_DIR}
 	mkdir ${RELEASE_DIR}/dump
 	cp ${TS_REPO_ROOT}/data/constants.hex ${RELEASE_DIR}/constants.hex
-	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/main.hex \
+
+	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/spect_app.hex \
 	--first-address=${FW_BASE_ADDR} \
-	--dump-program=${RELEASE_DIR}/dump/program_dump.s \
-	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump.s \
-	${SRC_DIR}/main.s > ${RELEASE_DIR}/compile.log
+	--dump-program=${RELEASE_DIR}/dump/program_dump_app.s \
+	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_app.s \
+	${SRC_DIR}/main.s > ${RELEASE_DIR}/compile_app.log
+
+	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/spect_debug.hex \
+	--first-address=${FW_BASE_ADDR} \
+	--dump-program=${RELEASE_DIR}/dump/program_dump_debug.s \
+	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_debug.s \
+	${SRC_DIR}/main_debug.s > ${RELEASE_DIR}/compile_debug.log
 
 release_boot_mpw1: data_ram_in_const_boot ops_constants
 	rm -rf ${BOOT_DIR}/mpw1

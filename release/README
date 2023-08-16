@@ -1,9 +1,0 @@
-Supported SPECT OPs:
-
-- eddsa_verify
-- sha512_init
-- sha512_update
-- sha512_final
-
-main.hex base address = 0x8000
-data_ram_in_const base address = 0x0200

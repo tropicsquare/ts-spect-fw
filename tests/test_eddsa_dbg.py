@@ -10,6 +10,7 @@ import models.ed25519 as ed25519
 def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""):
 
     main = "src/main_debug.s"
+    tag="Debug"
 
     insrc = 0x0
     outsrc = 0x1
@@ -35,7 +36,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     tc.write_bytes(cmd_file, sch, 0x00A0)
     tc.write_bytes(cmd_file, scn, 0x00C0)
 
-    ctx = tc.run_op(cmd_file, "eddsa_set_context_dbg", insrc, outsrc, 36, ops_cfg, test_dir, run_name=run_name, main=main)
+    ctx = tc.run_op(
+        cmd_file, "eddsa_set_context_dbg", insrc, outsrc, 36, ops_cfg, test_dir,
+        run_name=run_name, main=main, tag=tag
+    )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -55,7 +59,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
-    ctx = tc.run_op(cmd_file, "eddsa_nonce_init", insrc, outsrc, 36, ops_cfg, test_dir, run_name=run_name, old_context=ctx, main=main)
+    ctx = tc.run_op(
+        cmd_file, "eddsa_nonce_init", insrc, outsrc, 36, ops_cfg, test_dir,
+        run_name=run_name, old_context=ctx, main=main, tag=tag
+    )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -78,7 +85,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
         tc.start(cmd_file)
 
         tc.write_bytes(cmd_file, block, (insrc<<12))
-        ctx = tc.run_op(cmd_file, "eddsa_nonce_update", insrc, outsrc, 144, ops_cfg, test_dir, run_name=run_name, old_context=ctx, main=main)
+        ctx = tc.run_op(
+            cmd_file, "eddsa_nonce_update", insrc, outsrc, 144, ops_cfg, test_dir,
+            run_name=run_name, old_context=ctx, main=main, tag=tag
+        )
 
         SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -99,7 +109,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
 
     tc.write_bytes(cmd_file, last_block_tmac, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "eddsa_nonce_finish", insrc, outsrc, len(last_block_tmac), ops_cfg, test_dir, run_name=run_name, old_context=ctx, main=main)
+    ctx = tc.run_op(
+        cmd_file, "eddsa_nonce_finish", insrc, outsrc, len(last_block_tmac), ops_cfg, test_dir,
+        run_name=run_name, old_context=ctx, main=main, tag=tag
+    )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -119,7 +132,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
-    ctx = tc.run_op(cmd_file, "eddsa_R_part", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name, old_context=ctx, main=main)
+    ctx = tc.run_op(
+        cmd_file, "eddsa_R_part", insrc, outsrc, 0, ops_cfg, test_dir,
+        run_name=run_name, old_context=ctx, main=main, tag=tag
+    )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -138,7 +154,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
 
     tc.write_bytes(cmd_file, message, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "eddsa_e_at_once", insrc, outsrc, len(message), ops_cfg, test_dir, run_name=run_name, old_context=ctx, main=main)
+    ctx = tc.run_op(
+        cmd_file, "eddsa_e_at_once", insrc, outsrc, len(message), ops_cfg, test_dir,
+        run_name=run_name, old_context=ctx, main=main, tag=tag
+    )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -158,7 +177,10 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     #break_s = tc.dump_gpr_on(cmd_file, "bp_dump_eA", [11, 12, 13, 14])
     #break_s += tc.dump_gpr_on(cmd_file, "bp_dump_sG", [7, 8, 9, 10])
 
-    ctx = tc.run_op(cmd_file, "eddsa_finish", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name, old_context=ctx, main=main)
+    ctx = tc.run_op(
+        cmd_file, "eddsa_finish", insrc, outsrc, 0, ops_cfg, test_dir,
+        run_name=run_name, old_context=ctx, main=main, tag=tag
+    )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -214,5 +236,8 @@ if __name__ == "__main__":
         ret = 1
     else:
         tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
 
     sys.exit(ret)
