@@ -133,7 +133,7 @@ p256_key_setup_tmac_padding_loop:
     RET
     
 p256_key_setup_fail:
-    KBO     r26, ecc_kbus_verify_erase
+    KBO     r26, ecc_kbus_flush
     MOVI    r3,  ret_key_err
     RET
 
