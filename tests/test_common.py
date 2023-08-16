@@ -266,11 +266,12 @@ def read_output(test_dir: str, run_name: str, addr: int, count: int, string=Fals
             return val
     
 def run_op(
-                cmd_file,           op_name,
-                insrc,              outsrc,         data_in_size,
-                ops_cfg,            test_dir,       main=None,      run_name=None,
-                old_context=None,   keymem=None,    break_s=None,   isa=2, dump=True
-            ):
+            cmd_file,           op_name,
+            insrc,              outsrc,         data_in_size,
+            ops_cfg,            test_dir,       run_name=None,
+            main=None,          isa=2,          tag="Application",
+            old_context=None,   keymem=None,    break_s=None
+        ):
 
     op = find_in_list(op_name, ops_cfg)
     cfg_word = op["id"] + (outsrc << 8) + (insrc << 12) + (data_in_size << 16)
@@ -287,16 +288,37 @@ def run_op(
     new_context = run_name+".ctx"
     run_log = run_name+"_iss.log"
 
+    hexfile = "build/main.hex"
+    constfile = "data/constants.hex"
+
+
+    if "TS_SPECT_FW_TEST_RELEASE" in os.environ.keys():
+        if tag == "Boot1":
+            hexfile = "release_boot/mpw1/spect_boot_mpw1.hex"
+            constdir = "release_boot/mpw1/constants.hex"
+        elif tag == "Boot2":
+            hexfile = "release_boot/mpw2/spect_boot_mpw2.hex"
+            constdir = "release_boot/mpw2/constants.hex"
+        elif tag == "Debug":
+            hexfile = "release/spect_debug.hex"
+            constdir = "release/constants.hex"
+        else: # tag == "Application"
+            hexfile = "release/spect_app.hex"
+            constdir = "release/constants.hex"
+
     cmd = iss
-    if break_s or main:
+    
+    if ("TS_SPECT_FW_TEST_RELEASE" not in os.environ.keys()) and (break_s or main):
         if not main:
             main = "src/main.s"
         cmd += f" --program={TS_REPO_ROOT}/{main}"
+        print(f"Source: {main}")
     else:
-        cmd += f" --instruction-mem={TS_REPO_ROOT}/build/main.hex"
-    cmd += f" --first-address=0x8000"
+        cmd += f" --instruction-mem={TS_REPO_ROOT}/{hexfile}"
+        print(f"Source: {hexfile}")
     cmd += f" --isa-version={isa}"
-    cmd += f" --const-rom={TS_REPO_ROOT}/data/constants.hex"
+    cmd += f" --first-address=0x8000"
+    cmd += f" --const-rom={TS_REPO_ROOT}/{constfile}"
     cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --emem-out={test_dir}/{run_name}_emem_out.hex"
