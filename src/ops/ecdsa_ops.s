@@ -18,21 +18,23 @@ op_ecdsa_sign:
     AND     r25, r25, r2         ; SLOT
 
     LSL     r25, r25                    ; priv key slot
-    ORI     r26, r25, 1                 ; pub key slot
+    ORI     r25, r25, 1                 ; pub key slot
 
-    LDK     r5,  r26, ecc_key_metadata
+    LDK     r5,  r25, ecc_key_metadata
     BRE     ecdsa_sign_key_fail
     ANDI    r5,  r5,  0xFF
     CMPI    r5,  ecc_type_p256
     BRNZ    ecdsa_sign_curve_type_fail
 
-    LDK     r5,  r26, ecc_pub_key_Ax
+    LDK     r5,  r25, ecc_pub_key_Ax
     BRE     ecdsa_sign_key_fail
     ST      r5,  ca_ecdsa_sign_internal_Ax
-    LDK     r5,  r26, ecc_pub_key_Ay
+    LDK     r5,  r25, ecc_pub_key_Ay
     BRE     ecdsa_sign_key_fail
     ST      r5,  ca_ecdsa_sign_internal_Ay
-    KBO     r26, ecc_kbus_flush
+    KBO     r25, ecc_kbus_flush
+
+    SUBI    r25, r25, 1
 
     LDK     r26, r25, ecc_priv_key_1     ; Load privkey part d
     BRE     ecdsa_sign_key_fail
@@ -54,5 +56,6 @@ ecdsa_sign_curve_type_fail:
     JMP     ecdsa_sign_fail
 
 ecdsa_sign_key_fail:
+    KBO     r25, ecc_kbus_flush
     MOVI    r3,  ret_key_err
     JMP     ecdsa_sign_fail

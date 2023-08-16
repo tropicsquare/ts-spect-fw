@@ -13,7 +13,8 @@
 ;
 ; Input:
 ;   seed k in r19
-;   slot to write the key to in r25
+;   physical priv key slot in r25
+;   physical pub key slot in r26
 ;
 ; Outputs:
 ;   Writes the key set (d, w, A) to ECC key slot via KBUS
@@ -93,9 +94,6 @@ p256_key_setup_tmac_padding_loop:
 ;   Write the keys to the slot
 ; ==============================================================================
 
-    LSL     r25, r25                            ; Get private key slot
-    ADDI    r26, r25, 1                         ; Get pubkey slot
-
     ; Compose kpair metadata (origin, curve)
     LD      r0,  ca_spect_cfg_word
     MOVI    r4,  0xFF
@@ -119,13 +117,15 @@ p256_key_setup_tmac_padding_loop:
     LD      r28, ca_p256_key_setup_internal_d
     LD      r29, ca_p256_key_setup_internal_w
 
-    STK     r28, r25, ecc_priv_key_1            ; store d
+    MOV     r26, r25
+
+    STK     r28, r26, ecc_priv_key_1            ; store d
     BRE     p256_key_setup_fail
-    STK     r29, r25, ecc_priv_key_2            ; store w
+    STK     r29, r26, ecc_priv_key_2            ; store w
     BRE     p256_key_setup_fail
-    KBO     r25, ecc_kbus_program               ; program
+    KBO     r26, ecc_kbus_program               ; program
     BRE     p256_key_setup_fail
-    KBO     r25, ecc_kbus_flush                 ; flush
+    KBO     r26, ecc_kbus_flush                 ; flush
     BRE     p256_key_setup_fail
 
     MOVI    r3, ret_op_success
@@ -133,8 +133,10 @@ p256_key_setup_tmac_padding_loop:
     RET
     
 p256_key_setup_fail:
+    KBO     r26, ecc_kbus_flush
     MOVI    r3,  ret_key_err
     RET
+
 p256_key_setup_spm_fail:
     MOVI    r3,  ret_point_integrity_err
     RET

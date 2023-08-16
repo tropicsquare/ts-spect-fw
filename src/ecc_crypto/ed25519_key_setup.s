@@ -15,7 +15,8 @@
 ;
 ; Inputs:
 ;   seed k in r19
-;   slot to write the key to in r25
+;   physical priv key slot in r25
+;   physical pub key slot in r26
 ;
 ; Outputs:
 ;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
@@ -76,12 +77,6 @@ ed25519_key_setup:
     ; Transform A back to affine coordinates
     CALL        point_compress_ed25519
 
-    ; Get private key slot
-    LSL         r25, r25
-
-    ; Get pubkey slot
-    ADDI        r26, r25, 1
-
     ; Compose kpair metadata (origin, curve)
     LD          r0,  ca_spect_cfg_word
     MOVI        r4,  0xFF
@@ -107,15 +102,17 @@ ed25519_key_setup:
     LD          r31, ca_q25519
     REDP        r30, r0,  r28
 
-    STK         r28, r25, ecc_priv_key_1        ; store s
+    MOV         r26, r25
+
+    STK         r28, r26, ecc_priv_key_1        ; store s
     BRE         ed25519_key_setup_kbus_fail
-    STK         r29, r25, ecc_priv_key_2        ; store prefix
+    STK         r29, r26, ecc_priv_key_2        ; store prefix
     BRE         ed25519_key_setup_kbus_fail 
-    STK         r30, r25, ecc_priv_key_3        ; store s mod q
+    STK         r30, r26, ecc_priv_key_3        ; store s mod q
     BRE         ed25519_key_setup_kbus_fail 
-    KBO         r25, ecc_kbus_program           ; program
+    KBO         r26, ecc_kbus_program           ; program
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, ecc_kbus_flush             ; flush
+    KBO         r26, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
 
     ; Return success
@@ -127,5 +124,6 @@ ed25519_key_setup_spm_fail:
     RET
 
 ed25519_key_setup_kbus_fail:
+    KBO         r26, ecc_kbus_verify_erase
     MOVI        r3, ret_key_err
     RET

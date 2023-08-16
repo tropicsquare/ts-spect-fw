@@ -29,6 +29,8 @@ ecc_pub_key_Ax .eq 0x401
 ecc_pub_key_Ay .eq 0x402
 ecc_kbus_program .eq 0x402
 ecc_kbus_flush .eq 0x405
+ecc_kbus_erase .eq 0x403
+ecc_kbus_verify_erase .eq 0x404
 
 ; TMAC DSTs
 tmac_dst_ecdsa_key_setup .eq 0xA

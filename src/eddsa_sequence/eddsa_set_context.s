@@ -53,12 +53,14 @@ op_eddsa_set_context:
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
+    MOV     r21, r22 
+
     ; load private keys
-    LDK     r26, r22, ecc_priv_key_1
+    LDK     r26, r21, ecc_priv_key_1
     BRE     eddsa_set_context_kbus_fail
-    LDK     r20, r22, ecc_priv_key_2
+    LDK     r20, r21, ecc_priv_key_2
     BRE     eddsa_set_context_kbus_fail
-    LDK     r30, r22, ecc_priv_key_3
+    LDK     r30, r21, ecc_priv_key_3
     BRE     eddsa_set_context_kbus_fail
     ST      r30, ca_eddsa_sign_internal_smodq
 
@@ -71,6 +73,7 @@ op_eddsa_set_context:
     JMP     set_res_word
 
 eddsa_set_context_kbus_fail:
+    KBO     r21, ecc_kbus_verify_erase
     MOVI    r0,  ret_key_err
     JMP     set_res_word
 
