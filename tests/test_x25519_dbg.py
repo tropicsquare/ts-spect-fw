@@ -54,4 +54,7 @@ if __name__ == "__main__":
 
     tc.print_passed()
 
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
+
     sys.exit(0)
