@@ -1,0 +1,666 @@
+Using ISA version: 2
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/constants_layout.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/constants_layout.s
+Adding symbol: ca_p256(12288)
+Adding symbol: ca_q256(12320)
+Adding symbol: ca_ecdsa_exp_low(12352)
+Adding symbol: ca_p256_a(12384)
+Adding symbol: ca_p256_b(12416)
+Adding symbol: ca_p256_xG(12448)
+Adding symbol: ca_p256_yG(12480)
+Adding symbol: ca_p256_c1(12512)
+Adding symbol: ca_p256_c2(12544)
+Adding symbol: ca_p256_Z(12576)
+Adding symbol: ca_p25519(12608)
+Adding symbol: ca_q25519(12640)
+Adding symbol: ca_q25519_8(12672)
+Adding symbol: ca_ed25519_d(12704)
+Adding symbol: ca_ed25519_xG(12736)
+Adding symbol: ca_ed25519_yG(12768)
+Adding symbol: ca_p25519_c3(12800)
+Adding symbol: ca_x25519_a24(12832)
+Adding symbol: ca_ffff(12864)
+Adding symbol: ca_curve25519_a(12896)
+Adding symbol: ca_curve25519_a2d4(12928)
+Adding symbol: ca_curve25519_amap(12960)
+Adding symbol: ca_w25519_a(12992)
+Adding symbol: ca_w25519_3b(13024)
+Adding symbol: ca_pg_map2ed25519_c5(13056)
+Adding symbol: ca_dst_template(13088)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/internal_mem_layout.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/internal_mem_layout.s
+Adding symbol: ca_addr_base(256)
+Adding symbol: ca_ed25519_smp_P2x(512)
+Adding symbol: ca_ed25519_smp_P2y(544)
+Adding symbol: ca_ed25519_smp_P2z(576)
+Adding symbol: ca_ed25519_smp_P2t(608)
+Adding symbol: ca_eddsa_sign_internal_A(768)
+Adding symbol: ca_eddsa_sign_internal_R(800)
+Adding symbol: ca_eddsa_sign_internal_S(832)
+Adding symbol: ca_eddsa_sign_internal_EAx(864)
+Adding symbol: ca_eddsa_sign_internal_EAy(896)
+Adding symbol: ca_eddsa_sign_internal_EAz(928)
+Adding symbol: ca_eddsa_sign_internal_EAt(960)
+Adding symbol: ca_eddsa_sign_internal_smodq(992)
+Adding symbol: ca_eddsa_verify_internal_SBx(288)
+Adding symbol: ca_eddsa_verify_internal_SBy(320)
+Adding symbol: ca_eddsa_verify_internal_SBz(352)
+Adding symbol: ca_eddsa_verify_internal_SBt(384)
+Adding symbol: ca_ed25519_key_setup_internal_s(288)
+Adding symbol: ca_ed25519_key_setup_internal_prefix(320)
+Adding symbol: ca_p256_key_setup_internal_d(288)
+Adding symbol: ca_p256_key_setup_internal_w(320)
+Adding symbol: ca_ecdsa_sign_internal_z(288)
+Adding symbol: ca_ecdsa_sign_internal_s(320)
+Adding symbol: ca_ecdsa_sign_internal_Ax(352)
+Adding symbol: ca_ecdsa_sign_internal_Ay(384)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_constants.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_constants.s
+Adding symbol: clear_id(0)
+Adding symbol: ecc_key_id(96)
+Adding symbol: ecc_key_input_cmd_in(0)
+Adding symbol: ecc_key_output_result(0)
+Adding symbol: ecc_key_gen_id(96)
+Adding symbol: ecc_key_store_id(97)
+Adding symbol: ecc_key_store_input_k(16)
+Adding symbol: ecc_key_read_id(98)
+Adding symbol: ecc_key_read_output_pub_key(16)
+Adding symbol: ecc_key_erase_id(99)
+Adding symbol: x25519_id(16)
+Adding symbol: x25519_context_etpriv(64)
+Adding symbol: x25519_context_ehpub(96)
+Adding symbol: x25519_kpair_gen_id(17)
+Adding symbol: x25519_kpair_gen_output_etpub(4128)
+Adding symbol: x25519_sc_et_eh_id(18)
+Adding symbol: x25519_sc_et_eh_input_ehpub(32)
+Adding symbol: x25519_sc_et_eh_output_r1(4128)
+Adding symbol: x25519_sc_et_sh_id(19)
+Adding symbol: x25519_sc_et_sh_input_slot(32)
+Adding symbol: x25519_sc_et_sh_output_r2(4128)
+Adding symbol: x25519_sc_st_eh_id(20)
+Adding symbol: x25519_sc_st_eh_output_r3(4128)
+Adding symbol: eddsa_id(64)
+Adding symbol: eddsa_input_message(0)
+Adding symbol: eddsa_output_result(0)
+Adding symbol: eddsa_set_context_id(65)
+Adding symbol: eddsa_set_context_input_slot(0)
+Adding symbol: eddsa_set_context_input_sch(160)
+Adding symbol: eddsa_set_context_input_scn(192)
+Adding symbol: eddsa_nonce_init_id(66)
+Adding symbol: eddsa_nonce_update_id(67)
+Adding symbol: eddsa_nonce_finish_id(68)
+Adding symbol: eddsa_R_part_id(69)
+Adding symbol: eddsa_e_at_once_id(70)
+Adding symbol: eddsa_e_prep_id(71)
+Adding symbol: eddsa_e_update_id(72)
+Adding symbol: eddsa_e_finish_id(73)
+Adding symbol: eddsa_finish_id(74)
+Adding symbol: eddsa_finish_output_signature(16)
+Adding symbol: eddsa_verify_id(75)
+Adding symbol: eddsa_verify_input_R(32)
+Adding symbol: eddsa_verify_input_S(64)
+Adding symbol: eddsa_verify_input_pubkey(96)
+Adding symbol: eddsa_verify_input_message0(128)
+Adding symbol: eddsa_verify_input_message1(160)
+Adding symbol: eddsa_verify_output_result(4096)
+Adding symbol: ecdsa_id(112)
+Adding symbol: ecdsa_input_cmd_in(0)
+Adding symbol: ecdsa_input_message(16)
+Adding symbol: ecdsa_output_result(0)
+Adding symbol: ecdsa_sign_id(112)
+Adding symbol: ecdsa_sign_input_sch(160)
+Adding symbol: ecdsa_sign_input_scn(192)
+Adding symbol: ecdsa_sign_output_signature(16)
+Adding symbol: sha512_id(80)
+Adding symbol: sha512_input_data0(16)
+Adding symbol: sha512_input_data1(48)
+Adding symbol: sha512_input_data2(80)
+Adding symbol: sha512_input_data3(112)
+Adding symbol: sha512_init_id(81)
+Adding symbol: sha512_update_id(82)
+Adding symbol: sha512_final_id(83)
+Adding symbol: sha512_final_output_digest0(4112)
+Adding symbol: sha512_final_output_digest1(4144)
+Adding symbol: x25519_dbg_id(159)
+Adding symbol: x25519_dbg_input_priv(32)
+Adding symbol: x25519_dbg_input_pub(64)
+Adding symbol: x25519_dbg_output_r(4128)
+Adding symbol: ecdsa_sign_dbg_id(175)
+Adding symbol: ecdsa_sign_dbg_input_z(16)
+Adding symbol: ecdsa_sign_dbg_input_d(64)
+Adding symbol: ecdsa_sign_dbg_input_w(96)
+Adding symbol: ecdsa_sign_dbg_output_r(4112)
+Adding symbol: ecdsa_sign_dbg_output_s(4144)
+Adding symbol: eddsa_set_context_dbg_id(191)
+Adding symbol: eddsa_set_context_dbg_input_s(64)
+Adding symbol: eddsa_set_context_dbg_input_prefix(96)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_descriptors_constants.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_descriptors_constants.s
+Adding symbol: ca_spect_cfg_word(256)
+Adding symbol: ca_spect_res_word(4352)
+Adding symbol: ecc_type_ed25519(2)
+Adding symbol: ecc_type_p256(1)
+Adding symbol: ecc_priv_key_1(1024)
+Adding symbol: ecc_priv_key_2(1025)
+Adding symbol: ecc_priv_key_3(1026)
+Adding symbol: ecc_key_metadata(1024)
+Adding symbol: ecc_pub_key_Ax(1025)
+Adding symbol: ecc_pub_key_Ay(1026)
+Adding symbol: ecc_kbus_program(1026)
+Adding symbol: ecc_kbus_flush(1029)
+Adding symbol: ecc_kbus_erase(1027)
+Adding symbol: ecc_kbus_verify_erase(1028)
+Adding symbol: tmac_dst_ecdsa_key_setup(10)
+Adding symbol: tmac_dst_ecdsa_sign(11)
+Adding symbol: tmac_dst_eddsa_sign(12)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/l3_result_const.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/l3_result_const.s
+Adding symbol: l3_result_ok(195)
+Adding symbol: l3_result_fail(60)
+Adding symbol: l3_result_invalid_cmd(2)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_status.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_status.s
+Adding symbol: ret_op_success(0)
+Adding symbol: ret_ctx_err(241)
+Adding symbol: ret_key_err(242)
+Adding symbol: ret_op_id_err(243)
+Adding symbol: ret_curve_type_err(244)
+Adding symbol: ret_grv_err(245)
+Adding symbol: ret_x25519_err_inv_priv_key(17)
+Adding symbol: ret_x25519_err_inv_pub_key(18)
+Adding symbol: ret_ecdsa_err_inv_nonce(33)
+Adding symbol: ret_ecdsa_err_inv_r(34)
+Adding symbol: ret_ecdsa_err_inv_s(35)
+Adding symbol: ret_ecdsa_err_final_verify(36)
+Adding symbol: ret_eddsa_err_inv_priv_key(52)
+Adding symbol: ret_eddsa_err_inv_pub_key(53)
+Adding symbol: ret_eddsa_err_final_verify(54)
+Adding symbol: ret_point_integrity_err(65)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Adding symbol: _start(32768)
+Adding symbol: op_x25519_dbg
+Adding symbol: op_eddsa_set_context_dbg
+Adding symbol: op_ecdsa_dbg
+Adding symbol: op_eddsa_nonce_init
+Adding symbol: op_eddsa_nonce_update
+Adding symbol: op_eddsa_nonce_finish
+Adding symbol: op_eddsa_R_part
+Adding symbol: op_eddsa_e_at_once
+Adding symbol: op_eddsa_e_prep
+Adding symbol: op_eddsa_e_update
+Adding symbol: op_eddsa_e_finish
+Adding symbol: op_eddsa_finish
+Adding symbol: invalid_op_id(32880)
+Adding symbol: get_output_base
+Adding symbol: set_res_word
+Adding symbol: get_input_base(32904)
+Resolving symbol: get_output_base(32912)
+Adding symbol: get_data_in_size(32924)
+Resolving symbol: op_x25519_dbg(32956)
+Adding symbol: x25519_full_masked
+Adding symbol: op_x25519_end
+Resolving symbol: op_ecdsa_dbg(32980)
+Adding symbol: ecdsa_sign
+Resolving symbol: op_eddsa_set_context_dbg(33012)
+Resolving symbol: set_res_word(33056)
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/256/inv_q256.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/256/inv_q256.s
+Adding symbol: inv_q256(33076)
+Adding symbol: inv_q256_loop_8(33128)
+Adding symbol: inv_q256_loop_16(33160)
+Adding symbol: inv_q256_loop_64(33192)
+Adding symbol: inv_q256_loop_32(33228)
+Adding symbol: inv_q256_loop_lowpart(33260)
+Adding symbol: inv_q256_loop_x1
+Adding symbol: inv_q256_loop_x0(33276)
+Adding symbol: inv_q256_loop_lowpart_back
+Adding symbol: inv_q256_loop_x01(33284)
+Resolving symbol: inv_q256_loop_x1(33292)
+Adding symbol: inv_q256_loop_x11
+Adding symbol: inv_q256_loop_x10(33300)
+Resolving symbol: inv_q256_loop_x11(33308)
+Resolving symbol: inv_q256_loop_lowpart_back(33312)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/256/inv_p256.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/256/inv_p256.s
+Adding symbol: inv_p256_c1(33328)
+Adding symbol: inv_p256_loop_10_1(33388)
+Adding symbol: inv_p256_loop_10_2(33408)
+Adding symbol: inv_p256_loop_30_1(33452)
+Adding symbol: inv_p256_loop_128(33480)
+Adding symbol: inv_p256_loop_32(33512)
+Adding symbol: inv_p256_loop_30_2(33544)
+Adding symbol: inv_p256(33572)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/25519/inv_p25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/25519/inv_p25519.s
+Adding symbol: inv_p25519_250(33592)
+Adding symbol: inv_p25519_loop_8(33640)
+Adding symbol: inv_p25519_loop_16_1(33664)
+Adding symbol: inv_p25519_loop_16_2(33688)
+Adding symbol: inv_p25519_loop_50_1(33724)
+Adding symbol: inv_p25519_loop_100(33748)
+Adding symbol: inv_p25519_loop_50_2(33772)
+Adding symbol: inv_p25519(33792)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/25519/sqrt_p25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/field_math/25519/sqrt_p25519.s
+Adding symbol: sqrt_p25519(33828)
+Adding symbol: sqrt_p25519_final_correction
+Resolving symbol: sqrt_p25519_final_correction(33896)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_compress_ed25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_compress_ed25519.s
+Adding symbol: point_compress_ed25519(33904)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_decompress_ed25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_decompress_ed25519.s
+Adding symbol: point_decompress_ed25519(33948)
+Adding symbol: point_decompress_ed25519_x0_1
+Adding symbol: point_decompress_ed25519_x0_0(33960)
+Adding symbol: point_decompress_ed25519_sqr
+Resolving symbol: point_decompress_ed25519_x0_1(33968)
+Resolving symbol: point_decompress_ed25519_sqr(33976)
+Adding symbol: point_decompress_ed25519_vx2_check2
+Resolving symbol: point_decompress_ed25519_vx2_check2(34088)
+Adding symbol: point_decompress_ed25519_vx2_check_flag
+Resolving symbol: point_decompress_ed25519_vx2_check_flag(34112)
+Adding symbol: point_decompress_ed25519_fail
+Adding symbol: point_decompress_ed25519_check_x_is_0(34124)
+Adding symbol: point_decompress_ed25519_check_X0_is_1
+Resolving symbol: point_decompress_ed25519_check_X0_is_1(34136)
+Adding symbol: point_decompress_ed25519_check_x_is_0_and_X0_is_1
+Resolving symbol: point_decompress_ed25519_check_x_is_0_and_X0_is_1(34148)
+Adding symbol: point_decompress_ed25519_add_parity(34156)
+Adding symbol: point_decompress_ed25519_x_is_p_minus_x
+Adding symbol: point_decompress_ed25519_success
+Resolving symbol: point_decompress_ed25519_x_is_p_minus_x(34188)
+Resolving symbol: point_decompress_ed25519_success(34196)
+Resolving symbol: point_decompress_ed25519_fail(34204)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_add_ed25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_add_ed25519.s
+Adding symbol: point_add_ed25519(34212)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_dbl_ed25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_dbl_ed25519.s
+Adding symbol: point_dbl_ed25519(34292)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/spm_ed25519_short.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/spm_ed25519_short.s
+Adding symbol: spm_ed25519_short(34352)
+Adding symbol: spm_ed25519_short_loop(34372)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/spm_ed25519_long.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/spm_ed25519_long.s
+Adding symbol: spm_ed25519_long(34428)
+Adding symbol: spm_ed25519_long_loop_511_256(34448)
+Adding symbol: spm_ed25519_long_loop_255_0(34504)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/spm_ed25519_full_masked.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/spm_ed25519_full_masked.s
+Adding symbol: spm_ed25519_full_masked(34560)
+Adding symbol: spm_ed25519_full_masked_z_randomize(34568)
+Adding symbol: spm_ed25519_full_masked_z_fail
+Adding symbol: ed25519_point_generate
+Adding symbol: point_check_ed25519
+Adding symbol: ed25519_spm_fail
+Resolving symbol: ed25519_spm_fail(34872)
+Resolving symbol: spm_ed25519_full_masked_z_fail(34880)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_check_ed25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_check_ed25519.s
+Resolving symbol: point_check_ed25519(34888)
+Adding symbol: point_check_ed25519_ret
+Resolving symbol: point_check_ed25519_ret(34944)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/point_add_p256.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/point_add_p256.s
+Adding symbol: point_add_p256(34948)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/point_dbl_p256.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/point_dbl_p256.s
+Adding symbol: point_dbl_p256(35124)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/spm_p256_short.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/spm_p256_short.s
+Adding symbol: spm_p256_short(35276)
+Adding symbol: spm_p256_short_loop(35296)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/spm_p256_long.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/spm_p256_long.s
+Adding symbol: spm_p256_long(35344)
+Adding symbol: spm_p256_long_loop_511_256(35360)
+Adding symbol: spm_p256_long_loop_255_0(35408)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/spm_p256_full_masked.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/spm_p256_full_masked.s
+Adding symbol: spm_p256_full_masked(35456)
+Adding symbol: spm_p256_full_masked_z_randomize(35464)
+Adding symbol: spm_p256_full_masked_z_fail
+Adding symbol: p256_point_generate
+Adding symbol: point_check_p256
+Adding symbol: spm_p256_integrity_fail
+Resolving symbol: spm_p256_integrity_fail(35704)
+Resolving symbol: spm_p256_full_masked_z_fail(35712)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/point_check_p256.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/p256/point_check_p256.s
+Resolving symbol: point_check_p256(35720)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/get_y_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/get_y_curve25519.s
+Adding symbol: get_y_curve25519(35780)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_add_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_add_curve25519.s
+Adding symbol: point_add_curve25519(35832)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_check_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_check_curve25519.s
+Adding symbol: point_check_curve25519(36032)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_xadd_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_xadd_curve25519.s
+Adding symbol: point_xadd_curve25519(36076)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_xdbl_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/point_xdbl_curve25519.s
+Adding symbol: point_xdbl_curve25519(36128)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/spm_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/spm_curve25519.s
+Adding symbol: spm_curve25519(36168)
+Adding symbol: spm_curve25519_loop_511_256(36192)
+Adding symbol: spm_curve25519_loop_255_0(36232)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/y_recovery_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/curve25519/y_recovery_curve25519.s
+Adding symbol: y_recovery_curve25519(36272)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_load_msg.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_load_msg.s
+Adding symbol: eddsa_nonce_load_msg(36368)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_shift.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_shift.s
+Adding symbol: eddsa_nonce_shift(36440)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_set_context.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_set_context.s
+Adding symbol: op_eddsa_set_context(36468)
+Adding symbol: eddsa_set_context_kbus_fail
+Adding symbol: eddsa_set_context_curve_type_fail
+Resolving symbol: eddsa_set_context_kbus_fail(36592)
+Resolving symbol: eddsa_set_context_curve_type_fail(36604)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_init.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_init.s
+Resolving symbol: op_eddsa_nonce_init(36612)
+Adding symbol: tmac_sch_scn
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_update.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_update.s
+Resolving symbol: op_eddsa_nonce_update(36652)
+Adding symbol: eddsa_nonce_update_loop_l1(36660)
+Adding symbol: eddsa_nonce_update_loop_l2(36664)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_finish.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_nonce_finish.s
+Resolving symbol: op_eddsa_nonce_finish(36700)
+Adding symbol: eddsa_nonce_finish_loop_l1(36728)
+Adding symbol: eddsa_nonce_finish_last_block
+Adding symbol: eddsa_nonce_finish_loop_l2(36744)
+Resolving symbol: eddsa_nonce_finish_last_block(36764)
+Adding symbol: eddsa_nonce_finish_exact
+Adding symbol: eddsa_nonce_finish_last_loop(36780)
+Adding symbol: eddsa_nonce_finish_padding_1
+Adding symbol: eddsa_nonce_finish_padding_loop(36808)
+Adding symbol: eddsa_nonce_finish_last_update
+Resolving symbol: eddsa_nonce_finish_exact(36832)
+Resolving symbol: eddsa_nonce_finish_padding_1(36852)
+Resolving symbol: eddsa_nonce_finish_last_update(36868)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_r_part.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_r_part.s
+Resolving symbol: op_eddsa_R_part(36900)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_load_msg.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_load_msg.s
+Adding symbol: eddsa_e_load_message(36952)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_pad_mask.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_pad_mask.s
+Adding symbol: eddsa_e_pad_mask(37008)
+Adding symbol: eddsa_e__pad_mask_loop(37052)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_at_once.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_at_once.s
+Resolving symbol: op_eddsa_e_at_once(37068)
+Adding symbol: eddsa_e_finish_pad_in_r18
+Adding symbol: eddsa_e_finish_pad_in_r19
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_prep.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_prep.s
+Resolving symbol: op_eddsa_e_prep(37152)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_update.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_update.s
+Resolving symbol: op_eddsa_e_update(37212)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_finish.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_e_finish.s
+Resolving symbol: op_eddsa_e_finish(37236)
+Adding symbol: eddsa_e_finish_pad_in_next_block
+Adding symbol: eddsa_e_finish_pad_in_r20
+Adding symbol: eddsa_e_finish_pad_in_r21(37312)
+Adding symbol: eddsa_e_finish_last_hash
+Resolving symbol: eddsa_e_finish_pad_in_r20(37324)
+Resolving symbol: eddsa_e_finish_pad_in_r19(37336)
+Resolving symbol: eddsa_e_finish_pad_in_r18(37348)
+Adding symbol: eddsa_e_finish_pad_in_r18_next_block
+Resolving symbol: eddsa_e_finish_pad_in_r18_next_block(37372)
+Adding symbol: eddsa_e_finish_pad_next_block_continue
+Resolving symbol: eddsa_e_finish_pad_in_next_block(37384)
+Resolving symbol: eddsa_e_finish_pad_next_block_continue(37400)
+Resolving symbol: eddsa_e_finish_last_hash(37412)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_finish.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/eddsa_sequence/eddsa_finish.s
+Resolving symbol: op_eddsa_finish(37444)
+Adding symbol: eddsa_finish_s_randomize(37452)
+Adding symbol: eddsa_finish_randomize_fail
+Adding symbol: eddsa_finish_fail
+Resolving symbol: eddsa_finish_randomize_fail(37704)
+Resolving symbol: eddsa_finish_fail(37732)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/compose_exp_tag.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/compose_exp_tag.s
+Adding symbol: compose_exp_tag(37752)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/hash_to_field.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/hash_to_field.s
+Adding symbol: hash_to_field(37788)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/map_to_curve_elligator2_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/map_to_curve_elligator2_curve25519.s
+Adding symbol: map_to_curve_elligator2_curve25519(37816)
+Adding symbol: curve25519_point_generate_y_final
+Adding symbol: curve25519_point_generate_y1_y12
+Adding symbol: curve25519_point_generate_y1_y11(37944)
+Adding symbol: curve25519_point_generate_y1_next
+Resolving symbol: curve25519_point_generate_y1_y12(37952)
+Resolving symbol: curve25519_point_generate_y1_next(37960)
+Adding symbol: curve25519_point_generate_y2_y22
+Adding symbol: curve25519_point_generate_y2_y21(38004)
+Adding symbol: curve25519_point_generate_y2_next
+Resolving symbol: curve25519_point_generate_y2_y22(38012)
+Resolving symbol: curve25519_point_generate_y2_next(38020)
+Adding symbol: curve25519_point_generate_xn_x2n
+Adding symbol: curve25519_point_generate_xn_x1n(38040)
+Adding symbol: curve25519_point_generate_xn_next
+Resolving symbol: curve25519_point_generate_xn_x2n(38048)
+Resolving symbol: curve25519_point_generate_xn_next(38056)
+Adding symbol: curve25519_point_generate_y_y2
+Adding symbol: curve25519_point_generate_y_y1(38060)
+Adding symbol: curve25519_point_generate_y_next
+Resolving symbol: curve25519_point_generate_y_y2(38072)
+Resolving symbol: curve25519_point_generate_y_next(38084)
+Adding symbol: curve25519_point_generate_y_plus
+Adding symbol: curve25519_point_generate_y_minus(38108)
+Resolving symbol: curve25519_point_generate_y_plus(38116)
+Resolving symbol: curve25519_point_generate_y_final(38124)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/point_generate_curve25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/point_generate_curve25519.s
+Adding symbol: curve25519_point_generate(38128)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/point_generate_ed25519.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/point_generate_ed25519.s
+Resolving symbol: ed25519_point_generate(38164)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/sqrt_ratio_3mod4.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/sqrt_ratio_3mod4.s
+Adding symbol: sqrt_ratio_3mod4(38248)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/map_to_curve_simple_swu.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/map_to_curve_simple_swu.s
+Adding symbol: map_to_curve_simple_swu(38304)
+Adding symbol: bp_swu_after_sqrt_ratio(38408)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/point_generate_p256.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_point_generation/point_generate_p256.s
+Resolving symbol: p256_point_generate(38464)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/p256_key_setup.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/p256_key_setup.s
+Adding symbol: p256_key_setup(38488)
+Adding symbol: p256_key_setup_fail
+Adding symbol: p256_key_setup_tmac_padding_loop(38528)
+Adding symbol: p256_key_setup_spm_fail
+Resolving symbol: p256_key_setup_fail(38740)
+Resolving symbol: p256_key_setup_spm_fail(38752)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/ed25519_key_setup.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/ed25519_key_setup.s
+Adding symbol: ed25519_key_setup(38760)
+Adding symbol: ed25519_key_setup_spm_fail
+Adding symbol: ed25519_key_setup_kbus_fail
+Resolving symbol: ed25519_key_setup_spm_fail(39020)
+Resolving symbol: ed25519_key_setup_kbus_fail(39028)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/ecdsa_sign.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/ecdsa_sign.s
+Resolving symbol: ecdsa_sign(39040)
+Adding symbol: ecdsa_sign_tmac_z_first_loop(39080)
+Adding symbol: ecdsa_sign_tmac_z_second_loop(39104)
+Adding symbol: ecdsa_sign_tmac_padding_loop(39128)
+Adding symbol: ecdsa_sign_fail_k
+Adding symbol: ecdsa_sign_fail
+Adding symbol: ecdsa_sign_fail_r
+Adding symbol: ecdsa_sign_mask_k(39240)
+Adding symbol: ecdsa_fail_k_mask
+Adding symbol: ecdsa_sign_fail_s
+Adding symbol: eddsa_sign_verify_continue_add
+Adding symbol: ecdsa_fail_verify
+Adding symbol: eddsa_sign_verify_continue_dbl(39412)
+Resolving symbol: eddsa_sign_verify_continue_add(39412)
+Adding symbol: ecdsa_sign_end(39468)
+Adding symbol: ecdsa_sign_end_not_store
+Resolving symbol: ecdsa_sign_end_not_store(39516)
+Resolving symbol: ecdsa_sign_fail_k(39524)
+Resolving symbol: ecdsa_sign_fail_r(39532)
+Resolving symbol: ecdsa_sign_fail_s(39540)
+Resolving symbol: ecdsa_fail_k_mask(39548)
+Resolving symbol: ecdsa_fail_verify(39556)
+Resolving symbol: ecdsa_sign_fail(39564)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/x25519_full_masked.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/x25519_full_masked.s
+Resolving symbol: x25519_full_masked(39576)
+Adding symbol: x25519_pubkey_fail
+Adding symbol: x25519_full_masked_z_randomize(39592)
+Adding symbol: x25519_full_masked_z_fail
+Adding symbol: x25519_spm_fail
+Resolving symbol: x25519_pubkey_fail(39796)
+Resolving symbol: x25519_spm_fail(39804)
+Resolving symbol: x25519_full_masked_z_fail(39812)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/ecc_key_ops.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/ecc_key_ops.s
+Adding symbol: ecc_key_parse_input(39820)
+Adding symbol: op_ecc_key_gen_store(39860)
+Adding symbol: op_key_fail
+Adding symbol: ecc_key_gen_ed25519_call
+Adding symbol: ecc_key_gen_p256_call
+Adding symbol: op_key_setup_end
+Adding symbol: ecc_key_get_k(39916)
+Adding symbol: ecc_key_generate_k
+Resolving symbol: ecc_key_generate_k(39936)
+Resolving symbol: ecc_key_gen_ed25519_call(39944)
+Adding symbol: ecc_key_gen_ed25519_call_ok
+Resolving symbol: ecc_key_gen_ed25519_call_ok(39968)
+Resolving symbol: ecc_key_gen_p256_call(39976)
+Adding symbol: ecc_key_gen_p256_call_ok
+Resolving symbol: ecc_key_gen_p256_call_ok(40000)
+Resolving symbol: op_key_setup_end(40008)
+Adding symbol: op_ecc_key_read(40032)
+Adding symbol: ecc_key_read_skip_second_read
+Resolving symbol: ecc_key_read_skip_second_read(40096)
+Adding symbol: op_key_read_end
+Resolving symbol: op_key_fail(40120)
+Resolving symbol: op_key_read_end(40144)
+Adding symbol: op_ecc_key_erase(40168)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/ecdsa_ops.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/ecdsa_ops.s
+Adding symbol: op_ecdsa_sign(40252)
+Adding symbol: ecdsa_sign_key_fail
+Adding symbol: ecdsa_sign_curve_type_fail
+Resolving symbol: ecdsa_sign_curve_type_fail(40384)
+Resolving symbol: ecdsa_sign_key_fail(40392)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/x25519_ops.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/x25519_ops.s
+Resolving symbol: op_x25519_end(40404)
+Adding symbol: op_x25519_key_fail(40412)
+Adding symbol: op_x25519_kpair_gen(40420)
+Adding symbol: op_x25519_sc_et_eh(40484)
+Adding symbol: op_x25519_sc_et_sh(40520)
+Adding symbol: op_x25519_sc_st_eh(40568)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/clear.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ops/clear.s
+Adding symbol: op_clear(40644)
+Adding symbol: clear_data_in_loop(40652)
+Adding symbol: clear_data_out_loop(40672)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/others/tmac_shc_shn.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/others/tmac_shc_shn.s
+Resolving symbol: tmac_sch_scn(40828)
+Adding symbol: tmac_sch_scn_shift_first_block_loop(40844)
+Adding symbol: tmac_sch_scn_shift_second_block_loop(40872)
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/routines_includes.s
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/main_debug.s
+Assembling program to: /projects/tropic01/work/vmasek/ts-spect-fw/release/spect_debug.hex
+********************************************************************************
+[1;32mCompilation finished OK!
+[0m********************************************************************************
+First instruction address: 0x8000
+Last instruction address:  0x9fbc
+Number of instructions:    2032
+Program start address:     0x8000
+********************************************************************************
+Dumping program to: /projects/tropic01/work/vmasek/ts-spect-fw/release/dump/program_dump_debug.s
+Dumping symbols to: /projects/tropic01/work/vmasek/ts-spect-fw/release/dump/symbols_dump_debug.s

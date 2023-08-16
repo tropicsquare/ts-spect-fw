@@ -1,9 +1,9 @@
 Using ISA version: 2
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
-Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/mem_leyouts_includes.s
-Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/mem_leyouts_includes.s
-Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/constants_leyout.s
-Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/constants_leyout.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/constants_layout.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/constants_layout.s
 Adding symbol: ca_p256(12288)
 Adding symbol: ca_q256(12320)
 Adding symbol: ca_ecdsa_exp_low(12352)
@@ -30,9 +30,9 @@ Adding symbol: ca_w25519_a(12992)
 Adding symbol: ca_w25519_3b(13024)
 Adding symbol: ca_pg_map2ed25519_c5(13056)
 Adding symbol: ca_dst_template(13088)
-Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/mem_leyouts_includes.s
-Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/internal_mem_leyout.s
-Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/internal_mem_leyout.s
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
+Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/internal_mem_layout.s
+Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/internal_mem_layout.s
 Adding symbol: ca_addr_base(256)
 Adding symbol: ca_ed25519_smp_P2x(512)
 Adding symbol: ca_ed25519_smp_P2y(544)
@@ -45,6 +45,7 @@ Adding symbol: ca_eddsa_sign_internal_EAx(864)
 Adding symbol: ca_eddsa_sign_internal_EAy(896)
 Adding symbol: ca_eddsa_sign_internal_EAz(928)
 Adding symbol: ca_eddsa_sign_internal_EAt(960)
+Adding symbol: ca_eddsa_sign_internal_smodq(992)
 Adding symbol: ca_eddsa_verify_internal_SBx(288)
 Adding symbol: ca_eddsa_verify_internal_SBy(320)
 Adding symbol: ca_eddsa_verify_internal_SBz(352)
@@ -57,7 +58,7 @@ Adding symbol: ca_ecdsa_sign_internal_z(288)
 Adding symbol: ca_ecdsa_sign_internal_s(320)
 Adding symbol: ca_ecdsa_sign_internal_Ax(352)
 Adding symbol: ca_ecdsa_sign_internal_Ay(384)
-Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_leyouts/mem_leyouts_includes.s
+Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/mem_layouts/mem_layouts_includes.s
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
 Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_status.s
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_ops_status.s
@@ -97,7 +98,7 @@ Adding symbol: x25519_kpair_gen_id(17)
 Adding symbol: x25519_kpair_gen_output_etpub(4128)
 Adding symbol: x25519_sc_et_eh_id(18)
 Adding symbol: x25519_sc_et_eh_input_ehpub(32)
-Adding symbol: x25519_sc_et_eh_output_x1(4128)
+Adding symbol: x25519_sc_et_eh_output_r1(4128)
 Adding symbol: x25519_sc_et_sh_id(19)
 Adding symbol: x25519_sc_et_sh_input_slot(32)
 Adding symbol: x25519_sc_et_sh_output_r2(4128)
@@ -134,8 +135,7 @@ Adding symbol: ecdsa_output_result(0)
 Adding symbol: ecdsa_sign_id(112)
 Adding symbol: ecdsa_sign_input_sch(160)
 Adding symbol: ecdsa_sign_input_scn(192)
-Adding symbol: ecdsa_sign_output_R(16)
-Adding symbol: ecdsa_sign_output_S(48)
+Adding symbol: ecdsa_sign_output_signature(16)
 Adding symbol: sha512_id(80)
 Adding symbol: sha512_input_data0(16)
 Adding symbol: sha512_input_data1(48)
@@ -151,31 +151,14 @@ Adding symbol: x25519_dbg_input_priv(32)
 Adding symbol: x25519_dbg_input_pub(64)
 Adding symbol: x25519_dbg_output_r(4128)
 Adding symbol: ecdsa_sign_dbg_id(175)
-Adding symbol: ecdsa_sign_dbg_input_cmd_in(0)
 Adding symbol: ecdsa_sign_dbg_input_z(16)
 Adding symbol: ecdsa_sign_dbg_input_d(64)
 Adding symbol: ecdsa_sign_dbg_input_w(96)
-Adding symbol: ecdsa_sign_dbg_input_sch(160)
-Adding symbol: ecdsa_sign_dbg_input_scn(192)
 Adding symbol: ecdsa_sign_dbg_output_r(4112)
 Adding symbol: ecdsa_sign_dbg_output_s(4144)
-Adding symbol: eddsa_sign_dbg_id(191)
-Adding symbol: eddsa_sign_dbg_input_cmd_in(0)
-Adding symbol: eddsa_sign_dbg_input_m(16)
-Adding symbol: eddsa_sign_dbg_input_s(64)
-Adding symbol: eddsa_sign_dbg_input_prefix(96)
-Adding symbol: eddsa_sign_dbg_input_sch(160)
-Adding symbol: eddsa_sign_dbg_input_scn(192)
-Adding symbol: eddsa_sign_dbg_output_r(4128)
-Adding symbol: eddsa_sign_dbg_output_s(4160)
-Adding symbol: curve25519_rpg_id(208)
-Adding symbol: ed25519_rpg_id(209)
-Adding symbol: p256_spm_id(211)
-Adding symbol: p256_spm_input_gx(0)
-Adding symbol: p256_spm_input_gy(32)
-Adding symbol: p256_spm_input_gk(64)
-Adding symbol: p256_spm_output_qx(4096)
-Adding symbol: p256_spm_output_qy(4128)
+Adding symbol: eddsa_set_context_dbg_id(191)
+Adding symbol: eddsa_set_context_dbg_input_s(64)
+Adding symbol: eddsa_set_context_dbg_input_prefix(96)
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
 Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_descriptors_constants.s
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/constants/spect_descriptors_constants.s
@@ -185,11 +168,17 @@ Adding symbol: ecc_type_ed25519(2)
 Adding symbol: ecc_type_p256(1)
 Adding symbol: ecc_priv_key_1(1024)
 Adding symbol: ecc_priv_key_2(1025)
+Adding symbol: ecc_priv_key_3(1026)
 Adding symbol: ecc_key_metadata(1024)
 Adding symbol: ecc_pub_key_Ax(1025)
 Adding symbol: ecc_pub_key_Ay(1026)
 Adding symbol: ecc_kbus_program(1026)
 Adding symbol: ecc_kbus_flush(1029)
+Adding symbol: ecc_kbus_erase(1027)
+Adding symbol: ecc_kbus_verify_erase(1028)
+Adding symbol: tmac_dst_ecdsa_key_setup(10)
+Adding symbol: tmac_dst_ecdsa_sign(11)
+Adding symbol: tmac_dst_eddsa_sign(12)
 Back to file: /projects/tropic01/work/vmasek/ts-spect-fw/src/boot_main.s
 Adding symbol: _start(32768)
 Adding symbol: op_sha512_update
@@ -210,15 +199,10 @@ Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_crypto/eddsa_verify.s
 Resolving symbol: eddsa_verify(32984)
 Adding symbol: spm_ed25519_short
-Adding symbol: bp_eddsa_verify_sxb(33032)
-Adding symbol: bp_eddsa_verify_after_hram(33104)
 Adding symbol: point_decompress_ed25519
-Adding symbol: bp_eddsa_verify_deca(33124)
 Adding symbol: eddsa_verify_fail
-Adding symbol: bp_eddsa_verify_exa(33144)
 Adding symbol: point_add_ed25519
 Adding symbol: point_compress_ed25519
-Adding symbol: bp_eddsa_verify_encq(33200)
 Adding symbol: eddsa_verify_success
 Resolving symbol: eddsa_verify_fail(33208)
 Resolving symbol: eddsa_verify_success(33220)
@@ -246,6 +230,7 @@ Loading included file: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/e
 Compiling: /projects/tropic01/work/vmasek/ts-spect-fw/src/ecc_math/ed25519/point_decompress_ed25519.s
 Resolving symbol: point_decompress_ed25519(33492)
 Adding symbol: point_decompress_ed25519_x0_1
+Adding symbol: point_decompress_ed25519_x0_0(33504)
 Adding symbol: point_decompress_ed25519_sqr
 Resolving symbol: point_decompress_ed25519_x0_1(33512)
 Resolving symbol: point_decompress_ed25519_sqr(33520)
@@ -255,10 +240,12 @@ Resolving symbol: point_decompress_ed25519_vx2_check2(33632)
 Adding symbol: point_decompress_ed25519_vx2_check_flag
 Resolving symbol: point_decompress_ed25519_vx2_check_flag(33656)
 Adding symbol: point_decompress_ed25519_fail
+Adding symbol: point_decompress_ed25519_check_x_is_0(33668)
 Adding symbol: point_decompress_ed25519_check_X0_is_1
 Resolving symbol: point_decompress_ed25519_check_X0_is_1(33680)
 Adding symbol: point_decompress_ed25519_check_x_is_0_and_X0_is_1
 Resolving symbol: point_decompress_ed25519_check_x_is_0_and_X0_is_1(33692)
+Adding symbol: point_decompress_ed25519_add_parity(33700)
 Adding symbol: point_decompress_ed25519_x_is_p_minus_x
 Adding symbol: point_decompress_ed25519_success
 Resolving symbol: point_decompress_ed25519_x_is_p_minus_x(33732)
