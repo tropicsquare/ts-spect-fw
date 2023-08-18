@@ -1,4 +1,4 @@
-# SPECT Boot Firmware for MPW2, ISA v0.2, No parity
+# SPECT Boot Firmware for MPW2, ISA v0.2, Even parity
 
 `start_address = 0x8000`
 

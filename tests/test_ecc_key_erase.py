@@ -18,6 +18,9 @@ if __name__ == "__main__":
 
     ret = 0
 
+    insrc = tc.insrc_arr[rn.randint(0,1)]
+    outsrc = tc.outsrc_arr[rn.randint(0,1)]
+
 # ===================================================================================
 #   Full Slot
 # ===================================================================================
@@ -38,9 +41,9 @@ if __name__ == "__main__":
 
     input_word = (slot << 8) + tc.find_in_list("ecc_key_erase", ops_cfg)["id"]
 
-    tc.write_int32(cmd_file, input_word, 0x4000)
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "ecc_key_erase", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_erase", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -49,7 +52,7 @@ if __name__ == "__main__":
         tc.print_failed()
         ret |= 1
 
-    tmp = tc.read_output(test_dir, run_name, 0x5000, 1)
+    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
 
     if (l3_result != 0xc3):
@@ -92,9 +95,9 @@ if __name__ == "__main__":
 
     input_word = (slot << 8) + tc.find_in_list("ecc_key_erase", ops_cfg)["id"]
 
-    tc.write_int32(cmd_file, input_word, 0x4000)
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "ecc_key_erase", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_erase", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -103,7 +106,7 @@ if __name__ == "__main__":
         tc.print_failed()
         ret |= 2
 
-    tmp = tc.read_output(test_dir, run_name, 0x5000, 1)
+    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
 
     if (l3_result != 0x3c):

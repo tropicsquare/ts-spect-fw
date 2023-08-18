@@ -7,17 +7,10 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
-insrc_arr = [0x0, 0x4]
-outsrc_arr = [0x1, 0x5]
-
 def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
-    #insrc = insrc_arr[rn.randint(0,1)]
-    #outsrc = outsrc_arr[rn.randint(0,1)]
-
-    # Must be fixed now, because ISS does not support bigger EMEM
-    insrc = 0x0
-    outsrc = 0x1
+    insrc = tc.insrc_arr[rn.randint(0,1)]
+    outsrc = tc.outsrc_arr[rn.randint(0,1)]
 
     smodq = s % ed25519.q
 

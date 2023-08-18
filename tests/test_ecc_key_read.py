@@ -18,6 +18,12 @@ if __name__ == "__main__":
 
     ret = 0
 
+    insrc = tc.insrc_arr[rn.randint(0,1)]
+    outsrc = tc.outsrc_arr[rn.randint(0,1)]
+
+    print("insrc:", insrc)
+    print("outsrc:", outsrc)
+
 # ===================================================================================
 #   Curve = Ed25519
 # ===================================================================================
@@ -30,6 +36,8 @@ if __name__ == "__main__":
     slot = rn.randint(0, 127)
     pubkey_slot = (slot << 1)+1
 
+    print("slot:", slot)
+
     run_name = test_name + "_ed25519_" + f"{slot}"
 
     tc.print_run_name(run_name)
@@ -41,44 +49,43 @@ if __name__ == "__main__":
 
     input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
 
-    tc.write_int32(cmd_file, input_word, 0x4000)
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
         #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        tc.print_failed()
         ret |= 1
 
-    tmp = tc.read_output(test_dir, run_name, 0x5000, 1)
+    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    A = tc.read_output(test_dir, run_name, 0x5010, 8)
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
 
     if (l3_result != 0xc3):
         #print("L3 RESULT:", hex(l3_result))
-        tc.print_failed()
         ret |= 1
 
     if not(curve == curve_ref and origin == origin_ref and A == A_ref):
         #print("curve:   ", hex(curve))
         #print("origin:  ", hex(origin))
         #print("A:       ", hex(A))
-        tc.print_failed()
         ret |= 1
 
     if not(ret & 1):
         tc.print_passed()
+    else:
+        tc.print_failed()
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
-#   Curve = Ed25519
+#   Curve = P256
 # ===================================================================================
     cmd_file = tc.get_cmd_file(test_dir)
 
@@ -102,9 +109,9 @@ if __name__ == "__main__":
 
     input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
 
-    tc.write_int32(cmd_file, input_word, 0x4000)
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -113,13 +120,13 @@ if __name__ == "__main__":
         tc.print_failed()
         ret |= 2
 
-    tmp = tc.read_output(test_dir, run_name, 0x5000, 1)
+    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    Ax = tc.read_output(test_dir, run_name, 0x5010, 8)
-    Ay = tc.read_output(test_dir, run_name, 0x5030, 8)
+    Ax = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
+    Ay = tc.read_output(test_dir, run_name, (outsrc<<12)+0x30, 8)
 
     if (l3_result != 0xc3):
         #print("L3 RESULT:", hex(l3_result))
@@ -156,9 +163,9 @@ if __name__ == "__main__":
 
     input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
 
-    tc.write_int32(cmd_file, input_word, 0x4000)
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "ecc_key_read", 0x4, 0x5, 2, ops_cfg, test_dir, run_name=run_name)
+    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -167,7 +174,7 @@ if __name__ == "__main__":
         tc.print_failed()
         ret |= 4
 
-    tmp = tc.read_output(test_dir, run_name, 0x5000, 1)
+    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
 
     if (l3_result != 0x3c):

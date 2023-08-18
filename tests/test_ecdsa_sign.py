@@ -57,8 +57,8 @@ if __name__ == "__main__":
     tc.set_key(cmd_file, key=Ax,         ktype=0x04, slot=(slot<<1)+1, offset=8)
     tc.set_key(cmd_file, key=Ay,         ktype=0x04, slot=(slot<<1)+1, offset=16)
 
-    insrc = 0x4
-    outsrc = 0x5
+    insrc = tc.insrc_arr[rn.randint(0,1)]
+    outsrc = tc.outsrc_arr[rn.randint(0,1)]
 
     tc.write_bytes(cmd_file, z, (insrc<<12) + 0x10)
     tc.write_bytes(cmd_file, sch, 0x00A0)
@@ -83,10 +83,10 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # Read result
-    l3_result = tc.read_output(test_dir, run_name, outsrc<<12, 1)
+    l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result &= 0xFF
 
-    signature = tc.read_output(test_dir, run_name, (outsrc<<12) + 0x10, 16, string=True)
+    signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16, string=True)
 
     #print(signature_ref.hex())
     #print(signature.hex())
