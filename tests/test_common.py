@@ -16,6 +16,9 @@ DATA_RAM_OUT_DEPTH = 128
 
 SHA_CTX_INIT = binascii.unhexlify("6a09e667f3bcc908bb67ae8584caa73b3c6ef372fe94f82ba54ff53a5f1d36f1510e527fade682d19b05688c2b3e6c1f1f83d9abfb41bd6b5be0cd19137e2179")
 
+insrc_arr = [0x0, 0x4]
+outsrc_arr = [0x1, 0x5]
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 
