@@ -21,6 +21,9 @@ if __name__ == "__main__":
     insrc = tc.insrc_arr[rn.randint(0,1)]
     outsrc = tc.outsrc_arr[rn.randint(0,1)]
 
+    print("insrc:", insrc)
+    print("outsrc:", outsrc)
+
 # ===================================================================================
 #   Curve = Ed25519
 # ===================================================================================
@@ -33,6 +36,8 @@ if __name__ == "__main__":
     slot = rn.randint(0, 127)
     pubkey_slot = (slot << 1)+1
 
+    print("slot:", slot)
+
     run_name = test_name + "_ed25519_" + f"{slot}"
 
     tc.print_run_name(run_name)
@@ -44,7 +49,7 @@ if __name__ == "__main__":
 
     input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
 
-    tc.write_int32(cmd_file, input_word, 0x4000)
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
 
     ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
@@ -52,7 +57,6 @@ if __name__ == "__main__":
 
     if (SPECT_OP_STATUS):
         #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        tc.print_failed()
         ret |= 1
 
     tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
@@ -64,24 +68,24 @@ if __name__ == "__main__":
 
     if (l3_result != 0xc3):
         #print("L3 RESULT:", hex(l3_result))
-        tc.print_failed()
         ret |= 1
 
     if not(curve == curve_ref and origin == origin_ref and A == A_ref):
         #print("curve:   ", hex(curve))
         #print("origin:  ", hex(origin))
         #print("A:       ", hex(A))
-        tc.print_failed()
         ret |= 1
 
     if not(ret & 1):
         tc.print_passed()
+    else:
+        tc.print_failed()
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
 
 # ===================================================================================
-#   Curve = Ed25519
+#   Curve = P256
 # ===================================================================================
     cmd_file = tc.get_cmd_file(test_dir)
 
