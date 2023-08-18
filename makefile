@@ -10,6 +10,7 @@ ISS = spect_iss
 MEM_GEN = ${TS_REPO_ROOT}/scripts/gen_mem_files.py
 OPS_GEN = ${TS_REPO_ROOT}/scripts/gen_spect_ops_constants.py
 
+FW_PARITY = 2 	# even
 FW_BASE_ADDR = 0x8000
 
 clear:
@@ -34,6 +35,7 @@ ops_constants:
 compile: clear const_rom ops_constants
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
+	--parity=${FW_PARITY} \
 	--dump-program=${BUILD_DIR}/program_dump.s \
 	--dump-symbols=${BUILD_DIR}/symbols_dump.s \
 	${SRC_DIR}/main.s > ${BUILD_DIR}/compile.log
@@ -46,12 +48,14 @@ release: const_rom ops_constants
 
 	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/spect_app.hex \
 	--first-address=${FW_BASE_ADDR} \
+	--parity=${FW_PARITY} \
 	--dump-program=${RELEASE_DIR}/dump/program_dump_app.s \
 	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_app.s \
 	${SRC_DIR}/main.s > ${RELEASE_DIR}/compile_app.log
 
 	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/spect_debug.hex \
 	--first-address=${FW_BASE_ADDR} \
+	--parity=${FW_PARITY} \
 	--dump-program=${RELEASE_DIR}/dump/program_dump_debug.s \
 	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_debug.s \
 	${SRC_DIR}/main_debug.s > ${RELEASE_DIR}/compile_debug.log
@@ -63,6 +67,7 @@ release_boot_mpw1: data_ram_in_const_boot ops_constants
 	cp ${TS_REPO_ROOT}/data/constants.hex ${BOOT_DIR}/mpw1/constants.hex
 	${COMPILER} --isa-version=1 --hex-format=1 --hex-file=${BOOT_DIR}/mpw1/spect_boot_mpw1.hex \
 	--first-address=${FW_BASE_ADDR} \
+	--parity=${FW_PARITY} \
 	--dump-program=${BOOT_DIR}/mpw1/dump/program_dump.s \
 	--dump-symbols=${BOOT_DIR}/mpw1/dump/symbols_dump.s \
 	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/mpw1/compile.log
@@ -75,9 +80,12 @@ release_boot_mpw2: const_rom ops_constants
 	cp ${TS_REPO_ROOT}/data/constants.hex ${BOOT_DIR}/mpw2/constants.hex
 	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${BOOT_DIR}/mpw2/spect_boot_mpw2.hex \
 	--first-address=${FW_BASE_ADDR} \
+	--parity=${FW_PARITY} \
 	--dump-program=${BOOT_DIR}/mpw2/dump/program_dump.s \
 	--dump-symbols=${BOOT_DIR}/mpw2/dump/symbols_dump.s \
 	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/mpw2/compile.log
+
+release_all: release release_boot_mpw1 release_boot_mpw2
 
 fit_sources = x25519_nomask x25519_scalar_mask x25519_z_mask x25519_z_scalar_mask
 

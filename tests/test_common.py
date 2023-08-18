@@ -19,6 +19,8 @@ SHA_CTX_INIT = binascii.unhexlify("6a09e667f3bcc908bb67ae8584caa73b3c6ef372fe94f
 insrc_arr = [0x0, 0x4]
 outsrc_arr = [0x1, 0x5]
 
+fw_parity = 2
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 
@@ -318,6 +320,7 @@ def run_op(
         print(f"Source: {main}")
     else:
         cmd += f" --instruction-mem={TS_REPO_ROOT}/{hexfile}"
+        cmd += f" --parity={fw_parity}"
         print(f"Source: {hexfile}")
     cmd += f" --isa-version={isa}"
     cmd += f" --first-address=0x8000"
