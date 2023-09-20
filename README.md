@@ -17,7 +17,8 @@ of this repository.
    ```
 
 2. Ensure you have the `spect_compiler` and `spect_iss` binaries. These are part
-of the [`ts-spect-compiler`](../ts-spect-compiler) repository.
+of the [`ts-spect-compiler`](https://github.com/tropicsquare/ts-spect-compiler)
+repository.
 
    ```bash
    spect_compiler --help
