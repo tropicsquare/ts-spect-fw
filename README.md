@@ -3,12 +3,12 @@
 This repository contains the Makefile and associated scripts necessary to build firmware for a specific project. The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling, releasing, and managing the firmware.
 
 ## Documentation
-
+---
 Detailed documentation and resources can be found in the [`doc/`](doc/) folder
 of this repository.
 
 ## Prerequisites
-
+---
 1. Cloning repository and setting the environment variable `TS_REPO_ROOT` to the repository root.
 
    ```bash
@@ -35,6 +35,7 @@ repository.
    ```
 
 ## Build firmware
+---
 The primary [`makefile`](makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware.
 
@@ -53,3 +54,8 @@ release firmware, use:
 
 3. The firmware build artifacts will be generated in the appropriate directories
 , such as [`build/`](build/) and [`release/`](release/).
+
+
+## Licensing
+---
+Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
