@@ -3,20 +3,24 @@
 This repository contains the Makefile and associated scripts necessary to build firmware for a specific project. The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling, releasing, and managing the firmware.
 
 ## Documentation
-
+---
 Detailed documentation and resources can be found in the [`doc/`](doc/) folder
 of this repository.
 
 ## Prerequisites
-
-1. An environment variable `TS_REPO_ROOT` must be set to the repository root.
+---
+1. Cloning repository and setting the environment variable `TS_REPO_ROOT` to the repository root.
 
    ```bash
-   # from root of repository
+   # clone the spect firmware repository 
+   git clone https://github.com/tropicsquare/ts-spect-fw.git --recurse-submodules
+
+   # set env var TS_REPO_ROOT from root of repository
+   cd ts-spect-fw
    export TS_REPO_ROOT=`pwd`
    ```
 
-2. Ensure you have the `spect_compiler` and `spect_iss` binaries. These are part
+2. Ensure you have the `spect_compiler` and `spect_iss` binaries in the environment path. These are part
 of the [`ts-spect-compiler`](https://github.com/tropicsquare/ts-spect-compiler)
 repository.
 
@@ -31,6 +35,7 @@ repository.
    ```
 
 ## Build firmware
+---
 The primary [`makefile`](makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware.
 
@@ -49,3 +54,8 @@ release firmware, use:
 
 3. The firmware build artifacts will be generated in the appropriate directories
 , such as [`build/`](build/) and [`release/`](release/).
+
+
+## Licensing
+---
+Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
