@@ -1,6 +1,6 @@
 **/__pycache__
 build
-tests/test*/
+tests/test_*/
 **/logs/
 *.swp
 *.swo

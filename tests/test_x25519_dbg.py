@@ -3,6 +3,7 @@ import sys
 import random as rn
 import numpy as np
 import os
+import binascii
 
 import test_common as tc
 
@@ -10,9 +11,7 @@ import models.x25519
 
 if __name__ == "__main__":
 
-    seed = rn.randint(0, 2**32-1)
-    rn.seed(seed)
-    print("seed:", seed)
+    args = tc.parser.parse_args()
 
     ops_cfg = tc.get_ops_config()
     test_name = "x25519_dbg"
@@ -20,14 +19,26 @@ if __name__ == "__main__":
 
     test_dir = tc.make_test_dir(test_name)
 
-    priv = rn.randint(0, 2**256-1)
-    priv_scalar = models.x25519.int2scalar(priv)
-    pub = models.x25519.x25519(priv_scalar, 9)
-
     tc.print_run_name(run_name)
+
+    if args.testvec != "":
+        print(f"Reading test vector from {args.testvec}")
+        data_dir, rng_list = tc.parse_testvec(args.testvec, tc.rng_luts[test_name])
+        priv = tc.str2int(data_dir["priv"], 'little')
+        priv_scalar = models.x25519.int2scalar(priv)
+        pub = tc.str2int(data_dir["pub"], 'little')
+    else:
+        seed = tc.set_seed(args)
+        rn.seed(seed)
+        print("Randomization...")
+        print("seed:", seed)
+        priv = rn.randint(0, 2**256-1)
+        priv_scalar = models.x25519.int2scalar(priv)
+        pub = models.x25519.x25519(priv_scalar, 9)
+        rng_list = [rn.randint(0, 2**256-1) for i in range(8)]
+
     cmd_file = tc.get_cmd_file(test_dir)
-    rng = [rn.randint(0, 2**256-1) for i in range(8)]
-    tc.set_rng(test_dir, rng)
+    tc.set_rng(test_dir, rng_list)
     tc.start(cmd_file)
 
     R_ref = models.x25519.x25519(priv_scalar, pub)

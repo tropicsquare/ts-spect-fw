@@ -3,6 +3,8 @@ import binascii
 import os
 import sys
 import numpy as np
+import random as rn
+from argparse import SUPPRESS, ArgumentParser
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 OPS_CONFIG = TS_REPO_ROOT+"/spect_ops_config.yml"
@@ -21,6 +23,44 @@ outsrc_arr = [0x1, 0x5]
 
 fw_parity = 2
 
+#############################################################
+#   PARSER
+#############################################################
+parser = ArgumentParser(description='TS SPECT tests scripts')
+
+parser.add_argument(
+    "--testvec",
+    default="",
+    help='Test Vector input file name. Optional'
+)
+
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=SUPPRESS,
+    help="Seed for randomization. Optional"
+)
+
+##################################################################
+#   RNG LUTs
+##################################################################
+rng_luts = {
+    "x25519_dbg" : {
+        "pub_z_rng"     : {"idx": 0, "okzero" : False},
+        "s_rng_1"       : {"idx": 1, "okzero" : True},
+        "point_gen_rng" : {"idx": 2, "okzero" : True},
+        "s_rng_2"       : {"idx": 3, "okzero" : True}
+    },
+    "ecdsa_sign_dbg" : {
+        "base_z_rng"    : {"idx": 4, "okzero" : False},
+        "point_gen_rng" : {"idx": 5, "okzero" : True},
+        "s_rng_1"       : {"idx": 6, "okzero" : True},
+        "s_rng_2"       : {"idx": 7, "okzero" : True},
+        "t_rng"         : {"idx": 8, "okzero" : False}
+    }
+}
+##################################################################
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 
@@ -36,11 +76,14 @@ def find_in_list (name: str, l: list) -> dict:
             return item
     return None
 
+def str2int (in_str: str, endian: str) -> int:
+    return int.from_bytes(binascii.unhexlify(in_str), endian)
+
 def str2int32 (in_str: str) -> list:
     r = []
     for w in range(0, len(in_str), 8):
         w_str = in_str[w:w+8]
-        r.append(int.from_bytes(binascii.unhexlify(w_str), 'little'))
+        r.append(str2int(w_str, 'little'))
     return r
 
 def get_ops_config():
@@ -48,8 +91,15 @@ def get_ops_config():
         ops_cfg = yaml.safe_load(ca_file)
     return ops_cfg
 
-def make_test_dir(test_name):
-    test_dir = TS_REPO_ROOT+"/tests/test_"+test_name
+def get_data_cfg(run_name):
+    ops_cfg = get_ops_config()
+    cmd_cfg = find_in_list(run_name, ops_cfg)
+    with open(f"{run_name}_data_cfg.yml", 'r') as data_file:
+        data_cfg = yaml.safe_load(data_file)
+    return cmd_cfg, data_cfg
+
+def make_test_dir(test_name, directory = "tests"):
+    test_dir = f"{TS_REPO_ROOT}/{directory}/test_{test_name}"
     os.system(f"rm -rf {test_dir}")
     os.system(f"mkdir {test_dir}")
     return test_dir
@@ -199,6 +249,35 @@ def parse_key_mem(test_dir, run_name):
             offset += 1
     return kmem_array, kmem_slots
 
+def parse_testvec(testvec_file: str, rng_lut):
+    with open(testvec_file, 'r') as f:
+        testvec = yaml.safe_load(f)
+
+    data_dir = {}
+    for input in testvec["input"]:
+        data_dir[input["name"]] = input["value"]
+
+    z = 0
+    rng_list = [rn.randint(0, 2**256 - 1) for i in range(4*len(rng_lut))]
+    if "rng" in testvec.keys():
+        for rng in testvec["rng"]:
+            idx = rng_lut[rng["name"]]["idx"] + z
+            if rng["value"] is not None:
+                #print("Forcing", rng["name"], f"\tindex {idx} ->", hex(rng["value"]))
+                rng_list[idx] = rng["value"]
+                if rng["value"] == 0 and not rng_lut[rng["name"]]["okzero"]:
+                    v = rn.randint(1, 2**256-1)
+                    #print("Generating alternative mask for", rng["name"], "->", hex(v))
+                    z += 1
+                    rng_list[idx+1] = v
+    return data_dir, rng_list
+
+def set_seed(args) -> int:
+    if hasattr(args, "seed"):
+        return args.seed
+    else:
+        return rn.randint(0, 2**32-1)
+
 def set_key(cmd_file, key, ktype, slot, offset):
     val = [(key >> i*32) & 0xFFFFFFFF for i in range(8)]
     for w in range(len(val)):
@@ -300,16 +379,16 @@ def run_op(
     if "TS_SPECT_FW_TEST_RELEASE" in os.environ.keys():
         if tag == "Boot1":
             hexfile = "release_boot/mpw1/spect_boot_mpw1.hex"
-            constdir = "release_boot/mpw1/constants.hex"
+            constfile = "release_boot/mpw1/constants.hex"
         elif tag == "Boot2":
             hexfile = "release_boot/mpw2/spect_boot_mpw2.hex"
-            constdir = "release_boot/mpw2/constants.hex"
+            constfile = "release_boot/mpw2/constants.hex"
         elif tag == "Debug":
             hexfile = "release/spect_debug.hex"
-            constdir = "release/constants.hex"
+            constfile = "release/constants.hex"
         else: # tag == "Application"
             hexfile = "release/spect_app.hex"
-            constdir = "release/constants.hex"
+            constfile = "release/constants.hex"
 
     cmd = iss
     
