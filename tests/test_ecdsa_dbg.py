@@ -8,37 +8,50 @@ import models.p256 as p256
 
 if __name__ == "__main__":
 
-    seed = rn.randint(0, 2**32-1)
-    rn.seed(seed)
-    print("seed:", seed)
+    args = tc.parser.parse_args()
 
     ops_cfg = tc.get_ops_config()
     test_name = "ecdsa_sign_dbg"
     run_name = test_name
 
-    tc.print_run_name(run_name)
+    tc.print_run_name(test_name)
+
+    if args.testvec != "":
+        print(f"Reading test vector from {args.testvec}")
+        data_dir, rng_list = tc.parse_testvec(args.testvec, tc.rng_luts[test_name])
+        z = bytes.fromhex(data_dir["z"])
+        sch = bytes.fromhex(data_dir["sch"])
+        scn = bytes.fromhex(data_dir["scn"])
+        d = data_dir["d"]
+        w = bytes.fromhex(data_dir["w"])
+        Ax = data_dir["Ax"]
+        Ay = data_dir["Ay"]
+    else:
+        seed = tc.set_seed(args)
+        rn.seed(seed)
+        print("Randomization...")
+        print("seed:", seed)
+        # Generate test vector
+        d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
+        sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+        scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+        z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+
+        rng_list = [rn.randint(0, 2**256-1) for i in range(16)]
 
     test_dir = tc.make_test_dir(test_name)
     cmd_file = tc.get_cmd_file(test_dir)
 
-    rng = [rn.randint(0, 2**256-1) for i in range(16)]
-    tc.set_rng(test_dir, rng)
-
-    # Generate test vector
-    d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
-
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
-
-    z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+    tc.set_rng(test_dir, rng_list)
+    
     #print()
-    #print("d:   ", hex(d))
-    #print("w:   ", w.hex())
-    #print("sch: ", sch.hex())
-    #print("scn: ", scn.hex())
-    #print("z:   ", z.hex())
-    #print("Ax:  ", hex(Ax))
-    #print("Ay:  ", hex(Ay))
+    #print("\td:   ", hex(d))
+    #print("\tw:   ", w.hex())
+    #print("\tsch: ", sch.hex())
+    #print("\tscn: ", scn.hex())
+    #print("\tz:   ", z.hex())
+    #print("\tAx:  ", hex(Ax))
+    #print("\tAy:  ", hex(Ay))
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
 
@@ -86,6 +99,7 @@ if __name__ == "__main__":
 
     signature = tc.read_output(test_dir, run_name, (outsrc<<12) + 0x10, 16, string=True)
 
+    #print()
     #print(signature_ref.hex())
     #print(signature.hex())
 

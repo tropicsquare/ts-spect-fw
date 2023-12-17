@@ -2,6 +2,10 @@
 
 This repository contains the Makefile and associated scripts necessary to build firmware for a specific project. The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling, releasing, and managing the firmware.
 
+## Licensing
+---
+Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
+
 ## Documentation
 ---
 Detailed documentation and resources can be found in the [`doc/`](doc/) folder
@@ -55,7 +59,37 @@ release firmware, use:
 3. The firmware build artifacts will be generated in the appropriate directories
 , such as [`build/`](build/) and [`release/`](release/).
 
-
-## Licensing
+## Test/Simulate firmware
 ---
-Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
+Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The scripts generates or read test vector, preload SPECTs input buffers and key slots, setup configuration files for `spect_iss` and run it.
+
+Firmware must be compiled in [`build`](build) beforehand. Use:
+
+   ```bash
+   make compile
+   ```
+
+### Test Vectors
+
+Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models). 
+
+Test vectors can be also specified using YAML file and `--testvec` option to define parameters of test (private, public key, z coordinate, randomization). 
+
+See [`testvec`](tests/testvec) for test vector examples.
+
+> **_NOTE:_** Only [`test_x25519_dbg.py`](tests/test_x25519_dbg.py) and [`test_ecdsa_dbg.py`](tests/test_ecdsa_dbg.py) currently supports custom test vectors.
+
+
+   ```bash
+   cd tests
+   ```
+   
+   ```bash
+   ./test_x25519_dbg.py --testvec testvec/x25519_dbg_testvec.yml
+   ```
+
+   ```bash
+   ./test_x25519_dbg.py --testvec testvec/x25519_dbg_testvec.yml
+   ```
+
+   The test_*.py file controls test execution, output logs generate in tests/<test_name_directory> 
