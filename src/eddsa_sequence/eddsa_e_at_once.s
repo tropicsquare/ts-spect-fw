@@ -1,7 +1,13 @@
 ; ==============================================================================
 ;  file    eddsa_sequence/eddsa_e_at_once.s
 ;  author  vit.masek@tropicsquare.com
-;  license TODO
+;
+;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  directory of this source tree.
+;  If a copy of the LICENSE file was not distributed with this work, you can 
+;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Computes e = SHA512(R, A, M) mod q at once in case of len(M) < 64 bytes

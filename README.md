@@ -40,7 +40,7 @@ repository.
 
 ## Build firmware
 ---
-The primary [`makefile`](makefile) orchestrates the build process and provides
+The primary [`Makefile`](Makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware.
 
 
@@ -51,9 +51,9 @@ release firmware, use:
    make compile && make release_all
    ```
 
-2. For a complete list of targets, consult the makefile or run:
+2. For a complete list of targets, consult the Makefile or run:
    ```bash
-   grep : makefile | awk -F: '/^[^.]/ {print $1;}'
+   grep : Makefile | awk -F: '/^[^.]/ {print $1;}'
    ```
 
 3. The firmware build artifacts will be generated in the appropriate directories
