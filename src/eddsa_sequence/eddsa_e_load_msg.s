@@ -1,7 +1,13 @@
 ; ==============================================================================
 ;  file    eddsa_sequence/eddsa_e_load_msg.s
 ;  author  vit.masek@tropicsquare.com
-;  license TODO
+;
+;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  directory of this source tree.
+;  If a copy of the LICENSE file was not distributed with this work, you can 
+;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Loads 128B EdDSA message chunk into (r18, r19, r20, r21) for e computation.
