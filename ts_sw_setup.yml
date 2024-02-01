@@ -3,8 +3,8 @@ texlive 2022
 inkscape 1.2.1
 scl 2021.03
 cmake 3.23.2
-ts-spect-compiler v0.5
-ts-hw-scripts v0.27
+ts-spect-compiler v0.6
+ts-hw-scripts v0.30
 ts-synthesis-flow v1.6
 ts-latex-lib v0.18
 ts-python-env 0.2

@@ -1,4 +1,4 @@
-name: constants
+name: constants_data_in
 start_addr: 0x0200
 end_addr:   0x07FF
 data:
@@ -30,13 +30,13 @@ data:
     value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0
   - name : ca_x25519_a24
     value : 121665
-  - name : ca_ffff
-    value : 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
   - name : ca_curve25519_a
     value : 486662
-  - name : ca_curve25519_a2d4
-    value : 0x1db42
-  - name : ca_pg_map2ed25519_c5
-    value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
-  - name : ca_dst_template
-    value : 0x1E2054535F53504543545F445354000000000000000000000000000000000000
+  #- name : ca_ffff
+  #  value : 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  #- name : ca_curve25519_a2d4
+  #  value : 0x1db42
+  #- name : ca_pg_map2ed25519_c5
+  #  value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
+  #- name : ca_dst_template
+  #  value : 0x1E2054535F53504543545F445354000000000000000000000000000000000000
