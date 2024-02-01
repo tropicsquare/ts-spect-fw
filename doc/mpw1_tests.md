@@ -12,21 +12,43 @@ This markdown describes SPECT API for MPW1 tests and side chanel analysis. The s
     5. [Ed25519 Curve Scalar Multiplication (masked)](#ed25519_masked)
     6. [X25519 (non-masked)](#x25519_nonmasked)
     7. [X25519 (masked)](#x25519_masked)
-3. [Side Chanel Countermeasures] (#scc)
+3. [Side Chanel Countermeasures](#scc)
+    1. [Scalar Multiplication](#scc_scm)
+    2. [ECDSA Signature](#scc_ecdsa_sign)
 
 ## Setup <a name="command_setup"></a>
 
-Before executing any command, user must setup **CMD_ID** and preload constants needed for the ECC algorithms (e.g. curve parameters, primes, ...).
+### Firmware Compilation and Preload
 
-**CMD_ID** is identifier of every command. SPECT FW runs desired command based on this value. The value of **CMD_ID** every for every command is stated in [Commands](#commands) description. User must write the **CMD_ID** on address 0x0000 in SPECTs address space.
+To compile the MPW1 firmware, run
 
-Constants for MPW1 FW are specified in [`data/data_ram_in_const_config.yml`](data/data_ram_in_const_config.yml). To generate hex file from this config file, run
+```
+make compile_mpw1
+```
+
+This compiles the MPW1 firmware to [`build_mpw1/main_mpw1.hex`](build_mpw1/main_mpw1.hex) directory. User then writes this hex file to SPECTs Instruction RAM (from address 0x8000 in SPECTs address space).
+
+Ensure you have the `spect_compiler` binaries in the environment path.
+
+### Constants
+
+Constants for MPW1 FW are specified in [`data/data_ram_in_const_config.yml`](data/data_ram_in_const_config.yml).
+
+To generate hex file from this config file, run
 
 ```
 make data_ram_in_const
 ```
 
-It generates the hex file to [`data/constants_data_in.hex`](data/constants_data_in.hex) and also address descriptors that are then used in FW source code. After every reset/power-up, user writes the contents of the hex file starting from address 0x0200 in SPECTs address space (can be changed in the mentioned config file).
+It generates the hex file to [`data/constants_data_in.hex`](data/constants_data_in.hex) and also address descriptors that are then used in FW source code. This target is called automatically when running `compile_mpw1`.
+
+After every reset/power-up, user must write the content of the hex file starting from address 0x0200 in SPECTs address space (the address can be changed in the mentioned config file).
+
+### Command ID
+
+**CMD_ID** is identifier of every command. SPECT FW runs desired command based on this value. The value of **CMD_ID** every for every command is stated in [Commands](#commands) description.
+
+To select particular command to be executed by the FW, user must write the **CMD_ID** on address 0x0000 in SPECTs address space.
 
 ## Commands <a name="commands"></a>
 
@@ -84,3 +106,7 @@ Signature can fail if:
 ### X25519 (masked) <a name="x25519_masked"></a>
 
 ## Side Channel Countermeasures <a name="scc"></a>
+
+### Scalar Multiplication <a name="scc_scm"></a>
+
+### ECDSA Signature <a name="scc_ecdsa_sign"></a>
