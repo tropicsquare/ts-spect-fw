@@ -127,8 +127,8 @@ This command computes scalar multiple **Q = kP** of a point **P** on a NIST P-25
 | Name          | Address   | Size  | Description |
 | - | - | - | - |
 | **RET_CODE**  | `0x1000`    | 1B    | Return code |
-| **Qx**        | `0x1020`    | 32B   | Result x-coordinate |
-| **Qy**        | `0x1020`    | 32B   | Result y-coordinate |
+| **Qx**        | `0x1040`    | 32B   | Result x-coordinate |
+| **Qy**        | `0x1060`    | 32B   | Result y-coordinate |
 
 ---
 ### P-256 Curve Scalar Multiplication (masked) <a name="p256_masked"></a>
