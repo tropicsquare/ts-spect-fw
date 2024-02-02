@@ -15,10 +15,12 @@ FW_PARITY = 2 	# even
 FW_BASE_ADDR = 0x8000
 
 clear:
-	rm -rf ${BUILD_DIR_1}
-	mkdir ${BUILD_DIR_1}
+	rm -rf ${BUILD_DIR_MPW1}
+	mkdir ${BUILD_DIR_MPW1}
 	rm -rf ${BUILD_DIR}
 	mkdir ${BUILD_DIR}
+	rm -f ${TS_REPO_ROOT}/data/*.hex
+	rm -f ${SRC_DIR}/mem_layouts/constants*.s
 
 const_rom:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
@@ -36,8 +38,8 @@ ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
 
 compile: clear const_rom ops_constants
-	rm -rf ${BUILD_DIR_1}
-	mkdir ${BUILD_DIR_1}
+	rm -rf ${BUILD_DIR}
+	mkdir ${BUILD_DIR}
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
