@@ -39,12 +39,24 @@ point_check_ed25519:
     MUL25519    r0,  r0,  r1                    ; d*X^2*Y^2
     ADDP        r0,  r0,  r2
 
+.ifdef SPECT_ISA_VERSION_1
+    SUBP        r3,  r3,  r0
+    CMPA        r3,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
     XOR         r3,  r3,  r0
+.endif
     BRNZ        point_check_ed25519_ret
 
     MUL25519    r0,  r7,  r8                    ; X*Y
     MUL25519    r3,  r9,  r10                   ; Z*T
+.ifdef SPECT_ISA_VERSION_1
+    SUBP        r3,  r3,  r0
+    CMPA        r3,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
     XOR         r3,  r3,  r0
+.endif
 
 point_check_ed25519_ret:
     RET

@@ -48,7 +48,7 @@ def spm(k, x, y):
     for i in range(255, -1, -1):
         xQ, yQ = ec_dub(xQ, yQ)
         if shift(k, i):
-            xQ, yQ = ec_add(xQ, yQ, xG, yG)
+            xQ, yQ = ec_add(xQ, yQ, x, y)
     
     return xQ, yQ
 

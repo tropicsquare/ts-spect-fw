@@ -12,6 +12,7 @@ TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 
 def run_op(cmd_file, cmd_id, test_dir, run_name, break_s=None):
     tc.write_int32(cmd_file, cmd_id, 0x0000)
+    tc.write_hex(cmd_file, f"{TS_REPO_ROOT}/data/constants_data_in.hex", 0x0200)
     tc.run(cmd_file)
     if break_s:
         cmd_file.write(break_s)
@@ -39,20 +40,25 @@ def run_op(cmd_file, cmd_id, test_dir, run_name, break_s=None):
         sys.exit(2)
 
 if __name__ == "__main__":
-    seed = rn.randint(0, 2**32-1)
+    exit_val = 0
+
+    args = tc.parser.parse_args()
+    seed = tc.set_seed(args)
     rn.seed(seed)
     print("seed:", seed)
 
-    ops_cfg = tc.get_ops_config()
     test_name = "mpw1_test"
-    run_name = test_name
+    test_dir = tc.make_test_dir(test_name)
+
+    ##############################################################################
+    #   ECDSA
+    ##############################################################################
+
+    run_name = test_name + "_ecdsa"
 
     tc.print_run_name(run_name)
 
-    test_dir = tc.make_test_dir(test_name)
     cmd_file = tc.get_cmd_file(test_dir)
-
-    # ECDSA Sign
 
     d = rn.randint(0, p256.p - 1)
     z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
@@ -61,8 +67,6 @@ if __name__ == "__main__":
     r_ref, s_ref = p256.sign_mpw1(d, z, k)
 
     signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')
-
-    tc.write_hex(cmd_file, f"{TS_REPO_ROOT}/data/constants_data_in.hex", 0x0200)
 
     tc.write_int256(cmd_file, d, 0x0020)
     tc.write_bytes(cmd_file, z, 0x0040)
@@ -75,15 +79,188 @@ if __name__ == "__main__":
     run_op(cmd_file, 0xA1, test_dir, run_name)
 
     ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
-    signature = tc.read_output(test_dir, run_name, 0x1020, 16, string=True)
-
-    #print(signature_ref.hex())
-    #print(signature.hex())
+    signature = tc.read_output(test_dir, run_name, 0x1020, 16, string=True)    
 
     if not(signature_ref == signature):
+        print("RET_VAL: ", hex(ret_val))
+        print(signature_ref.hex())
+        print(signature.hex())
         tc.print_failed()
-        sys.exit(1)
+        exit_val += 1
+    else:
+        tc.print_passed()
 
-    tc.print_passed()
+    ##############################################################################
+    #   P-256 SPM
+    ##############################################################################
+    # NONMASKED ##################################################################
 
-    sys.exit(0)
+    run_name = test_name + "_scm_p256_nonmasked"
+
+    tc.print_run_name(run_name)
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    k = rn.randint(0, 2**256 - 1)
+    Px, Py = p256.spm(rn.randint(0, p256.q - 1), p256.xG, p256.yG)
+
+    Qx_ref, Qy_ref = p256.spm(k, Px, Py)
+
+    tc.write_int256(cmd_file, k,  0x0020)
+    tc.write_int256(cmd_file, Px, 0x0040)
+    tc.write_int256(cmd_file, Py, 0x0060)
+
+    run_op(cmd_file, 0xB1, test_dir, run_name)
+
+    ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
+    Qx = tc.read_output(test_dir, run_name, 0x1040, 8)
+    Qy = tc.read_output(test_dir, run_name, 0x1060, 8)
+
+    if not(Qx == Qx_ref and Qy == Qy_ref):
+        print("RET_VAL: ", hex(ret_val))
+        print("ref x: ", hex(Qx_ref))
+        print("ref y: ", hex(Qy_ref))
+        print("")
+        print("    x: ", hex(Qx))
+        print("    y: ", hex(Qy))
+        tc.print_failed()
+        exit_val += 1
+    else:
+        tc.print_passed()
+
+    # MASKED #####################################################################
+
+    run_name = test_name + "_scm_p256_masked"
+
+    tc.print_run_name(run_name)
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    #k = rn.randint(0, 2**256-1)
+    #Px, Py = p256.spm(rn.randint(0, p256.q - 1), p256.xG, p256.yG)
+
+    #Qx_ref, Qy_ref = p256.spm(k, Px, Py)
+
+    tc.write_int256(cmd_file, k,  0x0020)
+    tc.write_int256(cmd_file, Px, 0x0040)
+    tc.write_int256(cmd_file, Py, 0x0060)
+
+    t1 = rn.randint(1, 2**256-1)
+    t2 = rn.randint(0, 2**256-1)
+
+    tc.write_int256(cmd_file, t1, 0x0080)
+    tc.write_int256(cmd_file, t2, 0x00A0)
+
+    run_op(cmd_file, 0xB2, test_dir, run_name)
+
+    ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
+    Qx = tc.read_output(test_dir, run_name, 0x1040, 8)
+    Qy = tc.read_output(test_dir, run_name, 0x1060, 8)
+
+    if not(Qx == Qx_ref and Qy == Qy_ref):
+        print("RET_VAL: ", hex(ret_val))
+        print("ref x: ", hex(Qx_ref))
+        print("ref y: ", hex(Qy_ref))
+        print("")
+        print("    x: ", hex(Qx))
+        print("    y: ", hex(Qy))
+        tc.print_failed()
+        exit_val += 1
+    else:
+        tc.print_passed()
+
+    ##############################################################################
+    #   Ed25519 SPM
+    ##############################################################################
+    # NONMASKED ##################################################################
+
+    run_name = test_name + "_scm_ed25519_nonmasked"
+
+    tc.print_run_name(run_name)
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    k = rn.randint(0, 2**256-1)
+    P = ed25519.point_mul(rn.randint(0, 2**256-1), ed25519.G)
+    zinv = ed25519.modp_inv(P[2])
+    Px = P[0] * zinv % ed25519.p
+    Py = P[1] * zinv % ed25519.p
+
+    Q = ed25519.point_mul(k, P)
+    zinv = ed25519.modp_inv(Q[2])
+    Qx_ref = Q[0] * zinv % ed25519.p
+    Qy_ref = Q[1] * zinv % ed25519.p
+
+    #print("Px: ", hex(Px))
+    #print("Py: ", hex(Py))
+
+    tc.write_int256(cmd_file, k,  0x0020)
+    tc.write_int256(cmd_file, Px, 0x0040)
+    tc.write_int256(cmd_file, Py, 0x0060)
+
+    run_op(cmd_file, 0xC1, test_dir, run_name)
+
+    ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
+    Qx = tc.read_output(test_dir, run_name, 0x1040, 8)
+    Qy = tc.read_output(test_dir, run_name, 0x1060, 8)
+
+    if not(Qx == Qx_ref and Qy == Qy_ref):
+        print("RET_VAL: ", hex(ret_val))
+        print("ref x: ", hex(Qx_ref))
+        print("ref y: ", hex(Qy_ref))
+        print("")
+        print("    x: ", hex(Qx))
+        print("    y: ", hex(Qy))
+        tc.print_failed()
+        exit_val += 1
+    else:
+        tc.print_passed()
+
+    # MASKED #####################################################################
+
+    run_name = test_name + "_scm_ed25519_masked"
+
+    tc.print_run_name(run_name)
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    #k = rn.randint(0, 2**256-1)
+    #P = ed25519.point_mul(rn.randint(0, ed25519.q - 1), ed25519.G)
+    #zinv = ed25519.modp_inv(P[3])
+    #Px = P[0] * zinv % ed25519.p
+    #Py = P[1] * zinv % ed25519.p
+#
+    #Q = ed25519.point_mul(k, P)
+    #zinv = ed25519.modp_inv(Q[3])
+    #Qx_ref = Q[0] * zinv % ed25519.p
+    #Qy_ref = Q[1] * zinv % ed25519.p
+
+    tc.write_int256(cmd_file, k,  0x0020)
+    tc.write_int256(cmd_file, Px, 0x0040)
+    tc.write_int256(cmd_file, Py, 0x0060)
+
+    t1 = rn.randint(1, 2**256-1)
+    t2 = rn.randint(0, 2**256-1)
+
+    tc.write_int256(cmd_file, t1, 0x0080)
+    tc.write_int256(cmd_file, t2, 0x00A0)
+
+    run_op(cmd_file, 0xC2, test_dir, run_name)
+
+    ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
+    Qx = tc.read_output(test_dir, run_name, 0x1040, 8)
+    Qy = tc.read_output(test_dir, run_name, 0x1060, 8)
+
+    if not(Qx == Qx_ref and Qy == Qy_ref):
+        print("RET_VAL: ", hex(ret_val))
+        print("ref x: ", hex(Qx_ref))
+        print("ref y: ", hex(Qy_ref))
+        print("")
+        print("    x: ", hex(Qx))
+        print("    y: ", hex(Qy))
+        tc.print_failed()
+        exit_val += 1
+    else:
+        tc.print_passed()
+
+    sys.exit(exit_val)

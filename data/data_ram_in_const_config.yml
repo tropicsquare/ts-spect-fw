@@ -8,6 +8,8 @@ data:
     value : 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551
   - name : ca_ecdsa_exp_low
     value : 0xbce6faada7179e84f3b9cac2fc63254f00000000000000000000000000000000
+  - name : ca_p256_a
+    value : 0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC
   - name : ca_p256_b
     value : 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b
   - name : ca_p256_xG

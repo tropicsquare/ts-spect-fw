@@ -88,10 +88,15 @@ g_y = 4 * modp_inv(5) % p
 g_x = recover_x(g_y, 0)
 G = (g_x, g_y, 1, g_x * g_y % p)
 
-def point_compress(P):
+def to_affine(P):
     zinv = modp_inv(P[2])
     x = P[0] * zinv % p
     y = P[1] * zinv % p
+
+    return x, y
+
+def point_compress(P):
+    x, y = to_affine(P)
     return int.to_bytes(y | ((x & 1) << 255), 32, "little")
 
 def point_decompress(s):
