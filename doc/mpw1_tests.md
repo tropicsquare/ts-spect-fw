@@ -1,6 +1,6 @@
 # MPW1 Tests
 
-This markdown describes SPECT API for MPW1 tests and side chanel analysis. The source files are located in [`src/mpw1/`](doc/mpw1/) directory. This firmware is ISAv1 only and includes includes 7 commands for side chanel analysis.
+This markdown describes SPECT API for MPW1 tests and side chanel analysis. The source files are located in [`src/mpw1/`](../src/mpw1/) directory. This firmware is ISAv1 only and includes 7 commands for side chanel analysis.
 
 ---
 ## Table of Contents
@@ -30,14 +30,14 @@ To compile the MPW1 firmware, run
 make compile_mpw1
 ```
 
-This compiles the MPW1 firmware to [`build_mpw1/main_mpw1.hex`](build_mpw1/main_mpw1.hex) directory. User then writes this hex file to SPECTs Instruction RAM (from address `0x8000` in SPECTs address space).
+This compiles the MPW1 firmware to [`build_mpw1/main_mpw1.hex`](../build_mpw1/main_mpw1.hex) directory. User then writes this hex file to SPECTs Instruction RAM (from address `0x8000` in SPECTs address space).
 
 Ensure you have the `spect_compiler` binaries in the environment path.
 
 ---
 ### Constants
 
-Constants for MPW1 FW are specified in [`data/data_ram_in_const_config.yml`](data/data_ram_in_const_config.yml).
+Constants for MPW1 FW are specified in [`data/data_ram_in_const_config.yml`](../data/data_ram_in_const_config.yml).
 
 To generate hex file from this config file, run
 
@@ -45,7 +45,7 @@ To generate hex file from this config file, run
 make data_ram_in_const
 ```
 
-It generates the hex file to [`data/constants_data_in.hex`](data/constants_data_in.hex) and also address descriptors that are then used in FW source code. This target is called automatically when running `compile_mpw1` target.
+It generates the hex file to [`data/constants_data_in.hex`](../data/constants_data_in.hex) and also address descriptors that are then used in FW source code. This target is called automatically when running `compile_mpw1` target.
 
 After every reset/power-up, user must write the content of the hex file starting from address `0x0200` in SPECTs address space (the address can be changed in the mentioned config file).
 
@@ -59,7 +59,7 @@ To select particular command to be executed by the FW, user must write the **CMD
 ---
 ## Commands <a name="commands"></a>
 
-This section provides an overview of commands supported by MPW1 SPECT firmware. All commands perform some elliptic curve operation or whole DSA scheme. All commands use the same algorithm to compute scalar point multiple on a elliptic curve: [Montgomery ladder](https://eprint.iacr.org/2017/293) (conditional swap version). For more information about the ECC algorithms used, refer to headers of source files in [`src/ecc_math`](src/ecc_math/).
+This section provides an overview of commands supported by MPW1 SPECT firmware. All commands perform some elliptic curve operation or whole DSA scheme. All commands use the same algorithm to compute scalar point multiple on a elliptic curve: [Montgomery ladder](https://eprint.iacr.org/2017/293) (conditional swap version). For more information about the ECC algorithms used, refer to headers of source files in [`src/ecc_math`](../src/ecc_math/).
 
 If user specifies different **CMD_ID** then the ones stated below, SPECT FW ends with **RET_CODE** `0xF0`.
 
