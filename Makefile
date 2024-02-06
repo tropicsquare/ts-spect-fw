@@ -37,7 +37,7 @@ data_ram_in_const_boot:
 ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
 
-compile: clear const_rom ops_constants
+compile: const_rom ops_constants
 	rm -rf ${BUILD_DIR}
 	mkdir ${BUILD_DIR}
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \

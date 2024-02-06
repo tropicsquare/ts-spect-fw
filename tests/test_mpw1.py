@@ -136,11 +136,6 @@ if __name__ == "__main__":
 
     cmd_file = tc.get_cmd_file(test_dir)
 
-    #k = rn.randint(0, 2**256-1)
-    #Px, Py = p256.spm(rn.randint(0, p256.q - 1), p256.xG, p256.yG)
-
-    #Qx_ref, Qy_ref = p256.spm(k, Px, Py)
-
     tc.write_int256(cmd_file, k,  0x0020)
     tc.write_int256(cmd_file, Px, 0x0040)
     tc.write_int256(cmd_file, Py, 0x0060)
@@ -191,9 +186,6 @@ if __name__ == "__main__":
     Qx_ref = Q[0] * zinv % ed25519.p
     Qy_ref = Q[1] * zinv % ed25519.p
 
-    #print("Px: ", hex(Px))
-    #print("Py: ", hex(Py))
-
     tc.write_int256(cmd_file, k,  0x0020)
     tc.write_int256(cmd_file, Px, 0x0040)
     tc.write_int256(cmd_file, Py, 0x0060)
@@ -224,17 +216,6 @@ if __name__ == "__main__":
 
     cmd_file = tc.get_cmd_file(test_dir)
 
-    #k = rn.randint(0, 2**256-1)
-    #P = ed25519.point_mul(rn.randint(0, ed25519.q - 1), ed25519.G)
-    #zinv = ed25519.modp_inv(P[3])
-    #Px = P[0] * zinv % ed25519.p
-    #Py = P[1] * zinv % ed25519.p
-#
-    #Q = ed25519.point_mul(k, P)
-    #zinv = ed25519.modp_inv(Q[3])
-    #Qx_ref = Q[0] * zinv % ed25519.p
-    #Qy_ref = Q[1] * zinv % ed25519.p
-
     tc.write_int256(cmd_file, k,  0x0020)
     tc.write_int256(cmd_file, Px, 0x0040)
     tc.write_int256(cmd_file, Py, 0x0060)
@@ -262,5 +243,71 @@ if __name__ == "__main__":
         exit_val += 1
     else:
         tc.print_passed()
+
+    ##############################################################################
+    #   X25519
+    ##############################################################################
+    # NONMASKED ##################################################################
+    run_name = test_name + "_x25519_nonmasked"
+
+    tc.print_run_name(run_name)
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    k = rn.randint(0, 2**256-1)
+    u = x25519.x25519(x25519.int2scalar(rn.randint(0, 2**256-1)), 9)
+
+    k_scalar = x25519.int2scalar(k)
+    x_ref = x25519.x25519(k_scalar, u)
+
+    tc.write_int256(cmd_file, k,  0x0020)
+    tc.write_int256(cmd_file, u,  0x0040)
+
+    run_op(cmd_file, 0xD1, test_dir, run_name)
+
+    ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
+
+    x = tc.read_output(test_dir, run_name, 0x1040, 8)
+
+    if not(x == x_ref):
+        print("RET_VAL: ", hex(ret_val))
+        print("ref x: ", hex(x_ref))
+        print("    x: ", hex(x))
+        tc.print_failed()
+        exit_val += 1
+    else:
+        tc.print_passed()
+
+    # MASKED #####################################################################
+    run_name = test_name + "_x25519_masked"
+
+    tc.print_run_name(run_name)
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    tc.write_int256(cmd_file, k,  0x0020)
+    tc.write_int256(cmd_file, u,  0x0040)
+
+    t1 = rn.randint(1, 2**256-1)
+    t2 = rn.randint(0, 2**256-1)
+
+    tc.write_int256(cmd_file, t1, 0x0080)
+    tc.write_int256(cmd_file, t2, 0x00A0)
+
+    run_op(cmd_file, 0xD2, test_dir, run_name)
+
+    ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
+
+    x = tc.read_output(test_dir, run_name, 0x1040, 8)
+
+    if not(x == x_ref):
+        print("RET_VAL: ", hex(ret_val))
+        print("ref x: ", hex(x_ref))
+        print("    x: ", hex(x))
+        tc.print_failed()
+        exit_val += 1
+    else:
+        tc.print_passed()
+
 
     sys.exit(exit_val)

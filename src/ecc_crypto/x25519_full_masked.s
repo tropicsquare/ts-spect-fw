@@ -73,7 +73,7 @@ x25519_full_masked_z_randomize:
     CALL        curve25519_point_generate
 
     ; 5) Compute sP2 = s2.P2
-    CALL        spm_curve25519
+    CALL        spm_curve25519_long
 
     ; 6) Recover sP2.y
     CALL        y_recovery_curve25519
@@ -96,7 +96,7 @@ x25519_full_masked_z_randomize:
 
     ; 9) Compute sP3.x = s3.P3
     LD          r31, ca_p25519
-    CALL        spm_curve25519
+    CALL        spm_curve25519_long
 
     ;10) Recover sP3.y
     CALL        y_recovery_curve25519

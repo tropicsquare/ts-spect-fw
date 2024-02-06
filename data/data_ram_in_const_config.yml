@@ -28,16 +28,16 @@ data:
     value : 0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a
   - name : ca_ed25519_yG
     value : 0x6666666666666666666666666666666666666666666666666666666666666658
-  - name : ca_p25519_c3
-    value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0
-  - name : ca_x25519_a24
-    value : 121665
-  - name : ca_curve25519_a
-    value : 486662
+  - name : ca_curve25519_a2d4
+    value : 0x1db42
+  #- name : ca_p25519_c3
+  #  value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0
+  #- name : ca_x25519_a24
+  #  value : 121665
+  #- name : ca_curve25519_a
+  #  value : 486662
   #- name : ca_ffff
   #  value : 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-  #- name : ca_curve25519_a2d4
-  #  value : 0x1db42
   #- name : ca_pg_map2ed25519_c5
   #  value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
   #- name : ca_dst_template

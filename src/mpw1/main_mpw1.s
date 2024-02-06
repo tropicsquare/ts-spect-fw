@@ -47,10 +47,10 @@ _start:
     BRZ     ed25519_scm_mpw1
 
     CMPI    r0,  x25519_scm_pure_id_mpw1
-    BRZ     x25519_scm_pure_mpw1
+    BRZ     x25519_scm_mpw1
 
     CMPI    r0,  x25519_scm_masked_id_mpw1
-    BRZ     x25519_scm_masked_mpw1
+    BRZ     x25519_scm_mpw1
 
     JMP     op_err_mpw1
 
@@ -191,9 +191,47 @@ ed25519_scm_mpw1_end:
     ST          r8,  0x1060
     END
 
+x25519_scm_mpw1:
+    LD          r28, 0x0020
+    LD          r11, 0x0040
+    MOVI        r12, 1
+
+    ROL8        r27, r28
+    ANDI        r27, r27, 0x83f
+    ORI         r27, r27, 0x040
+    ROR8        r28, r27
+
+    LD          r31, ca_p25519
+
+    CMPI        r0,  x25519_scm_masked_id_mpw1
+    BRZ         x25519_scm_masked_mpw1        
 x25519_scm_pure_mpw1:
+    CALL        spm_curve25519_short
+    JMP         x25519_scm_mpw1_end
 
 x25519_scm_masked_mpw1:
+    LD          r12, 0x0080
+    MOVI        r0,  0
+    REDP        r12, r0,  r12
+    CMPA        r12, 0
+    BRZ         scm_err_mpw1
+    MUL25519    r11, r11, r12
+
+    LD          r31, ca_q25519
+    LD          r1,  0x00A0
+    SCB         r28, r28, r1
+
+    LD          r31, ca_p25519
+    CALL        spm_curve25519_long
+
+x25519_scm_mpw1_end:
+    MOV         r1,  r8
+    CALL        inv_p25519
+    MUL25519    r7,  r7,  r1
+    MOVI        r30, 0x1
+    ST          r30, 0x1000
+    ST          r7,  0x1040
+    END
 
 scm_err_mpw1:
     MOVI    r30, 0x0F
@@ -220,5 +258,10 @@ op_err_mpw1:
 .include    ../ecc_math/ed25519/point_check_ed25519.s
 .include    ../ecc_math/ed25519/spm_ed25519_short.s
 .include    ../ecc_math/ed25519/spm_ed25519_long.s
+
+.include    ../ecc_math/curve25519/point_xadd_curve25519.s
+.include    ../ecc_math/curve25519/point_xdbl_curve25519.s
+.include    ../ecc_math/curve25519/spm_curve25519_short.s
+.include    ../ecc_math/curve25519/spm_curve25519_long.s
 
 .include    ecdsa_sign_mpw1.s
