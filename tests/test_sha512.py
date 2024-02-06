@@ -12,7 +12,8 @@ def sha512(s):
 
 if __name__ == "__main__":
 
-    seed = rn.randint(0, 2**32-1)
+    args = tc.parser.parse_args()
+    seed = tc.set_seed(args)
     rn.seed(seed)
     print("seed:", seed)
 

@@ -204,7 +204,8 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
 
 if __name__ == "__main__":
 
-    seed = rn.randint(0, 2**32-1)
+    args = tc.parser.parse_args()
+    seed = tc.set_seed(args)
     rn.seed(seed)
     print("seed:", seed)
 
