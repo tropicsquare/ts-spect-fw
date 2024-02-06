@@ -2,6 +2,8 @@
 
 This markdown describes SPECT API for MPW1 tests and side chanel analysis. The source files are located in [`src/mpw1/`](../src/mpw1/) directory. This firmware is ISAv1 only and includes 7 commands for side chanel analysis.
 
+> **NOTE:** MPW1 contains a bug in `MUL256` instruction (multiplication in GF(P-256 prime)), therefore it is possible that computation on P-256 curve fails or give bad result even when it should not. If such a behavior occurs, please, create an issue with the inputs.
+
 ---
 ## Table of Contents
 
