@@ -2,16 +2,26 @@
 
 This repository contains the Makefile and associated scripts necessary to build firmware for a specific project. The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling, releasing, and managing the firmware.
 
-## Licensing
+## Table of Contents
+
+1. [Licensing](#license)
+2. [Documentation](#doc)
+3. [Prerequisites](#prereq)
+4. [Build firmware](#fwbuild)
+5. [Test/Simulate firmware](#fwtestsim)
+   1. [Test vectors](#testvec)
+
+
+## Licensing <a name="license"></a>
 ---
 Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
 
-## Documentation
+## Documentation <a name="doc"></a>
 ---
 Detailed documentation and resources can be found in the [`doc/`](doc/) folder
 of this repository.
 
-## Prerequisites
+## Prerequisites <a name="prereq"></a>
 ---
 1. Cloning repository and setting the environment variable `TS_REPO_ROOT` to the repository root.
 
@@ -38,7 +48,7 @@ repository.
    pip install -r requirements.txt
    ```
 
-## Build firmware
+## Build firmware <a name="fwbuild"></a>
 ---
 The primary [`Makefile`](Makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware.
@@ -59,7 +69,7 @@ release firmware, use:
 3. The firmware build artifacts will be generated in the appropriate directories
 , such as [`build/`](build/) and [`release/`](release/).
 
-## Test/Simulate firmware
+## Test/Simulate firmware <a name="fwtestsim"></a>
 ---
 Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The scripts generates or read test vector, preload SPECTs input buffers and key slots, setup configuration files for `spect_iss` and run it.
 
@@ -69,7 +79,7 @@ Firmware must be compiled in [`build`](build) beforehand. Use:
    make compile
    ```
 
-### Test Vectors
+### Test Vectors <a name="testvec"></a>
 
 Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models). 
 

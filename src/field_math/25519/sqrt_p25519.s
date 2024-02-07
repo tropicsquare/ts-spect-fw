@@ -44,7 +44,13 @@ sqrt_p25519:
     MUL25519    r3, r2, r4
 
     MUL25519    r4, r2, r2
+.ifdef SPECT_ISA_VERSION_1
+    SUBP        r4,  r4,  r1
+    CMPA        r4,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
     XOR         r4, r4, r1
+.endif
 
     BRNZ        sqrt_p25519_final_correction
     MOV         r1, r2

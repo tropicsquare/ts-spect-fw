@@ -48,7 +48,7 @@ def spm(k, x, y):
     for i in range(255, -1, -1):
         xQ, yQ = ec_dub(xQ, yQ)
         if shift(k, i):
-            xQ, yQ = ec_add(xQ, yQ, xG, yG)
+            xQ, yQ = ec_add(xQ, yQ, x, y)
     
     return xQ, yQ
 
@@ -80,6 +80,30 @@ def sign(d, w, sch, scn, z):
     z_int = int.from_bytes(z, 'big')
 
     s = ((z_int + d*r) * inv0(k_int, q)) % q
+
+    return r, s
+
+def sign_mpw1(d, z, k_int):
+    k_int = k_int % q
+    #print("k: ", hex(k_int))
+
+    if k_int == 0:
+        print("Test Model: k_int = 0. ECDSA Failed.")
+
+    x, y = spm(k_int, xG, yG)
+    r = x % q
+
+    #print("r: ", hex(r))
+
+    if r == 0:
+        print("Test Model: r = 0. ECDSA Failed.")
+
+    z_int = int.from_bytes(z, 'big')
+    #print("z: ", hex(z_int))
+
+    s = ((z_int + d*r) * inv0(k_int, q)) % q
+
+    #print("s: ", hex(s))
 
     return r, s
 

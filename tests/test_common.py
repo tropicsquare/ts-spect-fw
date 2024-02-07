@@ -317,6 +317,15 @@ def write_string(cmd_file, s: str, addr):
 def write_bytes(cmd_file, b: bytes, addr):
     write_string(cmd_file, b.hex(), addr)
 
+def write_hex(cmd_file, hex_file_name, start_addr):
+    with open(hex_file_name, 'r') as hex_file:
+        for line in hex_file:
+            line = line.strip()
+            if not line:
+                continue
+            write_int32(cmd_file, int(line, 16), start_addr)
+            start_addr += 4
+
 def set_rng(test_dir: str, rng: list):
     with open(f"{test_dir}/rng.hex", mode='w') as rng_hex:
         for r in rng:

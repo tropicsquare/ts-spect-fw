@@ -46,6 +46,13 @@ point_check_p256:
     ADDP    r0,  r0,  r1
     ADDP    r0,  r0,  r2                        ; X^3 + a*X*Z^2 + b*Z^3
 
+.ifdef SPECT_ISA_VERSION_1
+    SUBP    r0,  r0,  r3
+    CMPA    r0,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
     XOR     r0,  r0,  r3
+.endif
+
     RET
 

@@ -10,7 +10,7 @@
 ;
 ; ==============================================================================
 ;
-; Scalar Point Multiplication on Curve25519 with 512 bit scalar
+; Scalar Point Multiplication on Curve25519 with 256 bit scalar
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
 ; Uses diferential x-coordinate only addition/doubling
 ; 
@@ -18,7 +18,7 @@
 ;               X    Z
 ;   Point P = (r11, r12)
 ;
-;   Scalar k = (r28, r29)
+;   Scalar k = r28
 ;
 ; Output:
 ;                     X    Z
@@ -30,7 +30,7 @@
 ;
 ; ==============================================================================
 
-spm_curve25519:
+spm_curve25519_short:
     LD      r6,  ca_curve25519_a2d4
     MOV     r9,  r11
     MOV     r10, r12
@@ -43,26 +43,9 @@ spm_curve25519:
 
     MOVI r30, 256
 
-    ; scalar bits 511 downto 256
-spm_curve25519_loop_511_256:
-    ROL     r29, r29
-    CSWAP   r7,  r9
-    CSWAP   r8,  r10
-
-    CALL    point_xadd_curve25519
-    CALL    point_xdbl_curve25519
-
-    CSWAP   r7,  r9
-    CSWAP   r8,  r10
-
-    SUBI    r30, r30, 1
-    BRNZ    spm_curve25519_loop_511_256
-
-    MOVI    r30, 256
-
-    ; scalar bits 255 downto 0
-spm_curve25519_loop_255_0:
+spm_curve25519_short_loop:
     ROL     r28, r28
+
     CSWAP   r7,  r9
     CSWAP   r8,  r10
 
@@ -73,6 +56,6 @@ spm_curve25519_loop_255_0:
     CSWAP   r8,  r10
 
     SUBI    r30, r30, 1
-    BRNZ    spm_curve25519_loop_255_0
+    BRNZ    spm_curve25519_short_loop
 
     RET

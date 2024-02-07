@@ -1,5 +1,6 @@
 SRC_DIR = ${TS_REPO_ROOT}/src
 FIT_DIR = ${TS_REPO_ROOT}/fit
+BUILD_DIR_MPW1 = ${TS_REPO_ROOT}/build_mpw1
 BUILD_DIR = ${TS_REPO_ROOT}/build
 RELEASE_DIR = ${TS_REPO_ROOT}/release
 BOOT_DIR = ${TS_REPO_ROOT}/release_boot
@@ -14,8 +15,12 @@ FW_PARITY = 2 	# even
 FW_BASE_ADDR = 0x8000
 
 clear:
-	rm -rf ${TS_REPO_ROOT}/build
-	mkdir ${TS_REPO_ROOT}/build
+	rm -rf ${BUILD_DIR_MPW1}
+	mkdir ${BUILD_DIR_MPW1}
+	rm -rf ${BUILD_DIR}
+	mkdir ${BUILD_DIR}
+	rm -f ${TS_REPO_ROOT}/data/*.hex
+	rm -f ${SRC_DIR}/mem_layouts/constants*.s
 
 const_rom:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
@@ -23,7 +28,7 @@ const_rom:
 
 data_ram_in_const:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
+	mv ${TS_REPO_ROOT}/data/constants_data_in_layout.s ${SRC_DIR}/mem_layouts/constants_data_in_layout.s
 
 data_ram_in_const_boot:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_boot_config.yml
@@ -32,7 +37,9 @@ data_ram_in_const_boot:
 ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
 
-compile: clear const_rom ops_constants
+compile: const_rom ops_constants
+	rm -rf ${BUILD_DIR}
+	mkdir ${BUILD_DIR}
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
@@ -86,6 +93,16 @@ release_boot_mpw2: const_rom ops_constants
 	${SRC_DIR}/boot_main.s > ${BOOT_DIR}/mpw2/compile.log
 
 release_all: release release_boot_mpw1 release_boot_mpw2
+
+compile_mpw1: data_ram_in_const
+	rm -rf ${BUILD_DIR_MPW1}
+	mkdir ${BUILD_DIR_MPW1}
+	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR_MPW1}/main_mpw1.hex \
+	--isa-version=1 \
+	--first-address=${FW_BASE_ADDR} \
+	--dump-program=${BUILD_DIR_MPW1}/program_dump.s \
+	--dump-symbols=${BUILD_DIR_MPW1}/symbols_dump.s \
+	${SRC_DIR}/mpw1/main_mpw1.s > ${BUILD_DIR_MPW1}/compile.log
 
 fit_sources = x25519_nomask x25519_scalar_mask x25519_z_mask x25519_z_scalar_mask
 

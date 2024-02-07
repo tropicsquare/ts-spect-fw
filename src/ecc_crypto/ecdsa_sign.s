@@ -19,7 +19,7 @@
 ;   Message Digest z in r18
 ;
 ; Output:
-;   ECDSA Signature (R,S) = (r9, r0)
+;   ECDSA Signature (R,S) = (r9, r10)
 ;   Status in r30
 ;
 ; ==============================================================================
@@ -105,7 +105,7 @@ ecdsa_sign_tmac_padding_loop:
 
 ; ==============================================================================
 ;   Compute s = (z + r*d)/k
-;   Masked with t as (z*r + r*t*d) * (k*t)^(-1)
+;   Masked with t as (z*t + r*t*d) * (k*t)^(-1)
 ; ==============================================================================
 
 ecdsa_sign_mask_k:
