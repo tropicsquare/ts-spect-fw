@@ -164,14 +164,18 @@ ecdsa_sign_mask_k:
     MUL256      r2,  r15, r11
     MUL256      r3,  r9,  r17
     XOR         r0,  r2,  r3
-    BRNZ        eddsa_sign_verify_continue_add
+    BRNZ        eddsa_sign_verify_continue_add  ; P1x != P2x -> use add
     MUL256      r2,  r16, r11
     MUL256      r3,  r10, r17
     XOR         r0,  r2,  r3
-    BRNZ        ecdsa_fail_verify
-
+    BRNZ        ecdsa_fail_verify               ; P1x == -P2x -> fail
+    ; P1x == P2x -> use dbl
 eddsa_sign_verify_continue_dbl:
-    ; TODO
+    CALL        point_dbl_p256
+    MOV         r12, r9
+    MOV         r13, r10
+    MOV         r14, r11
+    JMP         eddsa_sign_verify_continue_dbladd
 
 eddsa_sign_verify_continue_add:
     MOV         r12, r15
@@ -179,6 +183,7 @@ eddsa_sign_verify_continue_add:
     MOV         r14, r17
 
     CALL        point_add_p256
+eddsa_sign_verify_continue_dbladd:
 
     MOV         r1,  r14
     CALL        inv_p256
