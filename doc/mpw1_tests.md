@@ -34,7 +34,7 @@ make compile_mpw1
 
 This compiles the MPW1 firmware to [`build_mpw1/main_mpw1.hex`](../build_mpw1/main_mpw1.hex) directory. User then writes this hex file to SPECTs Instruction RAM (from address `0x8000` in SPECTs address space).
 
-Ensure you have the `spect_compiler` binaries in the environment path.
+Ensure you have the `spect_compiler` binaries in the environment path. There is another [repository](https://github.com/tropicsquare/ts-spect-compiler).
 
 ---
 ### Constants
