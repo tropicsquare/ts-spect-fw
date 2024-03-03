@@ -6,10 +6,9 @@ This repository contains the Makefile and associated scripts necessary to build 
 
 1. [Licensing](#license)
 2. [Repository structure](#repostruct)
-3. [Documentation](#doc)
-4. [Prerequisites](#prereq)
-5. [Build firmware](#fwbuild)
-6. [Test/Simulate firmware](#fwtestsim)
+3. [Prerequisites](#prereq)
+4. [Build firmware](#fwbuild)
+5. [Test/Simulate firmware](#fwtestsim)
    1. [Test vectors](#testvec)
 
 
@@ -19,20 +18,15 @@ Everything in this repository is licensed under the Apache License, Version 2.0,
 
 ## Repository structure <a name="repostruct"></a>
 
-- [`data/`](data/) : configuration files for constants used by the firmware (primes, curve parameters, etc.)
-- [`doc/`](doc/) : firmware and algorithms documentation
-- [`fit/`](fit/) : directory dedicated to evaluation done by FIT, CTU in Prague
-- [`muni`](muni/) : _obsolete_ directory dedicated to evaluation done by MUNI in Brno
+- [`data`](data/) : configuration files for constants used by the firmware (primes, curve parameters, etc.)
+- [`doc`](doc/) : firmware and algorithms documentation
+- [`fit`](fit/) : directory dedicated to evaluation done by FIT, CTU in Prague
+- [`muni`](muni/) : (_obsolete_) directory dedicated to evaluation done by MUNI in Brno
 - [`release`](release/) : compiled application and debug firmware
 - [`release_boot`](release_boot/) : compiled firmware for EdDSA signature verification needed during TROPIC01 boot phase
 - [`scripts`](scripts/) : scripts needed to generate constants, memory layouts etc. from configuration files
 - [`src`](src/) : all firmware source files
 - [`tests`](tests/) : all python tests, models and custom test vectors
-
-## Documentation <a name="doc"></a>
----
-Detailed documentation and resources can be found in the [`doc/`](doc/) folder
-of this repository.
 
 ## Prerequisites <a name="prereq"></a>
 ---
