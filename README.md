@@ -5,16 +5,29 @@ This repository contains the Makefile and associated scripts necessary to build 
 ## Table of Contents
 
 1. [Licensing](#license)
-2. [Documentation](#doc)
-3. [Prerequisites](#prereq)
-4. [Build firmware](#fwbuild)
-5. [Test/Simulate firmware](#fwtestsim)
+2. [Repository structure](#repostruct)
+3. [Documentation](#doc)
+4. [Prerequisites](#prereq)
+5. [Build firmware](#fwbuild)
+6. [Test/Simulate firmware](#fwtestsim)
    1. [Test vectors](#testvec)
 
 
 ## Licensing <a name="license"></a>
 ---
 Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
+
+## Repository structure <a name="repostruct"></a>
+
+- [`data/`](data/) : configuration files for constants used by the firmware (primes, curve parameters, etc.)
+- [`doc/`](doc/) : firmware and algorithms documentation
+- [`fit/`](fit/) : directory dedicated to evaluation done by FIT, CTU in Prague
+- [`muni`](muni/) : _obsolete_ directory dedicated to evaluation done by MUNI in Brno
+- [`release`](release/) : compiled application and debug firmware
+- [`release_boot`](release_boot/) : compiled firmware for EdDSA signature verification needed during TROPIC01 boot phase
+- [`scripts`](scripts/) : scripts needed to generate constants, memory layouts etc. from configuration files
+- [`src`](src/) : all firmware source files
+- [`tests`](tests/) : all python tests, models and custom test vectors
 
 ## Documentation <a name="doc"></a>
 ---
@@ -99,7 +112,7 @@ See [`testvec`](tests/testvec) for test vector examples.
    ```
 
    ```bash
-   ./test_x25519_dbg.py --testvec testvec/x25519_dbg_testvec.yml
+   ./test_ecdsa_dbg.py --testvec testvec/ecdsa_dbg_testvec.yml
    ```
 
    The test_*.py file controls test execution, output logs generate in tests/<test_name_directory> 
