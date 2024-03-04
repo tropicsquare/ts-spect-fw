@@ -16,7 +16,8 @@ This markdown describes SPECT API for MPW1 tests and side chanel analysis. The s
     5. [Ed25519 Curve Scalar Multiplication (masked)](#ed25519_masked)
     6. [X25519 (non-masked)](#x25519_nonmasked)
     7. [X25519 (masked)](#x25519_masked)
-3. [Side Chanel Countermeasures](#scc)
+3. [Description of used algorithms and functions](#desc)
+4. [Side Chanel Countermeasures](#scc)
     1. [Scalar Multiplication](#scc_scm)
     2. [ECDSA Signature](#scc_ecdsa_sign)
 
@@ -264,6 +265,26 @@ This command computes X25519(k, u) function as defined in [`RFC7748`](https://da
 | - | - | - | - |
 | **RET_CODE**  | `0x1000`  | 1B    | Return code |
 | **x**         | `0x1040`  | 32B   | Result x-coordinate |
+
+---
+## Description of used algorithms and functions <a name="desc"></a>
+
+This section describes algorithms and functions used by MPW1 test firmware. For further information, refer to header comments in related S file in [`src`](../src/)
+
+### Field inversion
+
+Inversion in the finite fields is done using Fermat's little theorem, when $Z^{-1} = Z^{p-2}$.
+
+### Curve math
+
+- P-256 point addition : Algorithm 4 from https://eprint.iacr.org/2015/1060.pdf
+- P-256 point doubling : Algorithm 6 from https://eprint.iacr.org/2015/1060.pdf
+- Ed25519 point addition : Addition algorithm from https://datatracker.ietf.org/doc/rfc8032/ Section 5.1.4.
+- Ed25519 point doubling : Doubling algorithm from https://datatracker.ietf.org/doc/rfc8032/ Section 5.1.4.
+- Curve25519 point addition : Follows Algorithm 1 from https://eprint.iacr.org/2017/212.pdf
+- Curve25519 point doubling : Algorithm 2 from https://eprint.iacr.org/2017/212.pdf
+- Scalar point multiplication : CSWAP Montgomery Ladder method from https://eprint.iacr.org/2017/293
+
 
 ---
 ## Side Channel Countermeasures <a name="scc"></a>
