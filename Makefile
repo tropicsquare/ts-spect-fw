@@ -8,16 +8,23 @@ MPW1_BOOT_DIR = ${TS_REPO_ROOT}/build_mpw1_boot
 COMPILER = spect_compiler
 ISS = spect_iss
 
-ISA_VERSION=2
-
 MEM_GEN = ${TS_REPO_ROOT}/scripts/gen_mem_files.py
 OPS_GEN = ${TS_REPO_ROOT}/scripts/gen_spect_ops_constants.py
 
+ISA_VERSION=2
 FW_PARITY = 2 	# even
 FW_BASE_ADDR = 0x8000
 
+############################################################################################################
+#		Environment check
+############################################################################################################
+
 check_env:
 	printenv TS_REPO_ROOT
+
+############################################################################################################
+#		Clear
+############################################################################################################
 
 clear: check_env
 	rm -rf ${BUILD_DIR_MPW1}
@@ -28,6 +35,10 @@ clear: check_env
 	rm -f ${TS_REPO_ROOT}/data/*.hex
 	rm -f ${SRC_DIR}/mem_layouts/constants_layout.s
 	rm -f ${SRC_DIR}/constants/spect_ops_constants.s
+
+############################################################################################################
+#		Generating necessary files
+############################################################################################################
 
 const_rom:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
@@ -44,6 +55,10 @@ data_ram_in_const_boot:
 ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
 
+############################################################################################################
+#		Compile APP FW to build directory
+############################################################################################################
+
 compile: check_env const_rom ops_constants
 	rm -rf ${BUILD_DIR}
 	mkdir ${BUILD_DIR}
@@ -55,7 +70,7 @@ compile: check_env const_rom ops_constants
 	${SRC_DIR}/main.s > ${BUILD_DIR}/compile.log
 
 ############################################################################################################
-#		Final APP Release
+#		Final APP+BOOT FW Release
 ############################################################################################################
 
 release: check_env const_rom ops_constants
@@ -80,7 +95,7 @@ release: check_env const_rom ops_constants
 	${SRC_DIR}/boot_main.s > ${RELEASE_DIR}/log/compile_boot.log
 
 ############################################################################################################
-#		MPW1 FW
+#		MPW1 FW (APP+BOOT)
 ############################################################################################################
 
 compile_mpw1: check_env data_ram_in_const
