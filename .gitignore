@@ -1,8 +1,11 @@
 **/__pycache__
-build
-build_mpw1
+build*
+release*
 tests/test_*/
+data/*.hex
 **/logs/
 *.swp
 *.swo
 spect_ops_constants.h
+spect_ops_constants.s
+constants_layout.s

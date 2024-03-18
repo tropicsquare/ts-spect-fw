@@ -106,6 +106,7 @@
 .include    ops/ecdsa_ops.s
 .include    ops/x25519_ops.s
 .include    ops/clear.s
+.include    ops/debug.s
 
 ; ====================================================
 ; Others

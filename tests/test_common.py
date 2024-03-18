@@ -382,22 +382,19 @@ def run_op(
     run_log = run_name+"_iss.log"
 
     hexfile = "build/main.hex"
-    constfile = "data/constants.hex"
+    constfile = "build/constants.hex"
 
 
     if "TS_SPECT_FW_TEST_RELEASE" in os.environ.keys():
         if tag == "Boot1":
-            hexfile = "release_boot/mpw1/spect_boot_mpw1.hex"
-            constfile = "release_boot/mpw1/constants.hex"
+            hexfile = "build_mpw1_boot/spect_boot_mpw1.hex"
+            constfile = "build_mpw1_boot/constants.hex"
         elif tag == "Boot2":
-            hexfile = "release_boot/mpw2/spect_boot_mpw2.hex"
-            constfile = "release_boot/mpw2/constants.hex"
-        elif tag == "Debug":
-            hexfile = "release/spect_debug.hex"
-            constfile = "release/constants.hex"
+            hexfile = "release/spect_boot.hex"
+            constfile = "release/spect_const_rom_code.hex"
         else: # tag == "Application"
             hexfile = "release/spect_app.hex"
-            constfile = "release/constants.hex"
+            constfile = "release/spect_const_rom_code.hex"
 
     cmd = iss
     
@@ -412,7 +409,9 @@ def run_op(
         print(f"Source: {hexfile}")
     cmd += f" --isa-version={isa}"
     cmd += f" --first-address=0x8000"
-    cmd += f" --const-rom={TS_REPO_ROOT}/{constfile}"
+    if isa == 2:
+        print(f"Const: {constfile}")
+        cmd += f" --const-rom={TS_REPO_ROOT}/{constfile}"
     cmd += f" --grv-hex={test_dir}/rng.hex"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --emem-out={test_dir}/{run_name}_emem_out.hex"

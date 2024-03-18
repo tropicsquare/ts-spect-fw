@@ -75,6 +75,8 @@ def boot_sequence(signature, A, message, name, isa):
     tc.write_bytes(cmd_file, A, 0x0060)
     tc.write_bytes(cmd_file, digest, 0x0080)
 
+    preload_data_ram_in_const(cmd_file, f"{tc.TS_REPO_ROOT}/build_mpw1_boot/constants.hex")
+
     ctx = tc.run_op(
         cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir,
         run_name=run_name, main=main, isa=isa, tag=tag
@@ -107,10 +109,10 @@ if __name__ == "__main__":
     signature, A = ed25519.sign_standard(secret, digest_ref)
 
     ########################################################################################################
-    #   Uncorrupted ISA v0.2
+    #   Uncorrupted ISA v0.1
     ########################################################################################################
 
-    if boot_sequence(signature, A, message, "valid_isa_2", isa=2):
+    if boot_sequence(signature, A, message, "valid_isa_1", isa=1):
         tc.print_passed()
     else:
         tc.print_failed()
@@ -118,14 +120,14 @@ if __name__ == "__main__":
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
-
+        
     ########################################################################################################
-    #   Corrupted message ISA v0.2
+    #   Corrupted message ISA v0.1
     ########################################################################################################
 
     corrupted_message = message + b'\xAA'
 
-    if not boot_sequence(signature, A, corrupted_message, "corrupted_isa_2", isa=2):
+    if not boot_sequence(signature, A, corrupted_message, "corrupted_isa_1", isa=1):
         tc.print_passed()
     else:
         tc.print_failed()
@@ -133,8 +135,5 @@ if __name__ == "__main__":
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
-
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm -r {test_dir}")
 
     sys.exit(ret)

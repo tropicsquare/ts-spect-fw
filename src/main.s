@@ -21,7 +21,7 @@
 ; Constants Includes
 ; ==============================================================================
 .include mem_layouts/mem_layouts_includes.s
-.include constants/spect_ops_constants.s
+.include constants/spect_ops_constants.s ; Generated from spect_ops_config.yml
 .include constants/spect_descriptors_constants.s
 .include constants/l3_result_const.s
 .include constants/spect_ops_status.s
@@ -54,6 +54,16 @@ op_id_check_eddsa:
 op_id_check_ecdsa:
     CMPI    r4, ecdsa_id
     BRZ     op_ecdsa
+
+od_id_check_dbg:
+    CMPI    r1, x25519_dbg_id
+    BRZ     op_x25519_dbg
+
+    CMPI    r1, eddsa_set_context_dbg_id
+    BRZ     op_eddsa_set_context_dbg
+
+    CMPI    r1, ecdsa_sign_dbg_id
+    BRZ     op_ecdsa_dbg
 
     JMP     invalid_op_id
 

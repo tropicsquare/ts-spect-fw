@@ -3,7 +3,7 @@
 tests=(\
     "boot_sequence" \
     "x25519_full_sc" \
-    "ecc_key_gen"  \
+    "ecc_key_gen_store"  \
     "ecc_key_read" \
     "ecc_key_erase" \
     "ecdsa_sign" \
