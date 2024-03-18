@@ -60,13 +60,6 @@ release: const_rom ops_constants
 	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_app.s \
 	${SRC_DIR}/main.s > ${RELEASE_DIR}/compile_app.log
 
-	${COMPILER} --hex-format=1 --hex-file=${RELEASE_DIR}/spect_debug.hex \
-	--first-address=${FW_BASE_ADDR} \
-	--parity=${FW_PARITY} \
-	--dump-program=${RELEASE_DIR}/dump/program_dump_debug.s \
-	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_debug.s \
-	${SRC_DIR}/main_debug.s > ${RELEASE_DIR}/compile_debug.log
-
 release_boot_mpw1: data_ram_in_const_boot ops_constants
 	rm -rf ${BOOT_DIR}/mpw1
 	mkdir ${BOOT_DIR}/mpw1

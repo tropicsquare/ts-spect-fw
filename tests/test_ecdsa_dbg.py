@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # Run Op
     ctx = tc.run_op(
         cmd_file, "ecdsa_sign_dbg", insrc, outsrc, 0, ops_cfg, test_dir,
-        run_name=run_name, main="src/main_debug.s", tag="Debug"
+        run_name=run_name
     )
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)

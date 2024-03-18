@@ -40,7 +40,7 @@ op_ecc_key_gen_store:
     
     ADDI    r26, r25, 1                     ; physical pub key slot
 
-    ; check if priv key slot is empty
+    ; check if pub key slot is empty
     KBO     r26, ecc_kbus_verify_erase
     BRE     op_key_fail
 

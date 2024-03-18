@@ -55,6 +55,16 @@ op_id_check_ecdsa:
     CMPI    r4, ecdsa_id
     BRZ     op_ecdsa
 
+od_id_check_dbg:
+    CMPI    r1, x25519_dbg_id
+    BRZ     op_x25519_dbg
+
+    CMPI    r1, eddsa_set_context_dbg_id
+    BRZ     op_eddsa_set_context_dbg
+
+    CMPI    r1, ecdsa_sign_dbg_id
+    BRZ     op_ecdsa_dbg
+
     JMP     invalid_op_id
 
 ; ==============================================================================
