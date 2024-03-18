@@ -113,21 +113,17 @@ This creates `release` directory with following structure:
 ---
 Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The scripts generates or read test vector, preload SPECTs input buffers and key slots, setup configuration files for `spect_iss` and run it.
 
-Firmware must be compiled in [`build`](build) beforehand. Use:
-
-   ```bash
-   make compile
-   ```
-
-### Test Vectors <a name="testvec"></a>
-
-Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models). Python tests expects firmware to be build before using `make`. Besides python tests, there are 3 scripts to run certain set of tests.
+Python tests expects firmware to be build before using `make`. Besides python tests, there are 3 scripts to run certain set of tests.
 
 | Name | Description |
 | - | - |
 | [`run_tests.sh`](tests/run_tests.sh) | Compiles and tests application firmware |
 | [`run_tests_mpw1.sh`](tests/run_tests_mpw1.sh) | Compiles and tests MPW1 firmware (app + boot) |
 | [`run_tests_release.sh`](tests/run_tests_release.sh) | Tests released firmware (app + boot), previously compiled to `release` directory |
+
+### Test Vectors <a name="testvec"></a>
+
+Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models).
 
 Test vectors can be also specified using YAML file and `--testvec` option to define parameters of test (private, public key, z coordinate, randomization). 
 
