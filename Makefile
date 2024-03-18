@@ -32,7 +32,6 @@ clear: check_env
 	rm -rf ${MPW1_BOOT_DIR}
 	rm -rf ${RELEASE_DIR}
 	rm -f ${TS_REPO_ROOT}/data/*.hex
-	rm -f ${TS_REPO_ROOT}/data/*.hex
 	rm -f ${SRC_DIR}/mem_layouts/constants_layout.s
 	rm -f ${SRC_DIR}/constants/spect_ops_constants.s
 
@@ -50,7 +49,7 @@ data_ram_in_const:
 
 data_ram_in_const_boot:
 	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_boot_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
+	mv ${TS_REPO_ROOT}/data/constants_data_in_boot_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
 
 ops_constants:
 	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
@@ -62,6 +61,7 @@ ops_constants:
 compile: check_env const_rom ops_constants
 	rm -rf ${BUILD_DIR}
 	mkdir ${BUILD_DIR}
+	mv ${TS_REPO_ROOT}/data/constants.hex ${BUILD_DIR}/constants.hex
 	${COMPILER} --isa-version=${ISA_VERSION} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
@@ -101,6 +101,7 @@ release: check_env const_rom ops_constants
 compile_mpw1: check_env data_ram_in_const
 	rm -rf ${BUILD_DIR_MPW1}
 	mkdir ${BUILD_DIR_MPW1}
+	mv ${TS_REPO_ROOT}/data/constants_data_in.hex ${BUILD_DIR_MPW1}/constants.hex
 	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR_MPW1}/main_mpw1.hex \
 	--isa-version=1 \
 	--first-address=${FW_BASE_ADDR} \
@@ -112,7 +113,7 @@ compile_boot_mpw1: check_env data_ram_in_const_boot ops_constants
 	rm -rf ${MPW1_BOOT_DIR}
 	mkdir ${MPW1_BOOT_DIR}
 	mkdir ${MPW1_BOOT_DIR}/dump
-	mv ${TS_REPO_ROOT}/data/constants.hex ${MPW1_BOOT_DIR}/constants.hex
+	mv ${TS_REPO_ROOT}/data/constants_data_in_boot.hex ${MPW1_BOOT_DIR}/constants.hex
 	${COMPILER} --isa-version=1 --hex-format=1 --hex-file=${MPW1_BOOT_DIR}/spect_boot_mpw1.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
