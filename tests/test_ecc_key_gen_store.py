@@ -8,7 +8,7 @@ import test_common as tc
 import models.ed25519 as ed25519
 import models.p256 as p256
 
-def test_process(test_dir, run_id, insrc, outsrc, key_type):
+def test_process(test_dir, run_id, insrc, outsrc, key_type, op):
     cmd_file = tc.get_cmd_file(test_dir)
 
     rng = [rn.randint(0, 2**256-1) for i in range(8)]
@@ -16,9 +16,9 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
 
     k = rng[0].to_bytes(32, 'little')
 
-    slot = rn.randint(0, 7)
+    slot = rn.randint(0, 31)
 
-    run_name = f"ecc_key_gen_{run_id}_{slot}"
+    run_name = f"{op}_{run_id}_{slot}"
 
     tc.print_run_name(run_name)
 
@@ -43,11 +43,14 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type):
 
     tc.start(cmd_file)
 
-    input_word = (key_type << 16) + (slot << 8) + tc.find_in_list("ecc_key_gen", ops_cfg)["id"]
+    input_word = (key_type << 16) + (slot << 8) + tc.find_in_list(op, ops_cfg)["id"]
 
     tc.write_int32(cmd_file, input_word, (insrc<<12))
 
-    ctx = tc.run_op(cmd_file, "ecc_key_gen", insrc, outsrc, 3, ops_cfg, test_dir, run_name=run_name)
+    if op == "ecc_key_store":
+        tc.write_bytes(cmd_file, k, (insrc<<12) +  0x10)
+
+    ctx = tc.run_op(cmd_file, op, insrc, outsrc, 3, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -124,14 +127,17 @@ if __name__ == "__main__":
     print("seed:", seed)
     
     ops_cfg = tc.get_ops_config()
-    test_name = "ecc_key_gen"
+    test_name = "ecc_key_gen_store"
 
     test_dir = tc.make_test_dir(test_name)
 
 # ===================================================================================
-#   Curve = Ed25519, DATA RAM IN / OUT
+#   ECC Key Generate
 # ===================================================================================
-    if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, tc.Ed25519_ID)):
+    op = "ecc_key_gen"
+
+#   Curve = Ed25519, DATA RAM IN / OUT
+    if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, tc.Ed25519_ID, op)):
         tc.print_failed()
         ret |= 1
     else:
@@ -140,10 +146,8 @@ if __name__ == "__main__":
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
 
-# ===================================================================================
 #   Curve = Ed25519, Command Buffer / Result Buffer
-# ===================================================================================
-    if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, tc.Ed25519_ID)):
+    if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, tc.Ed25519_ID, op)):
         tc.print_failed()
         ret |= 2
     else:
@@ -152,10 +156,8 @@ if __name__ == "__main__":
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
 
-# ===================================================================================
 #   Curve = P256, DATA RAM IN / OUT
-# ===================================================================================
-    if (test_process(test_dir, "p256_ram", 0x0, 0x1, tc.P256_ID)):
+    if (test_process(test_dir, "p256_ram", 0x0, 0x1, tc.P256_ID, op)):
         tc.print_failed()
         ret |= 4
     else:
@@ -164,10 +166,50 @@ if __name__ == "__main__":
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm {test_dir}/*")
 
-# ===================================================================================
 #   Curve = P 256, Command Buffer / Result Buffer
+    if (test_process(test_dir, "p256_cpb", 0x4, 0x5, tc.P256_ID, op)):
+        tc.print_failed()
+        ret |= 8
+    else:
+        tc.print_passed()
+
 # ===================================================================================
-    if (test_process(test_dir, "p256_cpb", 0x4, 0x5, tc.P256_ID)):
+#   ECC Key Store
+# ===================================================================================
+    op = "ecc_key_store"
+
+#   Curve = Ed25519, DATA RAM IN / OUT
+    if (test_process(test_dir, "ed25519_ram", 0x0, 0x1, tc.Ed25519_ID, op)):
+        tc.print_failed()
+        ret |= 1
+    else:
+        tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
+
+#   Curve = Ed25519, Command Buffer / Result Buffer
+    if (test_process(test_dir, "ed25519_cpb", 0x4, 0x5, tc.Ed25519_ID, op)):
+        tc.print_failed()
+        ret |= 2
+    else:
+        tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
+
+#   Curve = P256, DATA RAM IN / OUT
+    if (test_process(test_dir, "p256_ram", 0x0, 0x1, tc.P256_ID, op)):
+        tc.print_failed()
+        ret |= 4
+    else:
+        tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
+
+#   Curve = P 256, Command Buffer / Result Buffer
+    if (test_process(test_dir, "p256_cpb", 0x4, 0x5, tc.P256_ID, op)):
         tc.print_failed()
         ret |= 8
     else:
@@ -175,5 +217,5 @@ if __name__ == "__main__":
 
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm -r {test_dir}")
-
+        
     sys.exit(ret)
