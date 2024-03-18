@@ -21,7 +21,7 @@
 ; Constants Includes
 ; ==============================================================================
 .include mem_layouts/mem_layouts_includes.s
-.include constants/spect_ops_constants.s
+.include constants/spect_ops_constants.s ; Generated from spect_ops_config.yml
 .include constants/spect_descriptors_constants.s
 .include constants/l3_result_const.s
 .include constants/spect_ops_status.s
