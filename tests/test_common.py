@@ -387,17 +387,14 @@ def run_op(
 
     if "TS_SPECT_FW_TEST_RELEASE" in os.environ.keys():
         if tag == "Boot1":
-            hexfile = "release_boot/mpw1/spect_boot_mpw1.hex"
-            constfile = "release_boot/mpw1/constants.hex"
+            hexfile = "build_mpw1_boot/spect_boot_mpw1.hex"
+            constfile = "build_mpw1_boot/constants.hex"
         elif tag == "Boot2":
-            hexfile = "release_boot/mpw2/spect_boot_mpw2.hex"
-            constfile = "release_boot/mpw2/constants.hex"
-        elif tag == "Debug":
-            hexfile = "release/spect_debug.hex"
-            constfile = "release/constants.hex"
+            hexfile = "release/spect_boot.hex"
+            constfile = "release/const_rom_code.hex"
         else: # tag == "Application"
             hexfile = "release/spect_app.hex"
-            constfile = "release/constants.hex"
+            constfile = "release/const_rom_code.hex"
 
     cmd = iss
     
