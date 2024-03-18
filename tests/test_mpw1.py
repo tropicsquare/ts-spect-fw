@@ -12,7 +12,7 @@ TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 
 def run_op(cmd_file, cmd_id, test_dir, run_name, break_s=None):
     tc.write_int32(cmd_file, cmd_id, 0x0000)
-    tc.write_hex(cmd_file, f"{TS_REPO_ROOT}/data/constants_data_in.hex", 0x0200)
+    tc.write_hex(cmd_file, f"{TS_REPO_ROOT}/build_mpw1/constants.hex", 0x0200)
     tc.run(cmd_file)
     if break_s:
         cmd_file.write(break_s)
@@ -22,15 +22,17 @@ def run_op(cmd_file, cmd_id, test_dir, run_name, break_s=None):
     iss = "spect_iss"
     run_log = run_name+"_iss.log"
 
-    hexfile = "build_mpw1/main_mpw1.hex"
-    constfile = "data/constants_data_in.hex"
+    main = "src/mpw1/main_mpw1.s"
+    print(f"Source: {main}")
+
+    #constfile = "data/constants_data_in.hex"
     isa = 1
 
     cmd = iss
-    cmd += f" --instruction-mem={TS_REPO_ROOT}/{hexfile}"
+    cmd += f" --program={TS_REPO_ROOT}/{main}"
     cmd += f" --isa-version={isa}"
     cmd += f" --first-address=0x8000"
-    cmd += f" --const-rom={TS_REPO_ROOT}/{constfile}"
+    #cmd += f" --const-rom={TS_REPO_ROOT}/{constfile}"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --shell --cmd-file={test_dir}/iss_cmd"
     cmd += f" > {test_dir}/{run_log}"
