@@ -4,6 +4,8 @@ import os
 import sys
 import numpy as np
 import random as rn
+import subprocess
+import re
 from argparse import SUPPRESS, ArgumentParser
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
@@ -61,11 +63,47 @@ rng_luts = {
 }
 ##################################################################
 
+def get_release_version():
+    try:
+        result = subprocess.run(
+            ['git', 'describe', '--dirty'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        if result.returncode == 0:
+            output = result.stdout.strip()
+            return output
+        else:
+            print("Error running 'git describe --dirty':", result.stderr.strip())
+            return None
+
+    except FileNotFoundError:
+        print("Git command not found. Make sure Git is installed.")
+        return None
+
+def get_released_file(prefix):
+    suffix = ".hex"
+    pattern = re.compile(f"{re.escape(prefix)}(.*){re.escape(suffix)}$")
+
+    matching_files = []
+    for filename in os.listdir(f"{TS_REPO_ROOT}/release"):
+        match = pattern.match(filename)
+        if match:
+            extracted_part = match.group(1)
+            matching_files.append((filename, extracted_part))
+
+    if len(matching_files) > 1:
+        print(f"Found more than one file of type \'{prefix}*.hex\'!")
+    
+    return matching_files[0]
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 
 def print_failed():
     print("\033[91m{}\033[00m".format("FAILED"))
+
+def print_warning(text):
+    print("\033[93mWarning: {}\033[00m".format(text))
 
 def print_run_name(run_name: str):
     print("\033[94m{}\033[00m".format(f"running {run_name}"))
@@ -386,15 +424,28 @@ def run_op(
 
 
     if "TS_SPECT_FW_TEST_RELEASE" in os.environ.keys():
-        if tag == "Boot1":
-            hexfile = "build_mpw1_boot/spect_boot_mpw1.hex"
-            constfile = "build_mpw1_boot/constants.hex"
-        elif tag == "Boot2":
-            hexfile = "release/spect_boot.hex"
-            constfile = "release/spect_const_rom_code.hex"
+        version = get_release_version()
+
+        release_const = get_released_file("spect_const_rom_code-")
+        constfile = f"release/{release_const[0]}"
+
+        if tag == "Boot2":
+            prefix = "spect_boot-"
         else: # tag == "Application"
-            hexfile = "release/spect_app.hex"
-            constfile = "release/spect_const_rom_code.hex"
+            prefix = "spect_app-"
+
+        release_file = get_released_file(prefix)
+        hexfile = f"release/{release_file[0]}"
+
+        if version != release_file[1]:
+            print_warning("Running test on release that does not match the current git version.")
+            print("Running:", release_file[1])
+            print("Current:", version)
+
+        if release_file[1] != release_const[1]:
+            print_warning("Release version of FW and Const ROM Code does not match.")
+            print("FW:     ", release_file[1])
+            print("Const:  ", release_const[1])
 
     cmd = iss
     

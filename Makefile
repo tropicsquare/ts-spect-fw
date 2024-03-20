@@ -15,6 +15,8 @@ ISA_VERSION=2
 FW_PARITY = 2 	# even
 FW_BASE_ADDR = 0x8000
 
+FW_VERSION=`git describe --dirty`
+
 ############################################################################################################
 #		Environment check
 ############################################################################################################
@@ -78,16 +80,16 @@ release: check_env const_rom ops_constants
 	mkdir ${RELEASE_DIR}
 	mkdir ${RELEASE_DIR}/dump
 	mkdir ${RELEASE_DIR}/log
-	mv ${TS_REPO_ROOT}/data/constants.hex ${RELEASE_DIR}/spect_const_rom_code.hex
+	mv ${TS_REPO_ROOT}/data/constants.hex ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex
 
-	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${RELEASE_DIR}/spect_app.hex \
+	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${RELEASE_DIR}/spect_app-${FW_VERSION}.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
 	--dump-program=${RELEASE_DIR}/dump/program_dump_app.s \
 	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_app.s \
 	${SRC_DIR}/main.s > ${RELEASE_DIR}/log/compile_app.log
 
-	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${RELEASE_DIR}/spect_boot.hex \
+	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${RELEASE_DIR}/spect_boot-${FW_VERSION}.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
 	--dump-program=${RELEASE_DIR}/dump/program_dump_boot.s \
