@@ -102,6 +102,9 @@ def print_passed():
 def print_failed():
     print("\033[91m{}\033[00m".format("FAILED"))
 
+def print_warning(text):
+    print("\033[93mWarning: {}\033[00m".format(text))
+
 def print_run_name(run_name: str):
     print("\033[94m{}\033[00m".format(f"running {run_name}"))
 
@@ -422,20 +425,27 @@ def run_op(
 
     if "TS_SPECT_FW_TEST_RELEASE" in os.environ.keys():
         version = get_release_version()
-        constfile = f"release/spect_const_rom_code-{version}.hex"
+
+        release_const = get_released_file("spect_const_rom_code-")
+        constfile = f"release/{release_const[0]}"
+
         if tag == "Boot2":
             prefix = "spect_boot-"
         else: # tag == "Application"
             prefix = "spect_app-"
 
         release_file = get_released_file(prefix)
+        hexfile = f"release/{release_file[0]}"
 
         if version != release_file[1]:
-            print("Warning: running test on release that does not match the current git version.")
+            print_warning("Running test on release that does not match the current git version.")
             print("Running:", release_file[1])
             print("Current:", version)
 
-        hexfile = f"release/{release_file[0]}"
+        if release_file[1] != release_const[1]:
+            print_warning("Release version of FW and Const ROM Code does not match.")
+            print("FW:     ", release_file[1])
+            print("Const:  ", release_const[1])
 
     cmd = iss
     
