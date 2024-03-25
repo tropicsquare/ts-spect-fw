@@ -2,6 +2,8 @@
 
 This repository contains the Makefile and associated scripts necessary to build firmware for a specific project. The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling, releasing, and managing the firmware.
 
+[**SPECT Firmware API**](doc/spect_fw_api/pdf/spect_fw_api.pdf)
+
 ## Table of Contents
 
 1. [Licensing](#license)

@@ -2,6 +2,7 @@
 
 > **_NOTE:_** Current state of the documentation is incomplete and work progress.
 
+- [`spect_fw_api.pdf`](spect_fw_api/pdf/spect_fw_api.pdf) specifies API provided by the firmware
 - [`TMAC.md`](TMAC.md) specifies TMAC function.
 - [`ecc_key_layout.md`](#ecc_key_layout.md) describes layout of ECC keys in each flash memory slot of TROPIC01.
 - [`message_processing.md`](message_processing.md) describes how a message is processed in SPECT FW using HASH and TMAC* instructions.
