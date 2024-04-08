@@ -9,7 +9,7 @@
 ;  obtain one at (https://tropicsquare.com/license).
 ; ==============================================================================
 ;
-; Key setup for curve NIST P-156 (ECDSA)
+; Key setup for curve NIST P-256 (ECDSA)
 ;
 ; Algorithm:
 ;   1) d = k mod q, if d == 0: fail
