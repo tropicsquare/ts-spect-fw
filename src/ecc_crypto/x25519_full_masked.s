@@ -43,6 +43,17 @@
 x25519_full_masked:
     LD          r31, ca_p25519
 
+.ifdef DEBUG_OUT
+    ST          r16, 0x1140
+    ST          r19, 0x1160
+.endif
+
+    ; Check u is in GF(p25519)
+    MOVI        r0,  0
+    REDP        r0,  r0,  r16
+    XOR         r0,  r0,  r16
+    BRNZ        x25519_pubkey_fail
+
     ; 1) Compute P1.y from P1.x
     CALL        get_y_curve25519
     BRNZ        x25519_pubkey_fail
@@ -81,6 +92,10 @@ x25519_full_masked_z_randomize:
     MOV         r24, r8
     MOV         r25, r9
     CALL        point_check_curve25519
+.ifdef DEBUG_OUT
+    MOVI        r0, 1
+    ST          r0, 0x1280
+.endif
     BRNZ        x25519_spm_fail
 
     ; 7) Compute P3 = P2 + P1
@@ -101,6 +116,10 @@ x25519_full_masked_z_randomize:
     ;10) Recover sP3.y
     CALL        y_recovery_curve25519
     CALL        point_check_curve25519
+.ifdef DEBUG_OUT
+    MOVI        r0, 2
+    ST          r0, 0x1280
+.endif
     BRNZ        x25519_spm_fail
 
     ; 11) Compute sP1 = sP2 - sP3
@@ -119,6 +138,10 @@ x25519_full_masked_z_randomize:
     MOVI        r12, 1
 
     CALL        point_check_curve25519
+.ifdef DEBUG_OUT
+    MOVI        r0, 3
+    ST          r0, 0x1280
+.endif
     BRNZ        x25519_spm_fail
 
     MOVI        r0,  0
