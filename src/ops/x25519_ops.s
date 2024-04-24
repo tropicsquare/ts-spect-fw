@@ -74,8 +74,6 @@ op_x25519_sc_et_sh:
     LD      r1, x25519_sc_et_sh_input_slot
     LDK     r16, r1, 0x200
     BRE     op_x25519_key_fail
-    KBO     r1, 0x205
-    BRE     op_x25519_key_fail
 
     LD      r19, x25519_context_etpriv
 
@@ -95,8 +93,6 @@ op_x25519_sc_st_eh:
     LD      r16, x25519_context_ehpub
     MOVI    r1, 0
     LDK     r19, r1, 0x000
-    BRE     op_x25519_key_fail
-    KBO     r1, 0x005
     BRE     op_x25519_key_fail
 
     MOVI    r0,  7
