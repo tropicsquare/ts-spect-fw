@@ -44,8 +44,8 @@ x25519_full_masked:
     LD          r31, ca_p25519
 
 .ifdef DEBUG_OUT
-    ST          r16, 0x1200
-    ST          r19, 0x1220
+    ST          r16, 0x1140
+    ST          r19, 0x1160
 .endif
 
     ; Check u is in GF(p25519)
@@ -94,7 +94,7 @@ x25519_full_masked_z_randomize:
     CALL        point_check_curve25519
 .ifdef DEBUG_OUT
     MOVI        r0, 1
-    ST          r0, 0x1240
+    ST          r0, 0x1280
 .endif
     BRNZ        x25519_spm_fail
 
@@ -118,7 +118,7 @@ x25519_full_masked_z_randomize:
     CALL        point_check_curve25519
 .ifdef DEBUG_OUT
     MOVI        r0, 2
-    ST          r0, 0x1240
+    ST          r0, 0x1280
 .endif
     BRNZ        x25519_spm_fail
 
@@ -140,7 +140,7 @@ x25519_full_masked_z_randomize:
     CALL        point_check_curve25519
 .ifdef DEBUG_OUT
     MOVI        r0, 3
-    ST          r0, 0x1240
+    ST          r0, 0x1280
 .endif
     BRNZ        x25519_spm_fail
 
