@@ -86,6 +86,15 @@
 
 \TsSection{SPECT Operations}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SPECT Operations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagebreak
+\TsSection{SPECT Operations}
+
 \newcommand{\SPECTCommandHead}[2]{
     \multicolumn{4}{|X}{\cellcolor{TropicBlue}\color{white}\textbf{#1}} &
     \multicolumn{1}{|>{\hsize=0.5\hsize}X}{\cellcolor{TropicBlue!70}\color{white}\Register{SPECT_OP_ID}:} &
@@ -134,10 +143,9 @@ SPECT comes with two types of firmware:
 \end{itemize}
 
 \TropicNote{
-    Besides these, another set of SPECT operations is available for debug purposes. These operations do not rely on
+    Besides these, another set of SPECT operations is available for debug purposes. These operations do not use rely on
     functionality of SCB, CPB nor KBUS.
 }
-\hspace{.3cm}
 
 CPU specifies SPECT operation and SPECT firmware parameters by writing\linebreak
 \Register{SPECT_CFG_WORD} on address 0x0100 of SPECTs address space (Data RAM In).
@@ -145,12 +153,7 @@ CPU specifies SPECT operation and SPECT firmware parameters by writing\linebreak
 \vspace{.3cm}
 \Register{SPECT_CFG_WORD}:
 
-\begin{TropicRatioTable3Col}
-    {0.5}                                 {0.25}                          {0.25}
-    {[31:16]                            & [15:8]                        & [7:0]                  }
-    \Register{SPECT_OP_DATA_IN_SIZE}    & \Register{SPECT_INOUT_SRC}    & \Register{SPECT_OP_ID} \Ttlb
-\end{TropicRatioTable3Col}
-\hspace{.3cm}
+\input{tables/table_spect_cfg_word_layout.tex}
 
 CPU selects input data source via \Register{SPECT_INOUT_SRC[7:4]}.
 \begin{itemize}
@@ -173,12 +176,7 @@ After SPECT finishes current operation, CPU reads \Register{SPECT_RES_WORD} from
 \vspace{.3cm}
 \Register{SPECT_RES_WORD:}
 
-\begin{TropicRatioTable3Col}
-    {0.5}                                 {0.25}    {0.25}
-    {[31:16]                            & [15:8]  & [7:0]                  }
-    \Register{SPECT_OP_DATA_OUT_SIZE}   & --      & \Register{SPECT_OP_STATUS} \Ttlb
-\end{TropicRatioTable3Col}
-\hspace{.3cm}
+\input{tables/table_spect_res_word_layout.tex}
 
 SPECT indicates status of the executed operation via \Register{SPECT_OP_STATUS}. SPECT also
 indicates number of bytes in Data RAM Out or Result Buffer via \linebreak \Register{SPECT_OP_DATA_OUT_SIZE}.
@@ -192,28 +190,7 @@ indicates number of bytes in Data RAM Out or Result Buffer via \linebreak \Regis
 \vspace{.3cm}
 Values of \Register{SPECT_OP_STATUS} after SPECT operation execution can be following:
 
-\hspace{.3cm}
-\begin{TropicRatioTable2Col}
-    {0.2}       {0.8}
-    {Value      & Description}
-    0x00        & SPECT Operation executed successfully     \Ttlb
-    0xF1        & SPECT Context error                       \Ttlb
-    0xF2        & SPECT KBUS error                          \Ttlb
-    0xF3        & SPECT Invalid OP_ID error                 \Ttlb
-    0xF4        & SPECT Invalid Curve Type error            \Ttlb
-    0xF5        & SPECT GRV error                           \Ttlb
-    0x11        & X25519 Error: invalid priv key            \Ttlb
-    0x12        & X25519 Error: invalid pub key             \Ttlb
-    0x21        & ECDSA Error: invalid ECDSA nonce ($k \equiv 0 \pmod{q_{P256}}$) \Ttlb
-    0x22        & ECDSA Error: invalid ECDSA $r$ ($r \equiv 0 \pmod{q_{P256}}$)   \Ttlb
-    0x23        & ECDSA Error: invalid ECDSA $s$ ($s \equiv 0 \pmod{q_{P256}}$)   \Ttlb
-    0x24        & ECDSA Error: final verify fail $A$        \Ttlb
-    0x34        & EdDSA Error: invalid priv key $s$         \Ttlb
-    0x35        & EdDSA Error: invalid pub key $A$          \Ttlb
-    0x36        & EdDSA Error: final verify fail $A$        \Ttlb
-    0x41        & Point Integrity Error                     \Ttlb
-\end{TropicRatioTable2Col}
-\hspace{.3cm}
+\input{tables/table_spect_return_value.tex}
 
 To perform some more complex algorithm, such as EdDSA or secure channel establishment,
 CPU needs to invoke SPECT multiple times. In such a case, SPECT keeps context between
@@ -271,8 +248,8 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
     \SPECTCommandHead{ecc_key_generate}{0x60}
 
     \SPECTCommandDescription{
-        Generates ECC key trio ($d, w, A$) for ECDSA/EdDSA and stores it to slot $i$ of
-        ECC Private/Public Key partition.
+        Computes ECC keys for ECDSA/EdDSA based on seed from TRNG, and stores them to user slot $i$ of
+        ECC Key partition in Flash memory.
     }
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
@@ -288,8 +265,8 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
     \SPECTCommandHead{ecc_key_store}{0x61}
 
     \SPECTCommandDescription{
-        Generates ECC key trio ($d, w, A$) for ECDSA/EdDSA based on $k$ and stores it to
-        slot $i$ of ECC Private/Public Key partition.
+        Computes ECC keys for ECDSA/EdDSA based on seed $k$, and stores them to user slot $i$ of
+        ECC Key partition in Flash memory.
     }
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
@@ -319,7 +296,7 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
     \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256, Ed25519))}
     \SPECTCommandMem{0x02}{1B}{\TsApiCmdFld{ORIGIN} (Identifier weather the key was stored or generated.)}
-    \SPECTCommandMem{0x10}{32/64B}{\TsApiCmdFld{PUB_KEY} (ECDSA/EdDSA ECC Pub Key $A$)}
+    \SPECTCommandMem{0x10}{64/32B}{\TsApiCmdFld{PUB_KEY} (ECDSA/EdDSA ECC Pub Key $A$)}
 }
 
 \SPECTCommandTable{

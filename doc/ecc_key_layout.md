@@ -12,7 +12,7 @@ Physical public key slo = 2x + 1
 | - | - |
 | 0 | d/s |
 | 8 | w/prefix |
-| 8 | s mod q |
+| 16 | s mod q |
 
 ## Public Key Slot
 
