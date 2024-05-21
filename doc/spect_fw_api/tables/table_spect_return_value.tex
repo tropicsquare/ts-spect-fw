@@ -1,0 +1,21 @@
+\hspace{.3cm}
+\begin{TropicRatioTable2Col}
+    {0.2}       {0.8}
+    {Value      & Description}
+    0x00        & SPECT Operation executed successfully     \Ttlb
+    0xF1        & SPECT Context error                       \Ttlb
+    0xF2        & SPECT KBUS error                          \Ttlb
+    0xF3        & SPECT Invalid OP_ID error                 \Ttlb
+    0xF4        & SPECT Invalid Curve Type error            \Ttlb
+    0xF5        & SPECT GRV error                           \Ttlb
+    0x11        & X25519 Error: invalid priv key            \Ttlb
+    0x12        & X25519 Error: invalid pub key             \Ttlb
+    0x21        & ECDSA Error: invalid ECDSA nonce ($k \equiv 0 \pmod{q_{P256}}$) \Ttlb
+    0x22        & ECDSA Error: invalid ECDSA $r$ ($r \equiv 0 \pmod{q_{P256}}$)   \Ttlb
+    0x23        & ECDSA Error: invalid ECDSA $s$ ($s \equiv 0 \pmod{q_{P256}}$)   \Ttlb
+    0x24        & ECDSA Error: final verify fail            \Ttlb
+    0x34        & EdDSA Error: invalid priv key $s$         \Ttlb
+    0x35        & EdDSA Error: invalid pub key $A$          \Ttlb
+    0x36        & EdDSA Error: final verify fail            \Ttlb
+    0x41        & Point Integrity Error                     \Ttlb
+\end{TropicRatioTable2Col}
