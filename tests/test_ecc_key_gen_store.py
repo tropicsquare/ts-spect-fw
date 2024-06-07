@@ -43,7 +43,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op):
 
     tc.start(cmd_file)
 
-    input_word = (key_type << 16) + (slot << 8) + tc.find_in_list(op, ops_cfg)["id"]
+    input_word = (key_type << 24) + (slot << 8) + tc.find_in_list(op, ops_cfg)["id"]
 
     tc.write_int32(cmd_file, input_word, (insrc<<12))
 

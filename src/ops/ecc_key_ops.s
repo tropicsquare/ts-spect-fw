@@ -25,6 +25,7 @@ ecc_key_parse_input:
     AND     r1,  r4,  r2
     ROR8    r25, r4
     ROR8    r4,  r25
+    ROR8    r4,  r4
     AND     r25, r25, r2                    ; SLOT
     AND     r4,  r4,  r2                    ; CURVE
     RET
