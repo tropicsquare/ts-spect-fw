@@ -102,7 +102,16 @@ p256_key_setup_tmac_padding_loop:
     ; Compose kpair metadata (origin, curve)
     LD      r0,  ca_spect_cfg_word
     MOVI    r4,  0xFF
-    AND     r20, r0,  r4                        ; mask SPECT_OP_ID to r1[7:0]
+    AND     r20, r0,  r4                        ; mask SPECT_OP_ID to r20[7:0]
+    CMPI    r20, ecc_key_gen_l3_cmd_id
+    BRZ     p256_key_setup_origin_gen
+p256_key_setup_origin_st:
+    MOVI    r20, ecc_key_origin_st
+    JMP     p256_key_setup_origin_continue
+p256_key_setup_origin_gen:
+    MOVI    r20, ecc_key_origin_gen
+
+p256_key_setup_origin_continue:
     ROL8    r20, r20
     ORI     r20, r20, ecc_type_p256
     STK     r20, r26, ecc_key_metadata          ; store metadata

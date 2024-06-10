@@ -8,6 +8,11 @@ import test_common as tc
 import models.ed25519 as ed25519
 import models.p256 as p256
 
+ecc_key_origin = {
+    "ecc_key_gen" : 0x1,
+    "ecc_key_store" : 0x2
+}
+
 def test_process(test_dir, run_id, insrc, outsrc, key_type, op):
     cmd_file = tc.get_cmd_file(test_dir)
 
@@ -81,6 +86,8 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op):
         priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
 
     metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
+    key_type_observed = metadata & 0xFF
+    origin_observed = (metadata >> 8) & 0xFF
 
     #print("Curve:  ", hex(metadata & 0xFF))
     #print("Origin: ", hex((metadata >> 8) & 0xFF))
@@ -111,7 +118,8 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op):
         priv3 == priv3_ref and
         pub1 == pub1_ref and
         pub2 == pub2_ref and
-        metadata & 0xFF==key_type)
+        key_type_observed == key_type and
+        origin_observed == ecc_key_origin[op])
     ):
         return 1
 

@@ -26,6 +26,13 @@ ca_spect_res_word .eq 0x1100
 ecc_type_ed25519 .eq 0x02
 ecc_type_p256 .eq 0x01
 
+; ECC key origins values
+ecc_key_gen_l3_cmd_id .eq 0x60
+ecc_key_st_l3_cmd_id .eq 0x61
+ecc_key_origin_gen .eq 0x01
+ecc_key_origin_st .eq 0x02
+
+
 ; KBUS descriptors
 ecc_priv_key_1 .eq 0x400
 ecc_priv_key_2 .eq 0x401
