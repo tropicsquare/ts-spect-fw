@@ -85,7 +85,16 @@ ed25519_key_setup:
     ; Compose kpair metadata (origin, curve)
     LD          r0,  ca_spect_cfg_word
     MOVI        r4,  0xFF
-    AND         r9,  r0,  r4                    ; mask SPECT_OP_ID to r1[7:0]
+    AND         r9,  r0,  r4                    ; mask SPECT_OP_ID to r9[7:0]
+    CMPI        r9,  ecc_key_gen_l3_cmd_id
+    BRZ         ed25519_key_setup_origin_gen
+ed25519_key_setup_origin_st:
+    MOVI        r9,  ecc_key_origin_st
+    JMP         ed25519_key_setup_origin_continue
+ed25519_key_setup_origin_gen:
+    MOVI        r9,  ecc_key_origin_gen
+
+ed25519_key_setup_origin_continue:
     ROL8        r9,  r9
     ORI         r9,  r9,  ecc_type_ed25519
     STK         r9,  r26, ecc_key_metadata      ; store metadata
