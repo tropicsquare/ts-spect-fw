@@ -115,6 +115,8 @@ op_ecc_key_read:
     MOVI    r30, 0xFF
     AND     r30, r30, r2
 
+    MOVI    r26, 0
+
     ; load pubkey
     LDK     r16, r25, ecc_pub_key_Ax
     BRE     op_key_fail
@@ -123,7 +125,7 @@ op_ecc_key_read:
     BRNZ    ecc_key_read_skip_second_read
 
     ; load rest of p256 pubkey
-    LDK     r16, r25, ecc_pub_key_Ay
+    LDK     r17, r25, ecc_pub_key_Ay
     BRE     op_key_fail
 
 ecc_key_read_skip_second_read:
@@ -148,6 +150,8 @@ op_key_read_end:
     STR     r2,  r21
     ADDI    r22, r20, ecc_key_read_output_pub_key
     STR     r16, r22
+    ADDI    r22, r22, 0x20
+    STR     r17, r22
     MOVI    r1,  48
     MOVI    r0,  ret_op_success
     JMP     set_res_word
