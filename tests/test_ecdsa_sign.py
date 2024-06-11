@@ -81,7 +81,7 @@ if __name__ == "__main__":
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         tc.print_failed()
-        sys.exit(0)
+        sys.exit(1)
 
     # Read result
     l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
@@ -101,4 +101,4 @@ if __name__ == "__main__":
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm -r {test_dir}")
 
-    sys.exit(0), 
+    sys.exit(0)
