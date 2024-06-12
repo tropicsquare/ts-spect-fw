@@ -122,14 +122,12 @@ op_ecc_key_read:
     BRE     op_key_fail
 
     CMPI    r30,  ecc_type_p256
-    BRNZ    ecc_key_read_ed25519_swe
+    BRNZ    ecc_key_read_skip_second_read
 
     ; load rest of p256 pubkey
     LDK     r17, r25, ecc_pub_key_Ay
     BRE     op_key_fail
-    JMP     ecc_key_read_skip_second_read
-ecc_key_read_ed25519_swe:
-    SWE     r16, r16
+
 ecc_key_read_skip_second_read:
     KBO     r25, ecc_kbus_flush
     BRE     op_key_fail
@@ -151,8 +149,10 @@ op_key_fail:
 op_key_read_end:
     STR     r2,  r21
     ADDI    r22, r20, ecc_key_read_output_pub_key
+    SWE     r16, r16
     STR     r16, r22
     ADDI    r22, r22, 0x20
+    SWE     r17, r17
     STR     r17, r22
     MOVI    r1,  48
     MOVI    r0,  ret_op_success

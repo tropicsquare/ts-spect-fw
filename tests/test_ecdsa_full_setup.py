@@ -87,10 +87,9 @@ def key_read(test_dir, run_name, keymem, slot):
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    Ax = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
-    Ay = tc.read_output(test_dir, run_name, (outsrc<<12)+0x30, 8)
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16).to_bytes(64, 'little')
 
-    return Ax, Ay
+    return A
 
 if __name__ == "__main__":
 
@@ -119,6 +118,7 @@ if __name__ == "__main__":
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
 
     d, w, Ax_ref, Ay_ref = p256.key_gen(k)
+    A_ref = Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
 
     z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
 
@@ -133,40 +133,31 @@ if __name__ == "__main__":
     if sign == None: sys_exit(1)
     A = key_read(test_dir, run_name, keymem, slot)
     if A == None: sys_exit(1)
-    Ax = A[0]
-    Ay = A[1]
 
-    pub = Ax.to_bytes(32, 'big') + Ay.to_bytes(32, 'big')
+    print("=====================================================================")
+    print("k   :", k.hex())
+    print("sch :", sch.hex())
+    print("scn :", scn.hex())
+    print("=====================================================================")
+    print("d :", hex(d))
+    print("w :", w.hex())
+    print("=====================================================================")
+    print()
+    print("z:")
+    print(z.hex())
+    print()
 
-    #print("=====================================================================")
-    #print("k   :", k.hex())
-    #print("sch :", sch.hex())
-    #print("scn :", scn.hex())
-    #print("=====================================================================")
-    #print("d :", hex(d))
-    #print("w :", w.hex())
-    #print("=====================================================================")
-    #print()
-    #print("z:")
-    #print(z.hex())
-    #print()
-#
-    #print("=====================================================================")
-    #print("sign    :", sign.hex())
-    #print("sign ref:", sign_ref.hex())
-    #print("=====================================================================")
-    #print("Ax     :", hex(Ax))
-    #print("Ax ref :", hex(Ax_ref))
-    #print("=====================================================================")
-    #print("Ay     :", hex(Ay))
-    #print("Ay ref :", hex(Ay_ref))
-    #print("=====================================================================")
-    #print(pub.hex())
+    print("=====================================================================")
+    print("sign    :", sign.hex())
+    print("sign ref:", sign_ref.hex())
+    print("=====================================================================")
+    print("A       :", A.hex())
+    print("A ref   :", A_ref.hex())
+    print("=====================================================================")
 
     if not(
         sign == sign_ref and
-        Ax == Ax_ref and
-        Ay == Ay_ref
+        A == A_ref
     ): 
         tc.print_failed()
         sys.exit(1)

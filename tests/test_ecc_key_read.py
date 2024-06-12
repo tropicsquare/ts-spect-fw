@@ -90,6 +90,7 @@ if __name__ == "__main__":
 
     Ax_ref = rn.randint(1,2**256 - 1)
     Ay_ref = rn.randint(1,2**256 - 1)
+    A_ref = Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
     curve_ref = 0x01
     origin_ref = 0x02
 
@@ -126,8 +127,7 @@ if __name__ == "__main__":
 
     print(hex(tc.read_output(test_dir, run_name, (outsrc<<12), 4)))
 
-    Ax = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
-    Ay = tc.read_output(test_dir, run_name, (outsrc<<12)+0x30, 8)
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16).to_bytes(64, 'little')
 
     if (l3_result != 0xc3):
         #print("L3 RESULT:", hex(l3_result))
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         ret |= 2
 
     if not(curve == curve_ref and origin == origin_ref and
-           Ax == Ax_ref and Ay == Ay_ref):
+           A == A_ref):
         tc.print_failed()
         ret |= 2
 
