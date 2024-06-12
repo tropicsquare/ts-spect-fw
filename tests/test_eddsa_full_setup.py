@@ -286,8 +286,7 @@ if __name__ == "__main__":
 
     test_dir = tc.make_test_dir(test_name)
 
-    #k = rn.randint(0, 2**256 - 1).to_bytes(32, 'little')
-    k = b'd\x86xC+^\xc7E\xe9\xe9!\xef%\xc7H\x10\xe1\x85\xc6\xf0^\xfb\xe8\x84\x9d\xea\x83\xa6\xc0\x1a\x95\xb6'
+    k = rn.randint(0, 2**256 - 1).to_bytes(32, 'little')
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
     slot = rn.randint(0, 7)
@@ -306,27 +305,27 @@ if __name__ == "__main__":
     A = key_read(test_dir, run_name, keymem, slot)
     if A == None: sys.exit(1)
 
-    print("=====================================================================")
-    print("k   :", k.hex())
-    print("sch :", sch.hex())
-    print("scn :", scn.hex())
-    print("=====================================================================")
-    print("s      :", hex(s))
-    print("prefix :", prefix.hex())
-    print("=====================================================================")
-    print()
-    print("message:")
-    print(message.hex())
-    print()
-
-    print("=====================================================================")
-    print("sign    :", sign.hex())
-    print("sign ref:", sign_ref.hex())
-    print("=====================================================================")
-    print("A    :", A.hex())
-    print("A ref:", A_ref.hex())
-    print("=====================================================================")
-    print()
+    #print("=====================================================================")
+    #print("k   :", k.hex())
+    #print("sch :", sch.hex())
+    #print("scn :", scn.hex())
+    #print("=====================================================================")
+    #print("s      :", hex(s))
+    #print("prefix :", prefix.hex())
+    #print("=====================================================================")
+    #print()
+    #print("message:")
+    #print(message.hex())
+    #print()
+#
+    #print("=====================================================================")
+    #print("sign    :", sign.hex())
+    #print("sign ref:", sign_ref.hex())
+    #print("=====================================================================")
+    #print("A    :", A.hex())
+    #print("A ref:", A_ref.hex())
+    #print("=====================================================================")
+    #print()
 
     if not(
         sign == sign_ref and

@@ -113,8 +113,7 @@ if __name__ == "__main__":
 
     slot = rn.randint(0, 7)
 
-    #k = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    k = b'D\x13+\xcb\xb9\x10\xb8\xc2\xc7\xd2\xd6\xb8\x19i\x9a\\\x05K\xa2~\x87\x1f\x93\xf5\xe6\x9e\xa9~\x83\x05\n\xcf'
+    k = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
 
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
