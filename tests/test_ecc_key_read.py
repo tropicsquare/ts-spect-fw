@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     A_ref = rn.randint(1,2**256 - 1)
     curve_ref = 0x02
-    origin_ref = 0x60
+    origin_ref = 0x01
 
     slot = rn.randint(0, 127)
     pubkey_slot = (slot << 1)+1
@@ -65,16 +65,14 @@ if __name__ == "__main__":
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8, string=True)
 
     if (l3_result != 0xc3):
-        #print("L3 RESULT:", hex(l3_result))
+        print("L3 RESULT:", hex(l3_result))
         ret |= 1
 
-    if not(curve == curve_ref and origin == origin_ref and A == A_ref):
-        #print("curve:   ", hex(curve))
-        #print("origin:  ", hex(origin))
-        #print("A:       ", hex(A))
+    # Note: SPECT handles byte string naturally in big-endian order so the debug is easier
+    if not(curve == curve_ref and origin == origin_ref and A == A_ref.to_bytes(32, 'big')):
         ret |= 1
 
     if not(ret & 1):
@@ -92,8 +90,9 @@ if __name__ == "__main__":
 
     Ax_ref = rn.randint(1,2**256 - 1)
     Ay_ref = rn.randint(1,2**256 - 1)
+    A_ref = Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
     curve_ref = 0x01
-    origin_ref = 0x61
+    origin_ref = 0x02
 
     slot = rn.randint(0, 127)
     pubkey_slot = (slot << 1)+1
@@ -126,19 +125,17 @@ if __name__ == "__main__":
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    Ax = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
-    Ay = tc.read_output(test_dir, run_name, (outsrc<<12)+0x30, 8)
+    print(hex(tc.read_output(test_dir, run_name, (outsrc<<12), 4)))
+
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16).to_bytes(64, 'little')
 
     if (l3_result != 0xc3):
         #print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
         ret |= 2
 
-    if not(curve == curve_ref and origin == origin_ref and A == A_ref):
-        #print("curve:   ", hex(curve))
-        #print("origin:  ", hex(origin))
-        #print("Ax:      ", hex(Ax))
-        #print("Ay:      ", hex(Ay))
+    if not(curve == curve_ref and origin == origin_ref and
+           A == A_ref):
         tc.print_failed()
         ret |= 2
 

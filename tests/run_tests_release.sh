@@ -8,6 +8,8 @@ tests=(\
     "ecc_key_erase" \
     "ecdsa_sign" \
     "eddsa_sequence" \
+    "eddsa_full_setup" \
+    "ecdsa_full_setup" \
     "x25519_dbg" \
     "eddsa_dbg" \
     "ecdsa_dbg" \
