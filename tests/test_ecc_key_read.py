@@ -65,16 +65,14 @@ if __name__ == "__main__":
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8)
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8, string=True)
 
     if (l3_result != 0xc3):
-        #print("L3 RESULT:", hex(l3_result))
+        print("L3 RESULT:", hex(l3_result))
         ret |= 1
 
-    if not(curve == curve_ref and origin == origin_ref and A == A_ref):
-        #print("curve:   ", hex(curve))
-        #print("origin:  ", hex(origin))
-        #print("A:       ", hex(A))
+    # Note: SPECT handles byte string naturally in big-endian order so the debug is easier
+    if not(curve == curve_ref and origin == origin_ref and A == A_ref.to_bytes(32, 'big')):
         ret |= 1
 
     if not(ret & 1):
