@@ -116,6 +116,7 @@ op_ecc_key_read:
     AND     r30, r30, r2
 
     MOVI    r26, 0
+    MOVI    r1,  48     ; data out size 16 + 32
 
     ; load pubkey
     LDK     r16, r25, ecc_pub_key_Ax
@@ -124,6 +125,7 @@ op_ecc_key_read:
     CMPI    r30,  ecc_type_p256
     BRNZ    ecc_key_read_skip_second_read
 
+    MOVI    r1,  80     ; add another 32 byte to data out size for P-256
     ; load rest of p256 pubkey
     LDK     r17, r25, ecc_pub_key_Ay
     BRE     op_key_fail
@@ -154,7 +156,7 @@ op_key_read_end:
     ADDI    r22, r22, 0x20
     SWE     r17, r17
     STR     r17, r22
-    MOVI    r1,  48
+    ;MOVI    r1,  48
     MOVI    r0,  ret_op_success
     JMP     set_res_word
 
