@@ -197,7 +197,6 @@ eddsa_sign_verify_continue_dbladd:
     BRNZ        ecdsa_fail_verify
 
     MOVI        r3,  ret_op_success
-    MOVI        r1,  48
 
 ecdsa_sign_end:
     CALL        get_output_base
@@ -205,7 +204,9 @@ ecdsa_sign_end:
     ADDI        r30, r0,  ecdsa_output_result
     STR         r2,  r30
     CMPI        r3,  ret_op_success
+    MOVI        r1,  1
     BRNZ        ecdsa_sign_end_not_store
+    MOVI        r1,  80
 
     ADDI        r30, r0,  ecdsa_sign_output_signature
     SWE         r22, r22

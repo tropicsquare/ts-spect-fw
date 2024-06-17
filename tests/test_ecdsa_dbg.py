@@ -91,7 +91,12 @@ if __name__ == "__main__":
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         tc.print_failed()
-        sys.exit(0)
+        sys.exit(1)
+
+    if (SPECT_OP_DATA_OUT_SIZE != 80):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        tc.print_failed()
+        sys.exit(1)
 
     # Read result
     l3_result = tc.read_output(test_dir, run_name, outsrc<<12, 1)
