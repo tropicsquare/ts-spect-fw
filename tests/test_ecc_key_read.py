@@ -172,7 +172,12 @@ if __name__ == "__main__":
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS != 0xF2):
-        #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        tc.print_failed()
+        ret |= 4
+
+    if (SPECT_OP_DATA_OUT_SIZE != 1):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
         tc.print_failed()
         ret |= 4
 
