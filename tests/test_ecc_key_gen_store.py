@@ -63,6 +63,10 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 1
 
+    if (SPECT_OP_DATA_OUT_SIZE != 1):
+        print("SPECT_OP_DATA_OUT_SIZE:", hex(SPECT_OP_DATA_OUT_SIZE))
+        return 1
+
     kmem_data, kmem_slots = tc.parse_key_mem(test_dir, run_name)
 
     if not kmem_slots[0x4][slot<<1]:
