@@ -60,6 +60,9 @@ if __name__ == "__main__":
         #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         ret |= 1
 
+    if (SPECT_OP_DATA_OUT_SIZE != 48):
+        ret |= 2
+
     tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
     curve = (tmp >> 8) & 0xFF
@@ -116,8 +119,9 @@ if __name__ == "__main__":
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        tc.print_failed()
+        ret |= 2
+
+    if (SPECT_OP_DATA_OUT_SIZE != 80):
         ret |= 2
 
     tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)

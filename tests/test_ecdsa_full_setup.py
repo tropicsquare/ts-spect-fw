@@ -82,12 +82,14 @@ def key_read(test_dir, run_name, keymem, slot):
     if (SPECT_OP_STATUS):
         return None
 
+    key_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
+
     tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16).to_bytes(64, 'little')
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, key_size).to_bytes(key_size*4, 'little')
 
     return A
 
