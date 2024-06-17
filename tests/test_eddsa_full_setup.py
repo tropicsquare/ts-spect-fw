@@ -265,12 +265,14 @@ def key_read(test_dir, run_name, keymem, slot):
     if (SPECT_OP_STATUS):
         return None
 
+    key_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
+
     tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8).to_bytes(32, 'little')
+    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, key_size).to_bytes(key_size*4, 'little')
 
     return A
 
@@ -305,27 +307,27 @@ if __name__ == "__main__":
     A = key_read(test_dir, run_name, keymem, slot)
     if A == None: sys.exit(1)
 
-    #print("=====================================================================")
-    #print("k   :", k.hex())
-    #print("sch :", sch.hex())
-    #print("scn :", scn.hex())
-    #print("=====================================================================")
-    #print("s      :", hex(s))
-    #print("prefix :", prefix.hex())
-    #print("=====================================================================")
-    #print()
-    #print("message:")
-    #print(message.hex())
-    #print()
-#
-    #print("=====================================================================")
-    #print("sign    :", sign.hex())
-    #print("sign ref:", sign_ref.hex())
-    #print("=====================================================================")
-    #print("A    :", A.hex())
-    #print("A ref:", A_ref.hex())
-    #print("=====================================================================")
-    #print()
+    print("=====================================================================")
+    print("k   :", k.hex())
+    print("sch :", sch.hex())
+    print("scn :", scn.hex())
+    print("=====================================================================")
+    print("s      :", hex(s))
+    print("prefix :", prefix.hex())
+    print("=====================================================================")
+    print()
+    print("message:")
+    print(message.hex())
+    print()
+
+    print("=====================================================================")
+    print("sign    :", sign.hex())
+    print("sign ref:", sign_ref.hex())
+    print("=====================================================================")
+    print("A    :", A.hex())
+    print("A ref:", A_ref.hex())
+    print("=====================================================================")
+    print()
 
     if not(
         sign == sign_ref and
