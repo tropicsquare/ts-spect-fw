@@ -171,6 +171,7 @@ op_ecc_key_erase:
     BRE     op_key_fail
     KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
+    KBO     r25, ecc_kbus_flush
 
     ADDI    r25, r25, 1
 
@@ -181,6 +182,7 @@ op_ecc_key_erase:
     BRE     op_key_fail
     KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
+    KBO     r25, ecc_kbus_flush
 
     ROL8    r2,  r2
     ORI     r2,  r2,  l3_result_ok
