@@ -108,7 +108,7 @@ eddsa_finish_s_randomize:
     STR         r5,  r30
 
     MOVI        r0,  ret_op_success
-    MOVI        r1,  48
+    MOVI        r1,  80
     JMP         set_res_word
 
 eddsa_finish_randomize_fail:
