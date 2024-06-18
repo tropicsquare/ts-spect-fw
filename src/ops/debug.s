@@ -52,5 +52,6 @@ op_eddsa_set_context_dbg:
     ST      r0,  ca_eddsa_sign_internal_smodq
 
     MOVI    r0,  ret_op_success
+    MOVI    r1,  0
     JMP     set_res_word
     

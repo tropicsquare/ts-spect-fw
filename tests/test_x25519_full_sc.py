@@ -64,6 +64,11 @@ if __name__ == "__main__":
         tc.print_failed()
         sys.exit(1)
 
+    if (SPECT_OP_DATA_OUT_SIZE != 32):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        tc.print_failed()
+        sys.exit(1)
+
     etpub = tc.read_output(test_dir, "x25519_kpair_gen", 0x1020, SPECT_OP_DATA_OUT_SIZE//4)
 
     if (not(etpub_ref == etpub)):
@@ -91,6 +96,11 @@ if __name__ == "__main__":
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        tc.print_failed()
+        sys.exit(1)
+
+    if (SPECT_OP_DATA_OUT_SIZE != 32):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
         tc.print_failed()
         sys.exit(1)
 
@@ -127,6 +137,11 @@ if __name__ == "__main__":
         tc.print_failed()
         sys.exit(1)
 
+    if (SPECT_OP_DATA_OUT_SIZE != 32):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        tc.print_failed()
+        sys.exit(1)
+
     R2 = tc.read_output(test_dir, "x25519_sc_et_sh", 0x1020, SPECT_OP_DATA_OUT_SIZE//4)
 
     if (not(R2_ref == R2)):
@@ -154,6 +169,11 @@ if __name__ == "__main__":
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        tc.print_failed()
+        sys.exit(1)
+
+    if (SPECT_OP_DATA_OUT_SIZE != 32):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
         tc.print_failed()
         sys.exit(1)
 

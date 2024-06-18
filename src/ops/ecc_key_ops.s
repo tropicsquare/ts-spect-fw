@@ -92,7 +92,7 @@ ecc_key_gen_p256_call_ok:
 op_key_setup_end:
     CALL    get_output_base
     ADDI    r0,  r0,  ecc_key_output_result
-    MOVI    r1,  0
+    MOVI    r1,  1
     STR     r2,  r0
     MOV     r0,  r3
     JMP     set_res_word
@@ -178,19 +178,15 @@ op_ecc_key_erase:
     ADDI    r25, r25, 1
 
     ; Erase pub key slot
-    LDK     r2,  r25, ecc_key_metadata
-    BRE     op_key_fail
     KBO     r25, ecc_kbus_erase
     BRE     op_key_fail
     KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
     KBO     r25, ecc_kbus_flush
 
-    ROL8    r2,  r2
-    ORI     r2,  r2,  l3_result_ok
-
+    MOVI    r2,  l3_result_ok
     STR     r2,  r21
 
-    MOVI    r1,  3
+    MOVI    r1,  1
     MOVI    r0,  ret_op_success
     JMP     set_res_word

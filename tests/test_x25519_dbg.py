@@ -55,6 +55,11 @@ if __name__ == "__main__":
         tc.print_failed()
         sys.exit(1)
 
+    if (SPECT_OP_DATA_OUT_SIZE != 32):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        tc.print_failed()
+        sys.exit(1)
+
     R = tc.read_output(test_dir, run_name, 0x1020, SPECT_OP_DATA_OUT_SIZE//4)
 
     if (not(R_ref == R)):

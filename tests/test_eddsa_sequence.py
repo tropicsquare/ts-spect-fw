@@ -51,6 +51,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 0
 
+    if (SPECT_OP_DATA_OUT_SIZE != 0):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        return 0
+
     ########################################################################################################
     #   Nonce Init
     ########################################################################################################
@@ -69,6 +73,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        return 0
+
+    if (SPECT_OP_DATA_OUT_SIZE != 0):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
         return 0
 
     ########################################################################################################
@@ -94,6 +102,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
             return 0
 
+        if (SPECT_OP_DATA_OUT_SIZE != 0):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+            return 0
+
     ########################################################################################################
     #   Nonce Update
     ########################################################################################################
@@ -113,6 +125,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        return 0
+
+    if (SPECT_OP_DATA_OUT_SIZE != 0):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
         return 0
 
     ########################################################################################################
@@ -135,6 +151,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 0
 
+    if (SPECT_OP_DATA_OUT_SIZE != 0):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        return 0
+
     if len(message) < 64:
         ########################################################################################################
         #   E at once
@@ -153,6 +173,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 0
+
+        if (SPECT_OP_DATA_OUT_SIZE != 0):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
             return 0
     else:
         ########################################################################################################
@@ -174,6 +198,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 0
+
+        if (SPECT_OP_DATA_OUT_SIZE != 0):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
             return 0
 
         ########################################################################################################
@@ -199,6 +227,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
                 print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
                 return 0
 
+            if (SPECT_OP_DATA_OUT_SIZE != 0):
+                print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+                return 0
+
         ########################################################################################################
         #   E Finish
         ########################################################################################################
@@ -218,6 +250,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 0
+
+        if (SPECT_OP_DATA_OUT_SIZE != 0):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
             return 0
 
     ########################################################################################################
@@ -240,6 +276,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 0
 
+    if (SPECT_OP_DATA_OUT_SIZE != 80):
+        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+        return 0
+
     ########################################################################################################
     #   Read and Check
     ########################################################################################################
@@ -249,7 +289,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     #print("signature_ref:", sign_ref.hex())
 
-    signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16, string=True)
+    signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, (SPECT_OP_DATA_OUT_SIZE-16)//4, string=True)
     #print("signature:    ", signature.hex())
 
     return sign_ref == signature

@@ -83,11 +83,13 @@ if __name__ == "__main__":
         tc.print_failed()
         sys.exit(1)
 
+    sing_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
+
     # Read result
     l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result &= 0xFF
 
-    signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16, string=True)
+    signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, sing_size, string=True)
 
     #print(signature_ref.hex())
     #print(signature.hex())

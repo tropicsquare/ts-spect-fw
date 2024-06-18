@@ -66,4 +66,6 @@ clear_data_out_loop:
     HASH_IT
     TMAC_IT r0
 
-    END
+    MOVI    r1, 0
+    MOVI    r0, 0
+    JMP     set_res_word
