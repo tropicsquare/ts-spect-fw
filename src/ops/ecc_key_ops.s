@@ -178,19 +178,15 @@ op_ecc_key_erase:
     ADDI    r25, r25, 1
 
     ; Erase pub key slot
-    LDK     r2,  r25, ecc_key_metadata
-    BRE     op_key_fail
     KBO     r25, ecc_kbus_erase
     BRE     op_key_fail
     KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
     KBO     r25, ecc_kbus_flush
 
-    ROL8    r2,  r2
-    ORI     r2,  r2,  l3_result_ok
-
+    MOVI    r2,  l3_result_ok
     STR     r2,  r21
 
-    MOVI    r1,  3
+    MOVI    r1,  1
     MOVI    r0,  ret_op_success
     JMP     set_res_word

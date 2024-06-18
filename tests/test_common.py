@@ -161,7 +161,7 @@ def set_cfg_word(cmd_file, cfg_word):
 def get_res_word(test_dir, run_name):
     res_word = read_output(test_dir, run_name, 0x1100, 1)
     SPECT_OP_STATUS = res_word & 0xFF
-    SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFF
+    SPECT_OP_DATA_OUT_SIZE = (res_word >> 16) & 0xFFFF
     return SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE
 
 def parse_context(test_dir, run_name):
