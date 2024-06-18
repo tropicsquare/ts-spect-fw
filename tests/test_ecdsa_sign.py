@@ -89,6 +89,11 @@ if __name__ == "__main__":
     l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result &= 0xFF
 
+    if (l3_result != 0xc3):
+        print("L3 RESULT:", hex(l3_result))
+        tc.print_failed()
+        sys.exit(1)
+
     signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, sing_size, string=True)
 
     #print(signature_ref.hex())

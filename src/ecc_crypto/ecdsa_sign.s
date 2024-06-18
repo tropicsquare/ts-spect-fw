@@ -197,7 +197,7 @@ eddsa_sign_verify_continue_dbladd:
     BRNZ        ecdsa_fail_verify
 
     MOVI        r3,  ret_op_success
-
+    MOVI        r2,  l3_result_ok
 ecdsa_sign_end:
     CALL        get_output_base
 

@@ -284,8 +284,13 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     #   Read and Check
     ########################################################################################################
 
-    result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+    l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     #print("result:", hex(result))
+
+    if (l3_result != 0xc3):
+        print("L3 RESULT:", hex(l3_result))
+        tc.print_failed()
+        sys.exit(1)
 
     #print("signature_ref:", sign_ref.hex())
 

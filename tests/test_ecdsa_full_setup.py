@@ -36,6 +36,11 @@ def ecdsa_sign(test_dir, run_name, keymem, slot, sch, scn, z):
     l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result &= 0xFF
 
+    if (l3_result != 0xc3):
+        print("L3 RESULT:", hex(l3_result))
+        tc.print_failed()
+        sys.exit(1)
+
     return tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16, string=True)
 
 def key_store(test_dir, run_name, slot, k):
@@ -59,9 +64,9 @@ def key_store(test_dir, run_name, slot, k):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 1
     
-    if (SPECT_OP_DATA_OUT_SIZE != 0):
+    if (SPECT_OP_DATA_OUT_SIZE != 1):
         print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        return 0
+        return 1
 
     l3_result = tc.read_output(test_dir, run_name, (outsrc << 12), 1)
     l3_result &= 0xFF
@@ -88,6 +93,7 @@ def key_read(test_dir, run_name, keymem, slot):
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
+        print("SPECT_OP_STATUS:", SPECT_OP_STATUS)
         return None
 
     if (SPECT_OP_DATA_OUT_SIZE != 80):
@@ -148,26 +154,26 @@ if __name__ == "__main__":
     A = key_read(test_dir, run_name, keymem, slot)
     if A == None: sys_exit(1)
 
-    print("=====================================================================")
-    print("k   :", k.hex())
-    print("sch :", sch.hex())
-    print("scn :", scn.hex())
-    print("=====================================================================")
-    print("d :", hex(d))
-    print("w :", w.hex())
-    print("=====================================================================")
-    print()
-    print("z:")
-    print(z.hex())
-    print()
-
-    print("=====================================================================")
-    print("sign    :", sign.hex())
-    print("sign ref:", sign_ref.hex())
-    print("=====================================================================")
-    print("A       :", A.hex())
-    print("A ref   :", A_ref.hex())
-    print("=====================================================================")
+    #print("=====================================================================")
+    #print("k   :", k.hex())
+    #print("sch :", sch.hex())
+    #print("scn :", scn.hex())
+    #print("=====================================================================")
+    #print("d :", hex(d))
+    #print("w :", w.hex())
+    #print("=====================================================================")
+    #print()
+    #print("z:")
+    #print(z.hex())
+    #print()
+#
+    #print("=====================================================================")
+    #print("sign    :", sign.hex())
+    #print("sign ref:", sign_ref.hex())
+    #print("=====================================================================")
+    #print("A       :", A.hex())
+    #print("A ref   :", A_ref.hex())
+    #print("=====================================================================")
 
     if not(
         sign == sign_ref and
