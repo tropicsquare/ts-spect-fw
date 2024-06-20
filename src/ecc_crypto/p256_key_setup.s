@@ -17,7 +17,8 @@
 ;   3) A = d.G
 ;
 ; Input:
-;   seed k in r19
+;   input src in r0
+;   generate / store command in r1
 ;   physical priv key slot in r25
 ;   physical pub key slot in r26
 ;
@@ -30,29 +31,36 @@
 ; ==============================================================================
 
 p256_key_setup:
-    LD r31, ca_q256
+    LD      r31, ca_q256
 
-; ==============================================================================
-;   Reduce k mod q
-; ==============================================================================
+    CMPI    r1, ecc_key_gen_id
+    BRZ     p256_key_setup_generate_k
+    ADDI    r4,  r0,  ecc_key_store_input_k
+    LDR     r19, r4
     SWE     r19, r19
-    MOVI    r1,  0
-    REDP    r28, r1,  r19
+    MOVI    r20,  0
+    REDP    r28, r20, r19
 
-    XORI    r1,  r28, 0
+    XOR     r1,  r28, r19
+    BRNZ    p256_key_setup_fail
+    JMP     p256_key_setup_start
 
-    BRZ p256_key_setup_fail
+p256_key_setup_generate_k:
+    GRV     r19
+    GRV     r20
+    REDP    r28, r20, r19
 
 ; ==============================================================================
 ;   Compute w = TMAC(d, "", 0xA)
 ; ==============================================================================
+p256_key_setup_start:
     GRV     r0
     GRV     r1
     GRV     r2
     GRV     r3
 
     TMAC_IT r0
-    SWE     r20, r19
+    SWE     r20, r28
     TMAC_IS r20, tmac_dst_ecdsa_key_setup
 
     MOVI    r2,  0x04

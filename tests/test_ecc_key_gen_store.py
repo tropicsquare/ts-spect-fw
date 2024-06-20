@@ -17,7 +17,7 @@ ecc_key_origin = {
 def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False):
     cmd_file = tc.get_cmd_file(test_dir)
 
-    rng = [rn.randint(0, 2**256-1) for i in range(8)]
+    rng = [rn.randint(0, 2**256-1) for i in range(10)]
     tc.set_rng(test_dir, rng)
 
     k = rng[0].to_bytes(32, 'little')
@@ -44,6 +44,8 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
         #print("prefix:  ", hex(priv2_ref))
         #print("A:       ", hex(pub1_ref))
     else:
+        if op == "ecc_key_gen":
+            k = rng[1].to_bytes(32, 'big') + rng[0].to_bytes(32, 'big')
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
         priv2_ref = int.from_bytes(priv2_ref, 'big')
         priv3_ref = 0
@@ -115,23 +117,23 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
             key_type_observed == key_type and
             origin_observed == ecc_key_origin[op])
         ):
+            print("Curve:  ", hex(metadata & 0xFF))
+            print("Origin: ", hex((metadata >> 8) & 0xFF))
+            print("priv1:    ", hex(priv1))
+            print("priv1_ref:", hex(priv1_ref))
+            print()
+            print("priv2:    ", hex(priv2))
+            print("priv2_ref:", hex(priv2_ref))
+            print()
+            print("pub1:     ", hex(pub1))
+            print("pub1_ref: ", hex(pub1_ref))
+            print()
+            print("pub2:     ", hex(pub2))
+            print("pub2_ref: ", hex(pub2_ref))
+            print()
             return 1
 
-        #print("Curve:  ", hex(metadata & 0xFF))
-        #print("Origin: ", hex((metadata >> 8) & 0xFF))
 
-        #print("priv1:    ", hex(priv1))
-        #print("priv1_ref:", hex(priv1_ref))
-        #print()
-        #print("priv2:    ", hex(priv2))
-        #print("priv2_ref:", hex(priv2_ref))
-        #print()
-        #print("pub1:     ", hex(pub1))
-        #print("pub1_ref: ", hex(pub1_ref))
-        #print()
-        #print("pub2:     ", hex(pub2))
-        #print("pub2_ref: ", hex(pub2_ref))
-        #print()
 
     l3_result = tc.read_output(test_dir, run_name, (outsrc << 12), 1)
     l3_result &= 0xFF
