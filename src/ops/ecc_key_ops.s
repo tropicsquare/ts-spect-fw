@@ -142,11 +142,9 @@ ecc_key_read_skip_second_read:
 
 op_key_fail:
     MOVI    r2,  l3_result_fail
-    STR     r2,  r21
-    MOVI    r1,  1
+    MOVI    r3,  ret_key_err
     KBO     r25, ecc_kbus_flush
-    MOVI    r0,  ret_key_err
-    JMP     set_res_word
+    JMP     op_key_setup_end
 
 op_key_read_end:
     STR     r2,  r21

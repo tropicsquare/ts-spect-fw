@@ -134,10 +134,11 @@ ed25519_key_setup_origin_continue:
     RET
 
 ed25519_key_setup_spm_fail:
+    KBO         r26, ecc_kbus_flush
     MOVI        r3, ret_point_integrity_err
     RET
 
 ed25519_key_setup_kbus_fail:
-    KBO         r26, ecc_kbus_verify_erase
+    KBO         r26, ecc_kbus_flush
     MOVI        r3, ret_key_err
     RET

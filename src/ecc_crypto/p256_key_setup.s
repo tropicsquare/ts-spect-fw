@@ -46,6 +46,10 @@ p256_key_setup:
 ; ==============================================================================
 ;   Compute w = TMAC(d, "", 0xA)
 ; ==============================================================================
+    GRV     r0
+    GRV     r1
+    GRV     r2
+    GRV     r3
 
     TMAC_IT r0
     SWE     r20, r19
@@ -152,5 +156,6 @@ p256_key_setup_fail:
     RET
 
 p256_key_setup_spm_fail:
+    KBO     r26, ecc_kbus_flush
     MOVI    r3,  ret_point_integrity_err
     RET
