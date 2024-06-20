@@ -43,6 +43,8 @@ p256_key_setup:
 
     XOR     r1,  r28, r19
     BRNZ    p256_key_setup_fail
+    XORI    r1,  r28, 0
+    BRZ     p256_key_setup_fail
     JMP     p256_key_setup_start
 
 p256_key_setup_generate_k:

@@ -17,7 +17,7 @@ ecc_key_origin = {
 def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False):
     cmd_file = tc.get_cmd_file(test_dir)
 
-    rng = [rn.randint(0, 2**256-1) for i in range(10)]
+    rng = [rn.randint(1, 2**256-1) for i in range(10)]
     tc.set_rng(test_dir, rng)
 
     k = rng[0].to_bytes(32, 'little')
@@ -46,6 +46,8 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
     else:
         if op == "ecc_key_gen":
             k = rng[1].to_bytes(32, 'big') + rng[0].to_bytes(32, 'big')
+        else:
+            k = (rng[0] % p256.q).to_bytes(32, 'little')
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
         priv2_ref = int.from_bytes(priv2_ref, 'big')
         priv3_ref = 0
