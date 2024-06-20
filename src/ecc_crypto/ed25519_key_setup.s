@@ -32,6 +32,15 @@
 ; ==============================================================================
 
 ed25519_key_setup:
+    CMPI    r1, ecc_key_gen_id
+    BRZ     ed25519_key_setup_generate_k
+    ADDI    r4,  r0,  ecc_key_store_input_k
+    LDR     r19, r4
+    JMP     ed25519_key_setup_start
+
+ed25519_key_setup_generate_k:
+    GRV     r19
+ed25519_key_setup_start:
     ; Add padding to k
     MOVI        r18, 1
     ROR         r18, r18

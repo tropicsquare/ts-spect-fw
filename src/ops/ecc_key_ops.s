@@ -54,19 +54,8 @@ op_ecc_key_gen_store:
     MOVI    r2, l3_result_fail
     JMP     op_key_setup_end
 
-ecc_key_get_k:
-    CMPI    r1, ecc_key_gen_id
-    BRZ     ecc_key_generate_k
-    ADDI    r4,  r0,  ecc_key_store_input_k
-    LDR     r19, r4
-    RET
-
-ecc_key_generate_k:
-    GRV     r19
-    RET
-
 ecc_key_gen_ed25519_call:
-    CALL    ecc_key_get_k
+    ;CALL    ecc_key_get_k
     CALL    ed25519_key_setup
     CMPI    r3,  0
     BRZ     ecc_key_gen_ed25519_call_ok
@@ -78,7 +67,7 @@ ecc_key_gen_ed25519_call_ok:
     JMP     op_key_setup_end
 
 ecc_key_gen_p256_call:
-    CALL    ecc_key_get_k
+    ;CALL    ecc_key_get_k
     CALL    p256_key_setup
     CMPI    r3,  0
     BRZ     ecc_key_gen_p256_call_ok

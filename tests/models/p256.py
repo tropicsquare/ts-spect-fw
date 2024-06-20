@@ -53,7 +53,7 @@ def spm(k, x, y):
     return xQ, yQ
 
 def key_gen(k):
-    d = int.from_bytes(k, 'big') % p
+    d = int.from_bytes(k, 'big') % q
     db = d.to_bytes(32, 'little')
     w = tmac(db, b"", b"\x0A")
     Ax, Ay = spm(d, xG, yG)
