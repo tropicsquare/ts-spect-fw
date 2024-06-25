@@ -26,25 +26,25 @@ op_ecdsa_sign:
     ORI     r25, r25, 1                 ; pub key slot
 
     LDK     r5,  r25, ecc_key_metadata
-    BRE     ecdsa_sign_key_fail
+    BRE     ecdsa_sign_kbus_err_fail
     ANDI    r5,  r5,  0xFF
     CMPI    r5,  ecc_type_p256
     BRNZ    ecdsa_sign_curve_type_fail
 
     LDK     r5,  r25, ecc_pub_key_Ax
-    BRE     ecdsa_sign_key_fail
+    BRE     ecdsa_sign_kbus_err_fail
     ST      r5,  ca_ecdsa_sign_internal_Ax
     LDK     r5,  r25, ecc_pub_key_Ay
-    BRE     ecdsa_sign_key_fail
+    BRE     ecdsa_sign_kbus_err_fail
     ST      r5,  ca_ecdsa_sign_internal_Ay
     KBO     r25, ecc_kbus_flush
 
     SUBI    r25, r25, 1
 
     LDK     r26, r25, ecc_priv_key_1     ; Load privkey part d
-    BRE     ecdsa_sign_key_fail
+    BRE     ecdsa_sign_kbus_err_fail
     LDK     r20, r25, ecc_priv_key_2     ; Load privkey part w
-    BRE     ecdsa_sign_key_fail
+    BRE     ecdsa_sign_kbus_err_fail
     KBO     r25, ecc_kbus_flush
 
     ADDI    r4,  r0,  ecdsa_input_message
@@ -58,9 +58,15 @@ op_ecdsa_sign:
 
 ecdsa_sign_curve_type_fail:
     MOVI    r3,  ret_curve_type_err
-    JMP     ecdsa_sign_fail
-
-ecdsa_sign_key_fail:
-    KBO     r25, ecc_kbus_flush
+    JMP     ecdsa_sign_invalid_key_fail
+ecdsa_sign_kbus_err_fail:
     MOVI    r3,  ret_key_err
-    JMP     ecdsa_sign_fail
+ecdsa_sign_invalid_key_fail:
+    KBO     r25, ecc_kbus_flush
+    CALL    get_output_base
+    ADDI    r30, r0,  ecdsa_output_result
+    MOVI    r2,  l3_result_invalid_key
+    STR     r2,  r30
+    MOV     r0,  r3
+    MOVI    r1,  1
+    JMP     set_res_word

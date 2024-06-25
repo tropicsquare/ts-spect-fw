@@ -26,15 +26,19 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
-    prefix_int = int.from_bytes(prefix, 'big')
-    tc.set_key(cmd_file, key=s,          ktype=0x04, slot=(slot<<1), offset=0)
-    tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=8)
-    tc.set_key(cmd_file, key=smodq      ,ktype=0x04, slot=(slot<<1), offset=16)
+    if run_name_suffix != "_empty_slot":
+        prefix_int = int.from_bytes(prefix, 'big')
+        tc.set_key(cmd_file, key=s,          ktype=0x04, slot=(slot<<1), offset=0)
+        tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=8)
+        tc.set_key(cmd_file, key=smodq      ,ktype=0x04, slot=(slot<<1), offset=16)
 
-    metadata = tc.Ed25519_ID
-    tc.set_key(cmd_file, key=metadata,  ktype=0x04, slot=(slot<<1)+1, offset=0)
-    A_int = int.from_bytes(A, 'big')
-    tc.set_key(cmd_file, key=A_int,     ktype=0x04, slot=(slot<<1)+1, offset=8)
+        if run_name_suffix != "_invalid_curve":
+            metadata = tc.Ed25519_ID
+        else:
+            metadata = tc.P256_ID
+        tc.set_key(cmd_file, key=metadata,  ktype=0x04, slot=(slot<<1)+1, offset=0)
+        A_int = int.from_bytes(A, 'big')
+        tc.set_key(cmd_file, key=A_int,     ktype=0x04, slot=(slot<<1)+1, offset=8)
 
     input_word = (slot << 8) + tc.find_in_list("eddsa_set_context", ops_cfg)["id"]
 
@@ -47,9 +51,16 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
-    if (SPECT_OP_STATUS):
+    print("run_name_suffix", run_name_suffix, "SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+    if ((run_name_suffix == "_empty_slot"      and SPECT_OP_STATUS != 0xF2) or
+        (run_name_suffix == "_invalid_curve"   and SPECT_OP_STATUS != 0xF4) or
+        (run_name_suffix in ["_small", "_big"] and SPECT_OP_STATUS != 0x00)):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 0
+
+    if ((run_name_suffix == "_empty_slot"      and SPECT_OP_STATUS == 0xF2) or
+        (run_name_suffix == "_invalid_curve"   and SPECT_OP_STATUS == 0xF4)):
+        return 1
 
     if (SPECT_OP_DATA_OUT_SIZE != 0):
         print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
@@ -290,7 +301,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     if (l3_result != 0xc3):
         print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
-        sys.exit(1)
+        return 1
 
     #print("signature_ref:", sign_ref.hex())
 
@@ -343,6 +354,18 @@ if __name__ == "__main__":
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
     if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_small"):
+        tc.print_failed()
+        ret = 1
+    else:
+        tc.print_passed()
+
+    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_empty_slot"):
+        tc.print_failed()
+        ret = 1
+    else:
+        tc.print_passed()
+
+    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_invalid_curve"):
         tc.print_failed()
         ret = 1
     else:
