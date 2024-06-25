@@ -51,7 +51,6 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
-    print("run_name_suffix", run_name_suffix, "SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
     if ((run_name_suffix == "_empty_slot"      and SPECT_OP_STATUS != 0xF2) or
         (run_name_suffix == "_invalid_curve"   and SPECT_OP_STATUS != 0xF4) or
         (run_name_suffix in ["_small", "_big"] and SPECT_OP_STATUS != 0x00)):
