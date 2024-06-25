@@ -79,10 +79,11 @@ op_eddsa_set_context:
     JMP     set_res_word
 
 eddsa_set_context_kbus_fail:
-    KBO     r21, ecc_kbus_verify_erase
+    KBO     r21, ecc_kbus_flush
     MOVI    r0,  ret_key_err
     JMP     set_res_word
 
 eddsa_set_context_curve_type_fail:
+    KBO     r21, ecc_kbus_flush
     MOVI    r0,  ret_curve_type_err
     JMP     set_res_word
