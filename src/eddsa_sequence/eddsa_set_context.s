@@ -80,7 +80,12 @@ op_eddsa_set_context:
 
 eddsa_set_context_kbus_fail:
     KBO     r21, ecc_kbus_flush
+    CALL    get_output_base
+    ADDI    r30, r0,  eddsa_output_result
+    MOVI    r2,  l3_result_invalid_key
+    STR     r2,  r30
     MOVI    r0,  ret_key_err
+    MOVI    r1,  1
     JMP     set_res_word
 
 eddsa_set_context_curve_type_fail:
