@@ -78,17 +78,22 @@ op_eddsa_set_context:
     MOVI    r0,  ret_op_success
     JMP     set_res_word
 
-eddsa_set_context_kbus_fail:
+
+eddsa_ret_invalid_key:
     KBO     r21, ecc_kbus_flush
     CALL    get_output_base
     ADDI    r30, r0,  eddsa_output_result
     MOVI    r2,  l3_result_invalid_key
     STR     r2,  r30
-    MOVI    r0,  ret_key_err
     MOVI    r1,  1
+    RET
+
+eddsa_set_context_kbus_fail:
+    CALL    eddsa_ret_invalid_key
+    MOVI    r0,  ret_key_err
     JMP     set_res_word
 
 eddsa_set_context_curve_type_fail:
-    KBO     r21, ecc_kbus_flush
+    CALL    eddsa_ret_invalid_key
     MOVI    r0,  ret_curve_type_err
     JMP     set_res_word
