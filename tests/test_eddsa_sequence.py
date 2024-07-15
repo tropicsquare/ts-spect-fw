@@ -51,19 +51,37 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
-    if ((run_name_suffix == "_empty_slot"      and SPECT_OP_STATUS != 0xF2) or
-        (run_name_suffix == "_invalid_curve"   and SPECT_OP_STATUS != 0xF4) or
-        (run_name_suffix in ["_small", "_big"] and SPECT_OP_STATUS != 0x00)):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 0
-
-    if ((run_name_suffix == "_empty_slot"      and SPECT_OP_STATUS == 0xF2) or
-        (run_name_suffix == "_invalid_curve"   and SPECT_OP_STATUS == 0xF4)):
+    if (run_name_suffix == "_empty_slot"):
+        if (SPECT_OP_STATUS != 0xF2):
+            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 0
+        if (SPECT_OP_DATA_OUT_SIZE != 1):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+            return 0
+        l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+        if (l3_result != 0x12):
+            print("L3 RESULT:", hex(l3_result))
+            return 0
         return 1
-
-    if (SPECT_OP_DATA_OUT_SIZE != 0):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        return 0
+    elif (run_name_suffix == "_invalid_curve"):
+        if (SPECT_OP_STATUS != 0xF4):
+            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 0
+        if (SPECT_OP_DATA_OUT_SIZE != 1):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+            return 0
+        l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+        if (l3_result != 0x12):
+            print("L3 RESULT:", hex(l3_result))
+            return 0
+        return 1
+    else:
+        if (SPECT_OP_STATUS != 0x00):
+            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 0
+        if (SPECT_OP_DATA_OUT_SIZE != 0):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+            return 0
 
     ########################################################################################################
     #   Nonce Init
