@@ -86,7 +86,6 @@ op_key_setup_end:
     MOV     r0,  r3
     JMP     set_res_word
 
-
 ; ECC Key Read from slot
 op_ecc_key_read:
     CALL    get_output_base
@@ -95,6 +94,11 @@ op_ecc_key_read:
     CALL    ecc_key_parse_input
     LSL     r25, r25
     ADDI    r25, r25, 1
+
+    MOVI    r3,  ret_key_err
+
+    KBO     r25, ecc_kbus_verify_erase
+    BRNE    op_key_read_invalid
 
     ; load kpair metadata
     LDK     r2,  r25, ecc_key_metadata
@@ -111,8 +115,13 @@ op_ecc_key_read:
     LDK     r16, r25, ecc_pub_key_Ax
     BRE     op_key_fail
 
+    MOVI    r3,  ret_curve_type_err
+
+    CMPI    r30,  ecc_type_ed25519
+    BRZ     ecc_key_read_skip_second_read
+
     CMPI    r30,  ecc_type_p256
-    BRNZ    ecc_key_read_skip_second_read
+    BRNZ    op_key_read_invalid
 
     MOVI    r1,  80     ; add another 32 byte to data out size for P-256
     ; load rest of p256 pubkey
@@ -128,6 +137,11 @@ ecc_key_read_skip_second_read:
     ORI     r2,  r2,  l3_result_ok
     MOVI    r0,  0
     JMP     op_key_read_end
+
+op_key_read_invalid:
+    MOVI    r2,  l3_result_invalid_key
+    KBO     r25, ecc_kbus_flush
+    JMP     op_key_setup_end
 
 op_key_fail:
     MOVI    r2,  l3_result_fail

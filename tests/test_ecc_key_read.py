@@ -31,7 +31,7 @@ if __name__ == "__main__":
     cmd_file = tc.get_cmd_file(test_dir)
 
     A_ref = rn.randint(1,2**256 - 1)
-    curve_ref = 0x02
+    curve_ref = tc.Ed25519_ID
     origin_ref = 0x01
 
     slot = rn.randint(0, 127)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     Ax_ref = rn.randint(1,2**256 - 1)
     Ay_ref = rn.randint(1,2**256 - 1)
     A_ref = Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
-    curve_ref = 0x01
+    curve_ref = tc.P256_ID
     origin_ref = 0x02
 
     slot = rn.randint(0, 127)
@@ -129,8 +129,6 @@ if __name__ == "__main__":
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
 
-    print(hex(tc.read_output(test_dir, run_name, (outsrc<<12), 4)))
-
     A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16).to_bytes(64, 'little')
 
     if (l3_result != 0xc3):
@@ -140,6 +138,53 @@ if __name__ == "__main__":
 
     if not(curve == curve_ref and origin == origin_ref and
            A == A_ref):
+        tc.print_failed()
+        ret |= 2
+
+    if not(ret & 2):
+        tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm {test_dir}/*")
+
+# ===================================================================================
+#   Invalid Curve Type
+# ===================================================================================
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    curve_ref = 0x66
+    origin_ref = 0x02
+
+    slot = rn.randint(0, 127)
+    pubkey_slot = (slot << 1)+1
+
+    run_name = test_name + "_invalid_curve_" + f"{slot}"
+
+    tc.print_run_name(run_name)
+
+    tc.set_key(cmd_file, curve_ref + (origin_ref << 8), ktype=0x4, slot=pubkey_slot, offset=0)
+
+    tc.start(cmd_file)
+
+    input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
+
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
+
+    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
+
+    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+
+    if (SPECT_OP_STATUS != 0xF4):
+        ret |= 2
+
+    if (SPECT_OP_DATA_OUT_SIZE != 1):
+        ret |= 2
+
+    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+    l3_result = tmp & 0xFF
+
+    if (l3_result != 0x12):
+        print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
         ret |= 2
 
@@ -184,8 +229,8 @@ if __name__ == "__main__":
     tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
     l3_result = tmp & 0xFF
 
-    if (l3_result != 0x3c):
-        #print("L3 RESULT:", hex(l3_result))
+    if (l3_result != 0x12):
+        print("L3 RESULT:", hex(l3_result))
         tc.print_failed()
         ret |= 4
 
