@@ -220,6 +220,9 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 def key_store(test_dir, run_name, slot, k):
     cmd_file = tc.get_cmd_file(test_dir)
 
+    rng = [rn.randint(1, 2**256-1) for i in range(10)]
+    tc.set_rng(test_dir, rng)
+
     tc.print_run_name(run_name)
 
     tc.start(cmd_file)
