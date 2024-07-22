@@ -27,6 +27,10 @@
 ;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
 ;   spect status in r3
 ;
+; Masking methods:
+;   1) Randomized Coordinates       -- (x, y, z, t) == (rx, ry, rz, rt)
+;   2) Group Scalar Randomization   -- k' = k + r * #E
+;
 ; See doc/ecc_key_layout.md for placement of the key values into physical slots.
 ;
 ; ==============================================================================
@@ -64,14 +68,19 @@ ed25519_key_setup_start:
 
     ST          r29, ca_ed25519_key_setup_internal_s
     ST          r28, ca_ed25519_key_setup_internal_prefix
-    MOV         r28, r29
+    GRV         r30
+    LD          r31, ca_q25519
+    SCB         r28, r29, r30
 
-    ; Load base point G and check its validity
+    ; Load base point G, mask it and check its validity
     LD          r31, ca_p25519
     LD          r11, ca_ed25519_xG
     LD          r12, ca_ed25519_yG
-    MOVI        r13, 1
-    MUL25519    r14, r11, r12
+    GRV         r13                 ; Z
+    ORI         r13, r13, 1         ; Ensure that Z != 0
+    MUL25519    r11, r11, r13       ; X = x * Z
+    MUL25519    r14, r11, r12       ; T = x * y * Z = X * y
+    MUL25519    r12, r12, r13       ; Y = y * Z
 
     LD          r6,  ca_ed25519_d
 
@@ -84,7 +93,7 @@ ed25519_key_setup_start:
     BRNZ        ed25519_key_setup_spm_fail
 
     ; Calculate A = s.G and check validity of the result
-    CALL        spm_ed25519_short
+    CALL        spm_ed25519_long
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
 

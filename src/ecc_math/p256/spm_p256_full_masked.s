@@ -41,16 +41,12 @@
 spm_p256_full_masked:
     ; 1) Convert P to randomized projective coordinates
     LD      r31, ca_p256
-    MOVI    r1,  3
 
 spm_p256_full_masked_z_randomize:
-    SUBI    r1,  r1,  1
-    BRZ     spm_p256_full_masked_z_fail
     GRV     r24
     MOVI    r0,  0
     REDP    r24, r0,  r24
-    XORI    r0,  r24, 0
-    BRZ     spm_p256_full_masked_z_randomize
+    ORI     r24, r24, 1         ; Ensure that Z != 0
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24
 

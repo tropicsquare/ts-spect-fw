@@ -48,17 +48,17 @@ parser.add_argument(
 ##################################################################
 rng_luts = {
     "x25519_dbg" : {
-        "pub_z_rng"     : {"idx": 0, "okzero" : False},
-        "s_rng_1"       : {"idx": 1, "okzero" : True},
-        "point_gen_rng" : {"idx": 2, "okzero" : True},
-        "s_rng_2"       : {"idx": 3, "okzero" : True}
+        "pub_z_rng"     : 0,
+        "s_rng_1"       : 1,
+        "point_gen_rng" : 2,
+        "s_rng_2"       : 3
     },
     "ecdsa_sign_dbg" : {
-        "base_z_rng"    : {"idx": 4, "okzero" : False},
-        "point_gen_rng" : {"idx": 5, "okzero" : True},
-        "s_rng_1"       : {"idx": 6, "okzero" : True},
-        "s_rng_2"       : {"idx": 7, "okzero" : True},
-        "t_rng"         : {"idx": 8, "okzero" : False}
+        "base_z_rng"    : 4,
+        "point_gen_rng" : 5,
+        "s_rng_1"       : 6,
+        "s_rng_2"       : 7,
+        "t_rng"         : 8
     }
 }
 ##################################################################
@@ -295,19 +295,12 @@ def parse_testvec(testvec_file: str, rng_lut):
     for input in testvec["input"]:
         data_dir[input["name"]] = input["value"]
 
-    z = 0
     rng_list = [rn.randint(0, 2**256 - 1) for i in range(4*len(rng_lut))]
     if "rng" in testvec.keys():
         for rng in testvec["rng"]:
-            idx = rng_lut[rng["name"]]["idx"] + z
+            idx = rng_lut[rng["name"]]
             if rng["value"] is not None:
-                #print("Forcing", rng["name"], f"\tindex {idx} ->", hex(rng["value"]))
                 rng_list[idx] = rng["value"]
-                if rng["value"] == 0 and not rng_lut[rng["name"]]["okzero"]:
-                    v = rn.randint(1, 2**256-1)
-                    #print("Generating alternative mask for", rng["name"], "->", hex(v))
-                    z += 1
-                    rng_list[idx+1] = v
     return data_dir, rng_list
 
 def set_seed(args) -> int:

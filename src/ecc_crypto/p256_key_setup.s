@@ -26,6 +26,10 @@
 ;   Writes the key set (d, w, A) to ECC key slot via KBUS
 ;   spect status in r3
 ;
+; Masking methods:
+;   1) Random Projective Coordinates -- (x, y, z) == (rx, ry, rz)
+;   2) Group Scalar Randomization -- k' = k + r * #E
+;
 ; See doc/ecc_key_layout.md for placement of the key values into physical slots.
 ;
 ; ==============================================================================
@@ -88,11 +92,18 @@ p256_key_setup_tmac_padding_loop:
 ;   Compute A = d.G
 ; ==============================================================================
 
+    LD      r31, ca_q256
+    GRV     r30
+    SCB     r28, r28, r30
+
     LD      r31, ca_p256
 
     LD      r12, ca_p256_xG
     LD      r13, ca_p256_yG
-    MOVI    r14, 1
+    GRV     r14
+    ORI     r14, r14, 1         ; Ensure that Z != 0
+    MUL256  r12, r12, r14
+    MUL256  r13, r13, r14
 
     MOV     r9,  r12
     MOV     r10, r13
@@ -101,9 +112,10 @@ p256_key_setup_tmac_padding_loop:
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail
 
+
     LD      r8,  ca_p256_b
 
-    CALL    spm_p256_short
+    CALL    spm_p256_long
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail
 
