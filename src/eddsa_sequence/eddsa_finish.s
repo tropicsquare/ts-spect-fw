@@ -22,13 +22,10 @@ op_eddsa_finish:
 
     MOVI        r0,  3
 eddsa_finish_s_randomize:
-    SUBI        r0,  r0,  1
-    BRZ         eddsa_finish_randomize_fail
     GRV         r1
     MOVI        r0,  0
     REDP        r1,  r0,  r1
-    XORI        r0,  r1,  0
-    BRZ         eddsa_finish_s_randomize
+    ORI         r1,  r1,  1         ; Ensure r != 0
 
     ; Compute S = r * e*s1 + e*s2
     LD          r26, ca_eddsa_sign_internal_smodq
@@ -109,15 +106,6 @@ eddsa_finish_s_randomize:
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  80
-    JMP         set_res_word
-
-eddsa_finish_randomize_fail:
-    CALL        get_output_base
-    ADDI        r30, r0,  eddsa_output_result
-    MOVI        r2,  l3_result_fail
-    STR         r2,  r30
-    MOVI        r0,  ret_grv_err
-    MOVI        r1,  1
     JMP         set_res_word
 
 eddsa_finish_fail:

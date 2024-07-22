@@ -41,16 +41,12 @@
 spm_ed25519_full_masked:
     ; 1) Convert P to randomized extended coordinates
     LD          r31, ca_p25519
-    MOVI        r1,  3
     
 spm_ed25519_full_masked_z_randomize:
-    SUBI        r1,  r1,  1
-    BRZ         spm_ed25519_full_masked_z_fail
     GRV         r23
     MOVI        r0,  0
     REDP        r23, r0,  r23                   ; Z
-    XORI        r0,  r23, 0
-    BRZ         spm_ed25519_full_masked_z_randomize
+    ORI         r23, r23, 1                     ; Ensure that Z != 0
     MUL25519    r21, r21, r23                   ; X = x * Z
     MUL25519    r24, r21, r22                   ; T = x * y * Z = X * y
     MUL25519    r22, r22, r23                   ; Y = y * Z

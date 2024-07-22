@@ -59,15 +59,11 @@ x25519_full_masked:
     BRNZ        x25519_pubkey_fail
 
     ; 2) Randomize P1.z
-    MOVI        r1,  3
 x25519_full_masked_z_randomize:
-    SUBI        r1,  r1, 1
-    BRZ         x25519_full_masked_z_fail
     GRV         r18
     MOVI        r0,  0
     REDP        r18, r0,  r18
-    XORI        r0,  r18, 0                     ; Z must not be 0
-    BRZ         x25519_full_masked_z_randomize
+    ORI         r18, r18, 1                     ; Ensure that Z != 0
     MUL25519    r16, r16, r18
     MUL25519    r17, r17, r18
 
@@ -153,8 +149,4 @@ x25519_pubkey_fail:
 
 x25519_spm_fail:
     MOVI        r0,  ret_point_integrity_err
-    RET
-
-x25519_full_masked_z_fail:
-    MOVI        r0,  ret_grv_err
     RET
