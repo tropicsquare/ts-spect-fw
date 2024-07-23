@@ -45,7 +45,7 @@ spm_ed25519_full_masked:
 spm_ed25519_full_masked_z_randomize:
     GRV         r23
     MOVI        r0,  0
-    REDP        r23, r0,  r23                   ; Z
+    REDP        r23, r23, r0                    ; Z
     ORI         r23, r23, 1                     ; Ensure that Z != 0
     MUL25519    r21, r21, r23                   ; X = x * Z
     MUL25519    r24, r21, r22                   ; T = x * y * Z = X * y

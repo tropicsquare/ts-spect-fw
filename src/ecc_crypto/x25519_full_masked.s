@@ -62,7 +62,7 @@ x25519_full_masked:
 x25519_full_masked_z_randomize:
     GRV         r18
     MOVI        r0,  0
-    REDP        r18, r0,  r18
+    REDP        r18, r18, r0
     ORI         r18, r18, 1                     ; Ensure that Z != 0
     MUL25519    r16, r16, r18
     MUL25519    r17, r17, r18

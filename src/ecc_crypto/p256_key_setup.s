@@ -100,7 +100,12 @@ p256_key_setup_tmac_padding_loop:
 
     LD      r12, ca_p256_xG
     LD      r13, ca_p256_yG
+
+    MOVI    r14, 1
+
     GRV     r14
+    MOVI    r0,  0
+    REDP    r14, r14, r0
     ORI     r14, r14, 1         ; Ensure that Z != 0
     MUL256  r12, r12, r14
     MUL256  r13, r13, r14
