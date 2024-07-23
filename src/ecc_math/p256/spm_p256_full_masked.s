@@ -45,7 +45,7 @@ spm_p256_full_masked:
 spm_p256_full_masked_z_randomize:
     GRV     r24
     MOVI    r0,  0
-    REDP    r24, r0,  r24
+    REDP    r24, r24, r0
     ORI     r24, r24, 1         ; Ensure that Z != 0
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24

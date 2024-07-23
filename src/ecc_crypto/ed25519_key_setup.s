@@ -77,14 +77,13 @@ ed25519_key_setup_start:
     LD          r11, ca_ed25519_xG
     LD          r12, ca_ed25519_yG
 
-    MOVI        r13, 1
-    MUL25519    r14, r11, r12
-
-    ;GRV         r13                 ; Z
-    ;ORI         r13, r13, 1         ; Ensure that Z != 0
-    ;MUL25519    r11, r11, r13       ; X = x * Z
-    ;MUL25519    r14, r11, r12       ; T = x * y * Z = X * y
-    ;MUL25519    r12, r12, r13       ; Y = y * Z
+    GRV         r13                 ; Z
+    MOVI        r0,  0
+    REDP        r13, r13, r0
+    ORI         r13, r13, 1         ; Ensure that Z != 0
+    MUL25519    r11, r11, r13       ; X = x * Z
+    MUL25519    r14, r11, r12       ; T = x * y * Z = X * y
+    MUL25519    r12, r12, r13       ; Y = y * Z
 
     LD          r6,  ca_ed25519_d
 
