@@ -31,6 +31,7 @@ op_x25519_dbg:
 
 op_ecdsa_dbg:
     LD      r26, ecdsa_sign_dbg_input_d
+    MOVI    r21, 0
     LD      r20, ecdsa_sign_dbg_input_w
     LD      r18, ecdsa_sign_dbg_input_z
     SWE     r18, r18
@@ -47,11 +48,11 @@ op_eddsa_set_context_dbg:
     SWE     r16, r16
     LD      r17, eddsa_set_context_input_scn
     MOVI    r0,  0
+    ST      r0,  ca_eddsa_sign_internal_s1
     LD      r31, ca_q25519
     REDP    r0,  r0,  r26
-    ST      r0,  ca_eddsa_sign_internal_smodq
+    ST      r0,  ca_eddsa_sign_internal_s2
 
     MOVI    r0,  ret_op_success
     MOVI    r1,  0
     JMP     set_res_word
-    

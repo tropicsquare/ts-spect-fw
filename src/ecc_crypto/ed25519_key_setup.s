@@ -124,7 +124,7 @@ ed25519_key_setup_origin_continue:
     ; Store the pubkey to key slot
     STK         r8,  r26, ecc_pub_key_Ax        ; store A
     BRE         ed25519_key_setup_kbus_fail
-    
+
     KBO         r26, ecc_kbus_program           ; program
     BRE         ed25519_key_setup_kbus_fail
     KBO         r26, ecc_kbus_flush             ; flush
@@ -137,17 +137,30 @@ ed25519_key_setup_origin_continue:
     LD          r31, ca_q25519
     REDP        r30, r0,  r28
 
+    ; Split the scalar
+    GRV         r1
+    REDP        r1,  r0,  r1
+    ; Ensure r != 0
+    ORI         r1,  r1,  1
+    SUBP        r28, r30, r1
+    ; Mask prefix
+    GRV         r2
+    XOR         r29, r29, r2
+
+    ; Change slot - needed so the slot register is same for flush in case of error
     MOV         r26, r25
 
-    STK         r28, r26, ecc_priv_key_1        ; store s
+    STK         r28, r25, ecc_priv_key_1        ; store s1
     BRE         ed25519_key_setup_kbus_fail
-    STK         r29, r26, ecc_priv_key_2        ; store prefix
-    BRE         ed25519_key_setup_kbus_fail 
-    STK         r30, r26, ecc_priv_key_3        ; store s mod q
-    BRE         ed25519_key_setup_kbus_fail 
-    KBO         r26, ecc_kbus_program           ; program
+    STK         r29, r25, ecc_priv_key_2        ; store prefix
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r26, ecc_kbus_flush             ; flush
+    STK         r1,  r25, ecc_priv_key_3        ; store s2
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r2,  r25, ecc_priv_key_4        ; prefix mask
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r25, ecc_kbus_program           ; program
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r25, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
 
     ; Return success

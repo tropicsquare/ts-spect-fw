@@ -55,8 +55,15 @@ def test_proc(test_type: str):
     z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
 
     wint = int.from_bytes(w, 'big')
-    tc.set_key(cmd_file, key=d,          ktype=0x04, slot=(slot<<1),   offset=0)
-    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1),   offset=8)
+    wmask = rn.randint(0, 2**256 - 1)
+    wint = wint ^ wmask
+    d2 = rn.randint(0, p256.q)
+    d1 = (d - d2) % p256.q
+
+    tc.set_key(cmd_file, key=d1,         ktype=0x04, slot=(slot<<1),  offset=0)
+    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1),  offset=8)
+    tc.set_key(cmd_file, key=d2,         ktype=0x04, slot=(slot<<1),  offset=16)
+    tc.set_key(cmd_file, key=wmask,      ktype=0x04, slot=(slot<<1),  offset=24)
 
     if test_type == "invalid_key_type":
         tc.set_key(cmd_file, key=0x1234, ktype=0x04, slot=(slot<<1)+1, offset=0)
@@ -110,13 +117,32 @@ def test_proc(test_type: str):
         sing_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
         signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, sing_size, string=True)
 
+        kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
+
+        remasked_d1      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
+        remasked_wint    = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
+        remasked_d2      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
+        remasked_wmask   = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+
+        b1 = ((remasked_d1 + remasked_d2) % p256.q) == ((d1 + d2) % p256.q)
+        b2 = (remasked_d1 != d1) and (remasked_d2 != d2)
+        b3 = (remasked_wint ^ remasked_wmask) == (wint ^ wmask)
+        b4 = (remasked_wint != wint) and (remasked_wmask != wmask)
+
+        if not(b1 and b2):
+            print("Remasking of d failed.")
+            return 0
+
+        if not(b3 and b4):
+            print("Remasking of w failed.")
+            return 0
+
         if not(signature_ref == signature):
             print("signature    ", signature.hex())
             print("signature_ref", signature_ref.hex())
             return 0
 
         return 1
-    return 0
 
 if __name__ == "__main__":
 
@@ -138,13 +164,13 @@ if __name__ == "__main__":
         tc.print_passed()
 
     if not test_proc("invalid_key_type"):
-        res |= 1
+        res |= 2
         tc.print_failed()
     else:
         tc.print_passed()
 
     if not test_proc("valid"):
-        res |= 1
+        res |= 4
         tc.print_failed()
     else:
         tc.print_passed()

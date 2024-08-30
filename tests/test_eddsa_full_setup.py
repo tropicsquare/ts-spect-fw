@@ -12,12 +12,12 @@ outsrc = 0x5
 
 def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
-    smodq = s % ed25519.q
-
     ########################################################################################################
     #   Set Context
     ########################################################################################################
-    
+    rng = [rn.randint(0, 2**256-1) for i in range(20)]
+    tc.set_rng(test_dir, rng)
+
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
@@ -39,9 +39,6 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
     ########################################################################################################
     #   Nonce Init
     ########################################################################################################
-
-    rng = [rn.randint(0, 2**256-1) for i in range(10)]
-    tc.set_rng(test_dir, rng)
 
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
@@ -294,7 +291,7 @@ if __name__ == "__main__":
     k = rn.randint(0, 2**256 - 1).to_bytes(32, 'little')
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
-    slot = rn.randint(0, 7)
+    slot = rn.randint(0, 31)
     msg_bitlen = rn.randint(64, 200)*8
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
@@ -305,39 +302,28 @@ if __name__ == "__main__":
     keymem = f"{test_dir}/{run_name}_keymem.hex"
 
     if key_store(test_dir, run_name, slot, k) == 1: sys.exit(1)
-    sign = eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message)
-    if sign == None: sys.exit(1)
-    A = key_read(test_dir, run_name, keymem, slot)
-    if A == None: sys.exit(1)
 
-    #print("=====================================================================")
-    #print("k   :", k.hex())
-    #print("sch :", sch.hex())
-    #print("scn :", scn.hex())
-    #print("=====================================================================")
-    #print("s      :", hex(s))
-    #print("prefix :", prefix.hex())
-    #print("=====================================================================")
-    #print()
-    #print("message:")
-    #print(message.hex())
-    #print()
-#
-    #print("=====================================================================")
-    #print("sign    :", sign.hex())
-    #print("sign ref:", sign_ref.hex())
-    #print("=====================================================================")
-    #print("A    :", A.hex())
-    #print("A ref:", A_ref.hex())
-    #print("=====================================================================")
-    #print()
-
-    if not(
-        sign == sign_ref and
-        A == A_ref
-    ): 
+    sign_1 = eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message)
+    if sign_1 == None: sys.exit(1)
+    if sign_1 != sign_ref:
+        print("Signature 1 fail")
         tc.print_failed()
         sys.exit(1)
+
+    sign_2 = eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message)
+    if sign_2 == None: sys.exit(1)
+    if sign_2 != sign_ref:
+        print("Signature 2 fail")
+        tc.print_failed()
+        sys.exit(1)
+
+    A = key_read(test_dir, run_name, keymem, slot)
+    if A == None: sys.exit(1)
+    if A != A_ref:
+        print("Pub key fail")
+        tc.print_failed()
+        sys.exit(1)
+
     tc.print_passed()
 
     sys.exit(0)

@@ -5,7 +5,7 @@
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
 ;  This work is subject to the license terms of the LICENSE.txt file in the root
 ;  directory of this source tree.
-;  If a copy of the LICENSE file was not distributed with this work, you can 
+;  If a copy of the LICENSE file was not distributed with this work, you can
 ;  obtain one at (https://tropicsquare.com/license).
 ;
 ; ==============================================================================
@@ -35,7 +35,7 @@
 spm_p256_long:
     ; (r9, r10, r11) = Q0 = "point at infinity O"
     MOVI    r9,  0
-    MOVI    r10, 1 
+    MOVI    r10, 1
     MOVI    r11, 0
 
     MOVI    r30, 256
@@ -79,4 +79,3 @@ spm_p256_long_loop_255_0:
     BRNZ    spm_p256_long_loop_255_0
 
     RET
-    

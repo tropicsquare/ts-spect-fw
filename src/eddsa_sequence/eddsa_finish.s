@@ -12,7 +12,7 @@
 ;
 ; Finish EdDSA signature
 ;
-;   1) Compute S = r + e*rng + e*(s - rng)
+;   1) Compute S = r + e*s1 + e*s2
 ;   2) Verify the computed signature
 ;
 ; ==============================================================================
@@ -22,16 +22,11 @@ op_eddsa_finish:
 
     MOVI        r0,  3
 eddsa_finish_s_randomize:
-    GRV         r1
-    MOVI        r0,  0
-    REDP        r1,  r0,  r1
-    ORI         r1,  r1,  1         ; Ensure r != 0
+    ; Compute S = r + e*s1 + e*s2
+    LD          r26, ca_eddsa_sign_internal_s1
+    LD          r2,  ca_eddsa_sign_internal_s2
 
-    ; Compute S = r * e*s1 + e*s2
-    LD          r26, ca_eddsa_sign_internal_smodq
-    SUBP        r2,  r26, r1
-
-    MULP        r1,  r1,  r25
+    MULP        r1,  r26, r25
     MULP        r2,  r2,  r25
     ADDP        r3,  r27, r1
     ADDP        r3,  r3,  r2

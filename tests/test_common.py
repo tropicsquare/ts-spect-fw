@@ -146,6 +146,10 @@ def get_cmd_file(test_dir):
     cmd_file = open(test_dir+"/iss_cmd", 'w')
     return cmd_file
 
+def gpr_preload(cmd_file):
+    for i in range(32):
+        cmd_file.write(f"set R{i} {rn.randint(0, 2**256 -1)}\n")
+
 def start(cmd_file):
     cmd_file.write("start\n")
 

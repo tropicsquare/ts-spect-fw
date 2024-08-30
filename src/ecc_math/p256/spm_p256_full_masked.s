@@ -62,7 +62,7 @@ spm_p256_full_masked_z_randomize:
 
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
-    
+
     ; 3) Mask scalar k as k2 = k + rng2 * #E
     LD      r31, ca_q256
     GRV     r30
@@ -77,7 +77,7 @@ spm_p256_full_masked_z_randomize:
 
     CALL    spm_p256_long
     CALL    point_check_p256
-    BRNZ    spm_p256_integrity_fail 
+    BRNZ    spm_p256_integrity_fail
 
     ; 5) Compute P3 = P1 - P2
     XOR     r0,  r0,  r0
@@ -91,7 +91,7 @@ spm_p256_full_masked_z_randomize:
     SUBP    r13, r0, r13    ; invert P2
 
     CALL    point_add_p256  ; r9.. = P1, r12.. = P3, r22.. = k2.P2
-    
+
     ; 6) Mask scalar k as k3 = k + rng3 * #E
     LD      r31, ca_q256
     GRV     r30
@@ -128,8 +128,4 @@ spm_p256_full_masked_z_randomize:
 
 spm_p256_integrity_fail:
     MOVI    r0,  ret_point_integrity_err
-    RET
-
-spm_p256_full_masked_z_fail:
-    MOVI    r0,  ret_grv_err
     RET

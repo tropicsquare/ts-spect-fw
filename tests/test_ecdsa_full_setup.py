@@ -151,39 +151,29 @@ if __name__ == "__main__":
 
     keymem = f"{test_dir}/{run_name}_keymem.hex"
 
-    if key_store(test_dir, run_name, slot, k) == 1: sys_exit(1)
-    sign = ecdsa_sign(test_dir, run_name, keymem, slot, sch, scn, z)
-    if sign == None: sys_exit(1)
-    A = key_read(test_dir, run_name, keymem, slot)
-    if A == None: sys_exit(1)
+    if key_store(test_dir, run_name, slot, k) == 1: sys.exit(1)
 
-    #print("=====================================================================")
-    #print("k   :", k.hex())
-    #print("sch :", sch.hex())
-    #print("scn :", scn.hex())
-    #print("=====================================================================")
-    #print("d :", hex(d))
-    #print("w :", w.hex())
-    #print("=====================================================================")
-    #print()
-    #print("z:")
-    #print(z.hex())
-    #print()
-#
-    #print("=====================================================================")
-    #print("sign    :", sign.hex())
-    #print("sign ref:", sign_ref.hex())
-    #print("=====================================================================")
-    #print("A       :", A.hex())
-    #print("A ref   :", A_ref.hex())
-    #print("=====================================================================")
-
-    if not(
-        sign == sign_ref and
-        A == A_ref
-    ): 
+    sign1 = ecdsa_sign(test_dir, run_name, keymem, slot, sch, scn, z)
+    if sign1 == None: sys.exit(1)
+    if sign1 != sign_ref:
+        print("Signature 1 fail")
         tc.print_failed()
         sys.exit(1)
+
+    sign2 = ecdsa_sign(test_dir, run_name, keymem, slot, sch, scn, z)
+    if sign2 == None: sys.exit(1)
+    if sign2 != sign_ref:
+        print("Signature 2 fail")
+        tc.print_failed()
+        sys.exit(1)
+
+    A = key_read(test_dir, run_name, keymem, slot)
+    if A == None: sys.exit(1)
+    if A != A_ref:
+        print("Pub key 2 fail")
+        tc.print_failed()
+        sys.exit(1)
+
     tc.print_passed()
 
     sys.exit(0)

@@ -5,7 +5,7 @@
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
 ;  This work is subject to the license terms of the LICENSE.txt file in the root
 ;  directory of this source tree.
-;  If a copy of the LICENSE file was not distributed with this work, you can 
+;  If a copy of the LICENSE file was not distributed with this work, you can
 ;  obtain one at (https://tropicsquare.com/license).
 ;
 ; ==============================================================================
@@ -15,10 +15,13 @@
 ; Loads keys from slot, loads Secure Chanel Hash and Nonce.
 ;
 ;   Public key A ----------------> ca_eddsa_sign_internal_A
-;   Private key part 's' --------> r26
+;   Private key part 's1' --------> ca_eddsa_sign_internal_s1
+;   Private key part 's2' --------> ca_eddsa_sign_internal_s2
 ;   Private key part 'prefix' ---> r20
 ;   Secure Channel Hash ---------> r16
 ;   Secure Channel Nonce --------> r17
+;
+;   Rerandomize private keys and store them back to flash slot
 ;
 ; ==============================================================================
 ;
@@ -59,16 +62,50 @@ op_eddsa_set_context:
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
-    MOV     r21, r22 
-
     ; load private keys
-    LDK     r26, r21, ecc_priv_key_1
+    LDK     r26, r22, ecc_priv_key_1
     BRE     eddsa_set_context_kbus_fail
-    LDK     r20, r21, ecc_priv_key_2
+    LDK     r23, r22, ecc_priv_key_2
     BRE     eddsa_set_context_kbus_fail
-    LDK     r30, r21, ecc_priv_key_3
+    LDK     r29, r22, ecc_priv_key_3
     BRE     eddsa_set_context_kbus_fail
-    ST      r30, ca_eddsa_sign_internal_smodq
+    LDK     r30, r22, ecc_priv_key_4
+    BRE     eddsa_set_context_kbus_fail
+    KBO     r22, ecc_kbus_flush
+    BRE     eddsa_set_context_kbus_fail
+
+    XOR     r20, r23, r30
+    ST      r26, ca_eddsa_sign_internal_s1
+    ST      r29, ca_eddsa_sign_internal_s2
+
+    ; Rerandomize and store back to ECC priv key slot
+    LD          r31, ca_q25519
+    GRV         r2
+    MOVI        r0,  0
+    REDP        r2,  r0,  r2
+    SUBP        r26, r26, r2
+    ADDP        r29, r29, r2
+
+    GRV         r2
+    XOR         r23, r23, r2
+    XOR         r30, r30, r2
+
+    MOV         r21, r22
+
+    KBO         r21, ecc_kbus_erase             ; Erase the slot before writing remasked keys
+    BRE         eddsa_set_context_kbus_fail
+    STK         r26, r21, ecc_priv_key_1        ; store s1
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r23, r21, ecc_priv_key_2        ; store prefix
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r29, r21, ecc_priv_key_3        ; store s2
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r30, r21, ecc_priv_key_4        ; prefix mask
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r21, ecc_kbus_program           ; program
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r21, ecc_kbus_flush             ; flush
+    BRE         ed25519_key_setup_kbus_fail
 
     ; load secure channel nonce + hash
     LD      r16, eddsa_set_context_input_sch
