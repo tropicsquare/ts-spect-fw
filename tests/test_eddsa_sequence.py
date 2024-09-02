@@ -7,6 +7,8 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
+key_remask_check_en = False
+
 def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     insrc = tc.insrc_arr[rn.randint(0,1)]
@@ -95,30 +97,26 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
             print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
             return 0
 
-        kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
+        if key_remask_check_en:
+            kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
 
-        remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
-        remasked_prefix     = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
-        remasked_s2         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
-        remasked_prefixmask = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+            remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
+            remasked_prefix     = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
+            remasked_s2         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
+            remasked_prefixmask = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
 
-        b1 = ((remasked_s1 + remasked_s2) % ed25519.q) == ((s1 + s2) % ed25519.q)
-        b2 = (remasked_s1 != s1) and (remasked_s2 != s2)
-        b3 = (remasked_prefix ^ remasked_prefixmask) == (prefix_int ^ prefixmask)
-        b4 = (remasked_prefix != prefix_int) and (remasked_prefixmask != prefixmask)
+            b1 = ((remasked_s1 + remasked_s2) % ed25519.q) == ((s1 + s2) % ed25519.q)
+            b2 = (remasked_s1 != s1) and (remasked_s2 != s2)
+            b3 = (remasked_prefix ^ remasked_prefixmask) == (prefix_int ^ prefixmask)
+            b4 = (remasked_prefix != prefix_int) and (remasked_prefixmask != prefixmask)
 
-        if not(b1 and b2):
-            print("Remasking of s failed.")
-            print(hex(s1))
-            print(hex(remasked_s1))
-            print()
-            print(hex(s2))
-            print(hex(remasked_s2))
-            return 0
+            if not(b1 and b2):
+                print("Remasking of s failed.")
+                return 0
 
-        if not(b3 and b4):
-            print("Remasking of prefix failed.")
-            return 0
+            if not(b3 and b4):
+                print("Remasking of prefix failed.")
+                return 0
 
     ########################################################################################################
     #   Nonce Init

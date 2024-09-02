@@ -54,28 +54,27 @@ op_ecdsa_sign:
     BRE     ecdsa_sign_kbus_err_fail
     KBO     r25, ecc_kbus_flush
 
-    XOR     r20, r22, r23
-
     ; Rerandomize d part
     LD      r31, ca_q256
     GRV     r10
     REDP    r10, r10, r10
-    SUBP    r11, r26, r10
-    ADDP    r12, r21, r10
+    SUBP    r26, r26, r10
+    ADDP    r21, r21, r10
 
     ; Rerandomize w part
     GRV     r10
     XOR     r22, r22, r10
     XOR     r23, r23, r10
 
+.ifdef ECC_KEY_RERANDOMIZE
     ; Store the rerandomized priv keys back to flash slot
     KBO         r25, ecc_kbus_erase             ; Erase the slot before writing remasked keys
     BRE         eddsa_set_context_kbus_fail
-    STK         r11, r25, ecc_priv_key_1        ; store d1
+    STK         r21, r25, ecc_priv_key_1        ; store d1
     BRE         ed25519_key_setup_kbus_fail
     STK         r22, r25, ecc_priv_key_2        ; store w
     BRE         ed25519_key_setup_kbus_fail
-    STK         r12, r25, ecc_priv_key_3        ; store d2
+    STK         r26, r25, ecc_priv_key_3        ; store d2
     BRE         ed25519_key_setup_kbus_fail
     STK         r23, r25, ecc_priv_key_4        ; w mask
     BRE         ed25519_key_setup_kbus_fail
@@ -83,6 +82,10 @@ op_ecdsa_sign:
     BRE         ed25519_key_setup_kbus_fail
     KBO         r25, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
+.endif
+
+    ; unmask w
+    XOR         r20, r22, r23
 
     ; Load secure channel hasn/nonce
     ADDI    r4,  r0,  ecdsa_input_message

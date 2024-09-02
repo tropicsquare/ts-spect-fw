@@ -62,23 +62,21 @@ op_eddsa_set_context:
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
+    MOV     r21, r22
+
     ; load private keys
-    LDK     r26, r22, ecc_priv_key_1
+    LDK     r26, r21, ecc_priv_key_1
     BRE     eddsa_set_context_kbus_fail
-    LDK     r23, r22, ecc_priv_key_2
+    LDK     r23, r21, ecc_priv_key_2
     BRE     eddsa_set_context_kbus_fail
-    LDK     r29, r22, ecc_priv_key_3
+    LDK     r29, r21, ecc_priv_key_3
     BRE     eddsa_set_context_kbus_fail
-    LDK     r30, r22, ecc_priv_key_4
+    LDK     r30, r21, ecc_priv_key_4
     BRE     eddsa_set_context_kbus_fail
-    KBO     r22, ecc_kbus_flush
+    KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
-    XOR     r20, r23, r30
-    ST      r26, ca_eddsa_sign_internal_s1
-    ST      r29, ca_eddsa_sign_internal_s2
-
-    ; Rerandomize and store back to ECC priv key slot
+    ; Rerandomize
     LD          r31, ca_q25519
     GRV         r2
     MOVI        r0,  0
@@ -90,8 +88,8 @@ op_eddsa_set_context:
     XOR         r23, r23, r2
     XOR         r30, r30, r2
 
-    MOV         r21, r22
-
+.ifdef ECC_KEY_RERANDOMIZE
+    ; Store back to ECC priv key slot
     KBO         r21, ecc_kbus_erase             ; Erase the slot before writing remasked keys
     BRE         eddsa_set_context_kbus_fail
     STK         r26, r21, ecc_priv_key_1        ; store s1
@@ -106,6 +104,12 @@ op_eddsa_set_context:
     BRE         ed25519_key_setup_kbus_fail
     KBO         r21, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
+.endif
+
+    ; unmask prefix and store the masked s for later use
+    XOR     r20, r23, r30
+    ST      r26, ca_eddsa_sign_internal_s1
+    ST      r29, ca_eddsa_sign_internal_s2
 
     ; load secure channel nonce + hash
     LD      r16, eddsa_set_context_input_sch

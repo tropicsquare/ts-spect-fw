@@ -6,6 +6,8 @@ import os
 import test_common as tc
 import models.p256 as p256
 
+key_remask_check_en = False
+
 def test_proc(test_type: str):
     run_name = f"{test_name}_{test_type}"
     tc.print_run_name(run_name)
@@ -117,25 +119,26 @@ def test_proc(test_type: str):
         sing_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
         signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, sing_size, string=True)
 
-        kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
+        if key_remask_check_en:
+            kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
 
-        remasked_d1      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
-        remasked_wint    = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
-        remasked_d2      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
-        remasked_wmask   = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+            remasked_d1      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
+            remasked_wint    = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
+            remasked_d2      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
+            remasked_wmask   = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
 
-        b1 = ((remasked_d1 + remasked_d2) % p256.q) == ((d1 + d2) % p256.q)
-        b2 = (remasked_d1 != d1) and (remasked_d2 != d2)
-        b3 = (remasked_wint ^ remasked_wmask) == (wint ^ wmask)
-        b4 = (remasked_wint != wint) and (remasked_wmask != wmask)
+            b1 = ((remasked_d1 + remasked_d2) % p256.q) == ((d1 + d2) % p256.q)
+            b2 = (remasked_d1 != d1) and (remasked_d2 != d2)
+            b3 = (remasked_wint ^ remasked_wmask) == (wint ^ wmask)
+            b4 = (remasked_wint != wint) and (remasked_wmask != wmask)
 
-        if not(b1 and b2):
-            print("Remasking of d failed.")
-            return 0
+            if not(b1 and b2):
+                print("Remasking of d failed.")
+                return 0
 
-        if not(b3 and b4):
-            print("Remasking of w failed.")
-            return 0
+            if not(b3 and b4):
+                print("Remasking of w failed.")
+                return 0
 
         if not(signature_ref == signature):
             print("signature    ", signature.hex())
