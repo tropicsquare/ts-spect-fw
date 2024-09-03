@@ -7,6 +7,8 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
+key_remask_check_en = False
+
 def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
     insrc = tc.insrc_arr[rn.randint(0,1)]
@@ -22,15 +24,26 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     ########################################################################################################
     run_name = "eddsa_set_context" + run_name_suffix
     tc.print_run_name(run_name)
-    
+
+    rng = [rn.randint(0, 2**256-1) for _ in range(10)]
+    tc.set_rng(test_dir, rng)
+
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
     if run_name_suffix != "_empty_slot":
+        smask = rn.randint(0, ed25519.q-1)
+        s1 = smask
+        s2 = (smodq - smask) % ed25519.q
+
         prefix_int = int.from_bytes(prefix, 'big')
-        tc.set_key(cmd_file, key=s,          ktype=0x04, slot=(slot<<1), offset=0)
+        prefixmask = rn.randint(0, 2**256-1)
+        prefix_int = prefix_int ^ prefixmask
+
+        tc.set_key(cmd_file, key=s1,         ktype=0x04, slot=(slot<<1), offset=0)
         tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=8)
-        tc.set_key(cmd_file, key=smodq      ,ktype=0x04, slot=(slot<<1), offset=16)
+        tc.set_key(cmd_file, key=s2,         ktype=0x04, slot=(slot<<1), offset=16)
+        tc.set_key(cmd_file, key=prefixmask, ktype=0x04, slot=(slot<<1), offset=24)
 
         if run_name_suffix != "_invalid_curve":
             metadata = tc.Ed25519_ID
@@ -62,6 +75,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         if (l3_result != 0x12):
             print("L3 RESULT:", hex(l3_result))
             return 0
+
         return 1
     elif (run_name_suffix == "_invalid_curve"):
         if (SPECT_OP_STATUS != 0xF4):
@@ -82,6 +96,27 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         if (SPECT_OP_DATA_OUT_SIZE != 0):
             print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
             return 0
+
+        if key_remask_check_en:
+            kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
+
+            remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
+            remasked_prefix     = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
+            remasked_s2         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
+            remasked_prefixmask = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+
+            b1 = ((remasked_s1 + remasked_s2) % ed25519.q) == ((s1 + s2) % ed25519.q)
+            b2 = (remasked_s1 != s1) and (remasked_s2 != s2)
+            b3 = (remasked_prefix ^ remasked_prefixmask) == (prefix_int ^ prefixmask)
+            b4 = (remasked_prefix != prefix_int) and (remasked_prefixmask != prefixmask)
+
+            if not(b1 and b2):
+                print("Remasking of s failed.")
+                return 0
+
+            if not(b3 and b4):
+                print("Remasking of prefix failed.")
+                return 0
 
     ########################################################################################################
     #   Nonce Init
@@ -165,7 +200,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     run_name = "eddsa_R_part" + run_name_suffix
     tc.print_run_name(run_name)
 
-    rng = [rn.randint(0, 2**256-1) for i in range(10)]
+    rng = [rn.randint(0, 2**256-1) for _ in range(10)]
     tc.set_rng(test_dir, rng)
 
     cmd_file = tc.get_cmd_file(test_dir)

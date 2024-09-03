@@ -148,7 +148,3 @@ spm_ed25519_full_masked_z_randomize:
 ed25519_spm_fail:
     MOVI        r0,  ret_point_integrity_err
     RET
-
-spm_ed25519_full_masked_z_fail:
-    MOVI        r0,  ret_grv_err
-    RET

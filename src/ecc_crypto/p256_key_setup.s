@@ -161,15 +161,30 @@ p256_key_setup_origin_continue:
     KBO     r26, ecc_kbus_flush                 ; flush
     BRE     p256_key_setup_fail
 
-    ; Store s and prefix to the slot
     LD      r28, ca_p256_key_setup_internal_d
     LD      r29, ca_p256_key_setup_internal_w
 
+    ; split priv key d
+    LD      r31, ca_q256
+    GRV     r1
+    REDP    r1,  r1,  r1
+    SUBP    r28, r28, r1
+
+    ; mask priv key w
+    GRV     r2
+    XOR     r29, r29, r2
+
+    ; Change slot - needed so the slot register is same for flush in case of error
     MOV     r26, r25
 
-    STK     r28, r26, ecc_priv_key_1            ; store d
+    ; Store private keys to slot
+    STK     r28, r26, ecc_priv_key_1            ; store d1
     BRE     p256_key_setup_fail
     STK     r29, r26, ecc_priv_key_2            ; store w
+    BRE     p256_key_setup_fail
+    STK     r1,  r26, ecc_priv_key_3            ; store d2
+    BRE     p256_key_setup_fail
+    STK     r2,  r26, ecc_priv_key_4            ; store w mask
     BRE     p256_key_setup_fail
     KBO     r26, ecc_kbus_program               ; program
     BRE     p256_key_setup_fail
@@ -179,7 +194,7 @@ p256_key_setup_origin_continue:
     MOVI    r3, ret_op_success
 
     RET
-    
+
 p256_key_setup_fail:
     KBO     r26, ecc_kbus_flush
     MOVI    r3,  ret_key_err

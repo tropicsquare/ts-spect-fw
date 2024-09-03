@@ -33,7 +33,8 @@ ca_eddsa_sign_internal_EAx .eq 0x0360
 ca_eddsa_sign_internal_EAy .eq 0x0380
 ca_eddsa_sign_internal_EAz .eq 0x03A0
 ca_eddsa_sign_internal_EAt .eq 0x03C0
-ca_eddsa_sign_internal_smodq .eq 0x03E0
+ca_eddsa_sign_internal_s1 .eq 0x03E0
+ca_eddsa_sign_internal_s2 .eq 0x0400
 
 ; ==============================================================================
 ;   EdDSA Verify

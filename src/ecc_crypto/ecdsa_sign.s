@@ -5,7 +5,7 @@
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
 ;  This work is subject to the license terms of the LICENSE.txt file in the root
 ;  directory of this source tree.
-;  If a copy of the LICENSE file was not distributed with this work, you can 
+;  If a copy of the LICENSE file was not distributed with this work, you can
 ;  obtain one at (https://tropicsquare.com/license).
 ; ==============================================================================
 ;
@@ -13,7 +13,8 @@
 ;
 ; Input:
 ;   Private Key part 'w' in r20
-;   Private Key part 'd' in 26
+;   Private Key part 'd1' in r21
+;   Private Key part 'd2' in r26
 ;   Secure Channel Hash in r16
 ;   Secure Channel Nonce in r17
 ;   Message Digest z in r18
@@ -101,28 +102,25 @@ ecdsa_sign_tmac_padding_loop:
     REDP        r22, r0, r22
     XORI        r0, r22, 0
     BRZ         ecdsa_sign_fail_r
-    MOVI        r1,  3
 
 ; ==============================================================================
 ;   Compute s = (z + r*d)/k
-;   Masked with t as (z*t + r*t*d) * (k*t)^(-1)
+;   Masked with t as (z*t + t*r*d1 + t*r*d2) * (k*t)^(-1)
 ; ==============================================================================
 
 ecdsa_sign_mask_k:
-    SUBI        r1,  r1,  1
-    BRZ         ecdsa_fail_k_mask
     GRV         r25                             ; t
-    MOVI        r0,  0
-    REDP        r25, r0,  r25
-    XORI        r25, r25, 0
-    BRZ         ecdsa_sign_mask_k               ; t must not be 0
+    REDP        r25, r25, r25
+    ORI         r25, r25, 1                     ; force mask to be even -> not 0
     MULP        r1,  r25, r27
     CALL        inv_q256                        ; (kt)^(-1)
 
     LD          r18, ca_ecdsa_sign_internal_z
     MULP        r10, r18, r25                   ; zt
     MULP        r11, r22, r25                   ; rt
-    MULP        r11, r26, r11                   ; rtd
+    MULP        r12, r26, r11                   ; rtd1
+    MULP        r13, r21, r11                   ; rtd2
+    ADDP        r11, r12, r13                   ; rtd1 + rtd2 = rtd
     ADDP        r10, r10, r11                   ; zt + rtd
     MULP        r10, r1,  r10                   ; (zt + rtd) / (kt)
 
@@ -229,9 +227,6 @@ ecdsa_sign_fail_r:
     JMP         ecdsa_sign_fail
 ecdsa_sign_fail_s:
     MOVI        r3,  ret_ecdsa_err_inv_s
-    JMP         ecdsa_sign_fail
-ecdsa_fail_k_mask:
-    MOVI        r3,  ret_grv_err
     JMP         ecdsa_sign_fail
 ecdsa_fail_verify:
     MOVI        r3,  ret_ecdsa_err_final_verify

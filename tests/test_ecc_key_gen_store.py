@@ -36,10 +36,10 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
     if key_type == tc.Ed25519_ID:
         priv1_ref, priv2_ref = ed25519.secret_expand(k)
         pub1_ref = ed25519.secret_to_public(k)
-        pub2_ref = 0
-        priv2_ref = int.from_bytes(priv2_ref, 'big')
         pub1_ref = int.from_bytes(pub1_ref, 'big')
-        priv3_ref = priv1_ref % ed25519.q
+        pub2_ref = 0
+        priv1_ref = priv1_ref % ed25519.q
+        priv2_ref = int.from_bytes(priv2_ref, 'big')
         #print("s:       ", hex(priv1_ref))
         #print("prefix:  ", hex(priv2_ref))
         #print("A:       ", hex(pub1_ref))
@@ -50,13 +50,13 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
             k = (rng[0] % p256.q).to_bytes(32, 'little')
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
         priv2_ref = int.from_bytes(priv2_ref, 'big')
-        priv3_ref = 0
         #print("d:   ", hex(priv1_ref))
         #print("w:   ", hex(priv2_ref))
         #print("Ax:  ", hex(pub1_ref))
         #print("Ay:  ", hex(pub2_ref))
 
     tc.start(cmd_file)
+    tc.gpr_preload(cmd_file)
 
     input_word = (key_type << 24) + (slot << 8) + tc.find_in_list(op, ops_cfg)["id"]
 
@@ -96,29 +96,34 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
 
         priv1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
         priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
+        priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
+        priv4 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+
+        if key_type == tc.Ed25519_ID:
+            priv1 = (priv1 + priv3) % ed25519.q
+        else:
+            priv1 = (priv1 + priv3) % p256.q
+
+        priv2 = priv2 ^ priv4
+
         pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=8)
 
         pub2 = pub2_ref
         if key_type == tc.P256_ID:
             pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=16)
 
-        priv3 = priv3_ref
-        if key_type == tc.Ed25519_ID:
-            priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
-
         metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
         key_type_observed = metadata & 0xFF
         origin_observed = (metadata >> 8) & 0xFF
 
-        if (not(
+        if not((
             priv1 == priv1_ref and
             priv2 == priv2_ref and
-            priv3 == priv3_ref and
             pub1 == pub1_ref and
             pub2 == pub2_ref and
             key_type_observed == key_type and
-            origin_observed == ecc_key_origin[op])
-        ):
+            origin_observed == ecc_key_origin[op]
+        )):
             print("Curve:  ", hex(metadata & 0xFF))
             print("Origin: ", hex((metadata >> 8) & 0xFF))
             print("priv1:    ", hex(priv1))
@@ -126,6 +131,9 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
             print()
             print("priv2:    ", hex(priv2))
             print("priv2_ref:", hex(priv2_ref))
+            print()
+            print("priv3:    ", hex(priv3))
+            print("priv4:    ", hex(priv4))
             print()
             print("pub1:     ", hex(pub1))
             print("pub1_ref: ", hex(pub1_ref))

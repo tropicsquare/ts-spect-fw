@@ -25,6 +25,7 @@ op_ecdsa_sign:
     LSL     r25, r25                    ; priv key slot
     ORI     r25, r25, 1                 ; pub key slot
 
+    ; Read public key slot
     LDK     r5,  r25, ecc_key_metadata
     BRE     ecdsa_sign_kbus_err_fail
     ANDI    r5,  r5,  0xFF
@@ -39,14 +40,54 @@ op_ecdsa_sign:
     ST      r5,  ca_ecdsa_sign_internal_Ay
     KBO     r25, ecc_kbus_flush
 
+    ; Change slot to priv key
     SUBI    r25, r25, 1
 
-    LDK     r26, r25, ecc_priv_key_1     ; Load privkey part d
+    ; Read private key slot
+    LDK     r26, r25, ecc_priv_key_1     ; Load privkey part d1
     BRE     ecdsa_sign_kbus_err_fail
-    LDK     r20, r25, ecc_priv_key_2     ; Load privkey part w
+    LDK     r22, r25, ecc_priv_key_2     ; Load privkey part w
+    BRE     ecdsa_sign_kbus_err_fail
+    LDK     r21, r25, ecc_priv_key_3     ; Load privkey part d2
+    BRE     ecdsa_sign_kbus_err_fail
+    LDK     r23, r25, ecc_priv_key_4     ; Load privkey part w mask
     BRE     ecdsa_sign_kbus_err_fail
     KBO     r25, ecc_kbus_flush
 
+    ; Rerandomize d part
+    LD      r31, ca_q256
+    GRV     r10
+    REDP    r10, r10, r10
+    SUBP    r26, r26, r10
+    ADDP    r21, r21, r10
+
+    ; Rerandomize w part
+    GRV     r10
+    XOR     r22, r22, r10
+    XOR     r23, r23, r10
+
+.ifdef ECC_KEY_RERANDOMIZE
+    ; Store the rerandomized priv keys back to flash slot
+    KBO         r25, ecc_kbus_erase             ; Erase the slot before writing remasked keys
+    BRE         eddsa_set_context_kbus_fail
+    STK         r21, r25, ecc_priv_key_1        ; store d1
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r22, r25, ecc_priv_key_2        ; store w
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r26, r25, ecc_priv_key_3        ; store d2
+    BRE         ed25519_key_setup_kbus_fail
+    STK         r23, r25, ecc_priv_key_4        ; w mask
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r25, ecc_kbus_program           ; program
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r25, ecc_kbus_flush             ; flush
+    BRE         ed25519_key_setup_kbus_fail
+.endif
+
+    ; unmask w
+    XOR         r20, r22, r23
+
+    ; Load secure channel hasn/nonce
     ADDI    r4,  r0,  ecdsa_input_message
     LDR     r18, r4
     SWE     r18, r18
@@ -57,9 +98,11 @@ op_ecdsa_sign:
     JMP     ecdsa_sign
 
 ecdsa_sign_curve_type_fail:
+    KBO     r25, ecc_kbus_flush
     MOVI    r3,  ret_curve_type_err
     JMP     ecdsa_sign_invalid_key_fail
 ecdsa_sign_kbus_err_fail:
+    KBO     r25, ecc_kbus_flush
     MOVI    r3,  ret_key_err
 ecdsa_sign_invalid_key_fail:
     KBO     r25, ecc_kbus_flush
