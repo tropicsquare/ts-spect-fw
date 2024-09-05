@@ -15,7 +15,7 @@
 ; Inputs:
 ;   X25519 Public Key u in r16
 ;   X25519 Private Key k in r19
-;   DST_ID for point generation in r20
+;   DST in ca_gfp_gen_dst
 ;
 ; Outputs:
 ;   X25519(k, u) in r11
@@ -70,9 +70,6 @@ x25519_full_masked_z_randomize:
 
     ; 4) Generate random point P2
     LD          r31, ca_p25519
-    LD          r1, ca_dst_template
-    OR          r1, r1, r20
-    ROL8        r1, r1
     CALL        curve25519_point_generate
 
     ; 5) Compute sP2 = s2.P2

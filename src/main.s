@@ -117,7 +117,7 @@ op_ecc_key:
 
 ; ==============================================================================
 op_x25519:
-    ; Compose DST for x25519 ops
+    ; Compose GF(p) gen DST for x25519 ops
     ORI     r5,  r5, gfp_gen_dst_x25519
     ROL8    r5,  r5
     ST      r5,  ca_gfp_gen_dst
@@ -138,7 +138,7 @@ op_x25519:
 
 ; ==============================================================================
 op_eddsa:
-    ; Compose DST for eddsa ops
+    ; Compose GF(p) gen DST for eddsa ops
     ORI     r5,  r5, gfp_gen_dst_eddsa
     ROL8    r5,  r5
     ST      r5,  ca_gfp_gen_dst
@@ -177,7 +177,7 @@ op_eddsa:
 
 ; ==============================================================================
 op_ecdsa:
-    ; Compose DST for ecdsa ops
+    ; Compose GF(p) gen DST for ecdsa ops
     ORI     r5,  r5, gfp_gen_dst_ecdsa
     ROL8    r5,  r5
     ST      r5,  ca_gfp_gen_dst

@@ -13,7 +13,7 @@
 ; Point Generate on Curve25519
 ;
 ; Input:
-;   0x02 || DST || 0x1E in r1
+;   DST in ca_gfp_gen_dst
 ;
 ; Output:
 ;   Random point (x, z, y) on Curve25519 -- (r11, r12, r13)
@@ -30,6 +30,7 @@
 
 curve25519_point_generate:
     GRV         r2
+    LD          r1,  ca_gfp_gen_dst
     CALL        hash_to_field                   ; r0 = x in GF(2^255 - 19)
 
     CALL        map_to_curve_elligator2_curve25519

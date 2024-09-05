@@ -52,7 +52,7 @@ tmac_dst_ecdsa_sign .eq 0xB
 tmac_dst_eddsa_sign .eq 0xC
 
 ; GF(p) gen DSTs
-gfp_gen_dst_ecdsa .eq 0x1
-gfp_gen_dst_eddsa .eq 0x2
-gfp_gen_dst_x25519 .eq 0x3
-gfp_gen_dst_ecc_key .eq 0x4
+gfp_gen_dst_ecdsa .eq 0xF1
+gfp_gen_dst_eddsa .eq 0xF2
+gfp_gen_dst_x25519 .eq 0xF3
+gfp_gen_dst_ecc_key .eq 0xF4

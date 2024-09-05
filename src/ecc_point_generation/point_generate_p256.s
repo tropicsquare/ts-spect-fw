@@ -13,7 +13,7 @@
 ; Point Generate on NIST curve P-256
 ;
 ; Input:
-;   0x02 || DST || 0x1E in r1
+;   DST in ca_gfp_gen_dst
 ;
 ; Output:
 ;   Random point (x, y, z) on cirve P-256 -- (r17, r18, r19)
@@ -28,6 +28,7 @@
 ;
 ; ==============================================================================
 p256_point_generate:
+    LD      r1, ca_gfp_gen_dst
     GRV     r2
     CALL    hash_to_field
 

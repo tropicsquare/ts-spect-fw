@@ -22,8 +22,6 @@ op_x25519_dbg:
     LD      r19, x25519_dbg_input_priv
     LD      r16, x25519_dbg_input_pub
 
-    MOVI    r20, 0xD4
-
     CALL    x25519_full_masked
 
     ST      r11, x25519_dbg_output_r

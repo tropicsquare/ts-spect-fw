@@ -15,7 +15,7 @@
 ; Inputs:
 ;   Scalar k in r27
 ;   Point P in affine coordinates in (r22, r23)
-;   DST_ID  in r25
+;   DST in ca_gfp_gen_dst
 ;
 ; Outputs:
 ;   k.P in affine coordinates in (r22, r23)
@@ -44,16 +44,13 @@ spm_p256_full_masked:
 
 spm_p256_full_masked_z_randomize:
     GRV     r2
-    LD      r1, ca_gfp_gen_dst
+    LD      r1,  ca_gfp_gen_dst
     CALL    hash_to_field
     ORI     r24, r0,  1         ; Ensure that Z != 0
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24
 
     ; 2) Generate randpom point P2 (See str2point.md)
-    LD      r1, ca_dst_template
-    OR      r1, r1, r25
-    ROL8    r1, r1
     CALL    p256_point_generate
 
     MOV     r9,  r17
