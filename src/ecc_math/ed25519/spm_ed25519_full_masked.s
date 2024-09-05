@@ -15,7 +15,7 @@
 ; Inputs:
 ;   Scalar k in r27
 ;   Point P in affine coordinates in (r21, r22)
-;   DST_ID in r25
+;   DST in ca_gfp_gen_dst
 ;
 ; Outputs:
 ;   k.p in affine coordinates in (r21, r22)
@@ -52,9 +52,6 @@ spm_ed25519_full_masked_z_randomize:
     MUL25519    r22, r22, r23                   ; Y = y * Z
 
     ; 2) Generate randpom point P2 (See str2point.md)
-    LD          r1,  ca_dst_template
-    OR          r1,  r1,  r25
-    ROL8        r1,  r1
     CALL        ed25519_point_generate
 
     ; 3) Mask scalar k as k2 = k + rng2 * #E

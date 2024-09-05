@@ -91,8 +91,6 @@ ecdsa_sign_tmac_padding_loop:
     LD          r22, ca_p256_xG
     LD          r23, ca_p256_yG
 
-    MOVI        r25, 0xD8
-
     CALL        spm_p256_full_masked
     MOV         r3,  r0
     CMPI        r0,  0

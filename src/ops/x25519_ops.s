@@ -42,7 +42,6 @@ op_x25519_kpair_gen:
     ST      r19, x25519_context_etpriv
 
     MOVI    r16, 9
-    MOVI    r20, 0xD3
 
     CALL    x25519_full_masked
 
@@ -58,8 +57,6 @@ op_x25519_sc_et_eh:
     LD      r19, x25519_context_etpriv
     LD      r16, x25519_sc_et_eh_input_ehpub
     ST      r16, x25519_context_ehpub
-
-    MOVI    r20, 0xD4
 
     CALL    x25519_full_masked
 
@@ -77,8 +74,6 @@ op_x25519_sc_et_sh:
     BRE     op_x25519_key_fail
 
     LD      r19, x25519_context_etpriv
-
-    MOVI    r20, 0xD5
 
     CALL    x25519_full_masked
 
@@ -103,8 +98,6 @@ op_x25519_sc_st_eh:
     AND     r19, r0, r19
     MOVI    r1,  254
     SBIT    r19, r19, r1
-
-    MOVI    r20, 0xD6
 
     CALL    x25519_full_masked
 

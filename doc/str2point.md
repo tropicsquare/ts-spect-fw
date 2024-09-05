@@ -2,23 +2,6 @@
 
 This is a summary of algorithms used in SPECT firmware to encode an arbitrary string to a point on an elliptic curve. It is based on https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/. The algorithms are modified to a particular purposes in SPECT.
 
-## Requirements
-
-### Use of domain separation for the encoding.
-
-- ECDSA / EdDSA / X25519
-- Different for each op withing secure channel establishment
-
-Rationale: https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#name-domain-separation-requireme
-
-#### Domain separation tag (DST) requirements:
-- Tags MUST be supplied as the DST parameter to hash_to_field.
-- Tags MUST have nonzero length. A minimum length of 16 bytes is RECOMMENDED to reduce the chance of collisions with other applications.
-- Tags SHOULD begin with a fixed identification string that is unique to the application.
-- Tags SHOULD include a version number.
-- For applications that define multiple ciphersuites, each ciphersuite's tag MUST be different. For this purpose, it is RECOMMENDED to include a ciphersuite identifier in each tag.
-- For applications that use multiple encodings, either to the same curve or to different curves, each encoding MUST use a different tag. For this purpose, it is RECOMMENDED to include the encoding's Suite ID (Section 8) in the domain separation tag. For independent encodings based on the same suite, each tag SHOULD also include a distinct identifier, e.g., "ENC1" and "ENC2".
-
 ## Functions description
 
 ### sgn0
@@ -49,58 +32,6 @@ CMOV(a, b, c): If c is False, CMOV returns a, otherwise it returns b.
 ```
 is_square(x) := { True,  iff x^((p - 1) / 2) is 0 or 1 in GF(p);
                 { False, otherwise.
-```
-
-### expand message
-
-```
-parameters:
-    EXP_TAG, variant identifier
-
-input:
-    message, maximum 256 bytes
-    DST, maximum 256 bytes
-output:
-    64 uniform bytes
-
-m_len = byte_len(message) as string
-dst_len = byte_len(DST) as string
-
-return SHA512(EXP_TAG || message || m_len || DST || dst_len)
-```
-
-In case of SPECT `m_len = 32 = "20"`, `dst_len = 30 = "1E"`. EXP_TAG is always 32 bytes. E.g. for:
-- EXP_TAG `"E00000000000000000000000000000000000000000000000000000000000000E"`
-- message `"A00000000000000000000000000000000000000000000000000000000000000A"`
-- DST     `"D0000000000000000000000000000000000000000000000000000000000D"`
-
-the resulting string for SHA512 **with padding** is:
-```
-"E00000000000000000000000000000000000000000000000000000000000000EA00000000000000000000000000000000000000000000000000000000000000A
-20D0000000000000000000000000000000000000000000000000000000000D10100000000000000000000000000000000000000000000000000000000000300"
-```
-
-## Hashing to a finite field
-
-The hash_to_field function hashes a byte string msg of arbitrary length into one or more elements of a field GF(p). The function uses DST to separate different contexts of its use.
-
-```
-hash_to_field(msg)
-
-Parameters:
-- DST
-- F = GF(p)
-- L = 64
-
-Inputs:
-- msg, a byte string containing the message to hash.
-
-Outputs:
-- field element u.
-
-uniform_bytes = expand_message(message, DST)
-x = uniform_bytes as big-endian integer ("1234" = 0x1234)
-return x mod p
 ```
 
 ## Deterministic mapping
@@ -360,49 +291,3 @@ Constants:
 Procedure:
 1. return x^c1
 ```
-
-## Issues
-
-- Does the resulting point have to be in the subgroup of $G$ for the point blinding to work?
-- Does the encoding have to be uniform in case of point blinding 
-
-## Random Point Generation in SPECT
-
-```
-1. Get 256-bit random value m from TRNG.
-2. Represent m as big-endian encoded integer: 0x1234 = "1234"
-3. Use hash_to_field(m) to hash m to an element u in the finite field of the current curve.
-4. Use one of the methods to map the element u to a point on desired curve.
-
-```
-
-### Expand Message Tag
-
-Expand message tag (`EXP_TAG`) is 32-byte string used to separate use of random point generation in different projects and versions of the projects (e.g. TROPIC01, TROPIC02 ...)
-
-- `EXP_TAG[0] = 0x80`
-- `EXP_TAG[29] = 0x54`
-- `EXP_TAG[30] = 0x53`
-- `EXP_TAG[31] = version` (For TROPIC01 `x01`)
-- Others 0x00
-
-### Domain Separation Tag
-
-Domain Separation Tag `DST` is 30-byte string used to separate use of random point generation in different contexts, e.g. different SPECT command.
-
-`DTS` for all use-cases have the same prefix `"TS_SPECT_DST"` = `"54535F53504543545F445354"` followed by version and padded with zero bytes. The last byte (`DST[29]`) is following:
-
-- `x25519_kpair_gen` : `0xD3`
-- `x25519_sc_et_eh` : `0xD4`
-- `x25519_sc_et_sh` : `0xD5`
-- `x25519_sc_st_eh` : `0xD6`
-
-- `eddsa_R_part` : `0xD7`
-
-- `ecdsa_sign` : `0xD8`
-
-E.g. `DST` for `ecdsa_sign`, version `0x01 = `"54535F53504543545F4453540100000000000000000000000000000000D8"`
-
-### Expand Message Function
-
-- `SHA512(EXP_TAG || m || 0x20 || DST || 0x1E)`

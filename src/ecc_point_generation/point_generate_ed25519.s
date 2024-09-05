@@ -13,7 +13,7 @@
 ; Point Generate on Ed25519
 ;
 ; Input:
-;   0x02 || DST || 0x1E in r1
+;   DST in co_gfp_gen_dst
 ;
 ; Output:
 ;   Random point (x, y, z, t) on Ed25519 -- (r11, r12, r13, r14)
@@ -27,6 +27,7 @@
 
 ed25519_point_generate:
     LD          r31, ca_p25519
+    LD          r1,  ca_gfp_gen_dst
     GRV         r2
     CALL        hash_to_field                   ; r0 = x in GF(2^255 - 19)
 
