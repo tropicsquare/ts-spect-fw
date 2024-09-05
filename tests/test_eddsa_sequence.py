@@ -7,12 +7,17 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
-key_remask_check_en = False
+defines_set = tc.get_main_defines()
 
 def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
-    insrc = tc.insrc_arr[rn.randint(0,1)]
-    outsrc = tc.outsrc_arr[rn.randint(0,1)]
+    insrc = 0x4
+    if "IN_SRC_EN" in defines_set:
+        insrc = tc.insrc_arr[rn.randint(0,1)]
+
+    outsrc = 0x5
+    if "OUT_SRC_EN" in defines_set:
+        outsrc = tc.outsrc_arr[rn.randint(0,1)]
 
     smodq = s % ed25519.q
 

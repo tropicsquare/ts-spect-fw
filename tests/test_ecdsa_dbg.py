@@ -8,6 +8,11 @@ import models.p256 as p256
 
 if __name__ == "__main__":
 
+    defines_set = tc.get_main_defines()
+    if "DEBUG_OPS" not in defines_set:
+        tc.print_test_skipped("Debug ops are disabled.")
+        sys.exit(0)
+
     args = tc.parser.parse_args()
 
     ops_cfg = tc.get_ops_config()

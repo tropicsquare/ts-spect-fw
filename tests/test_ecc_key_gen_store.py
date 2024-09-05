@@ -14,7 +14,10 @@ ecc_key_origin = {
     "ecc_key_store" : 0x2
 }
 
+defines_set = tc.get_main_defines()
+
 def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False):
+
     cmd_file = tc.get_cmd_file(test_dir)
 
     rng = [rn.randint(1, 2**256-1) for i in range(10)]
@@ -32,6 +35,12 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
     run_name = f"{op}_{run_id}_{slot}_{slot_state}"
 
     tc.print_run_name(run_name)
+
+    if "ram" in run_id and (
+        ("IN_SRC_EN" not in defines_set) or ("OUT_SRC_EN" not in defines_set)
+    ):
+        tc.print_test_skipped("INOUT_SRC debug feature is disabled.")
+        return 0
 
     if key_type == tc.Ed25519_ID:
         priv1_ref, priv2_ref = ed25519.secret_expand(k)

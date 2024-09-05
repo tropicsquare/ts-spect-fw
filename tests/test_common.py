@@ -96,6 +96,20 @@ def get_released_file(prefix):
     
     return matching_files[0]
 
+def get_main_defines() -> set:
+    defines_set = set()
+    with open(SPECT_FW_MAIN, 'r') as fmain:
+        in_defines = False
+        for line in fmain:
+            if not in_defines:
+                in_defines = "DEFINES START" in line
+                continue
+            if in_defines:
+                if line.startswith(".define"):
+                    defines_set.add(line.split()[1])
+                elif "DEFINES END" in line:
+                    return defines_set
+
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
 
@@ -104,6 +118,9 @@ def print_failed():
 
 def print_warning(text):
     print("\033[93mWarning: {}\033[00m".format(text))
+
+def print_test_skipped(text: str):
+    print("\033[93m{} {}\033[00m".format("SKIPPED:", text))
 
 def print_run_name(run_name: str):
     print("\033[94m{}\033[00m".format(f"running {run_name}"))

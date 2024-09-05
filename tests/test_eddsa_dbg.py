@@ -228,6 +228,13 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     return sign_ref == signature
 
 if __name__ == "__main__":
+    defines_set = tc.get_main_defines()
+    if "DEBUG_OPS" not in defines_set:
+        tc.print_test_skipped("Debug ops are disabled.")
+        sys.exit(0)
+    if "IN_SRC_EN" not in defines_set or "OUT_SRC_EN" not in defines_set:
+        tc.print_test_skipped("INOUT SRC feature disabled, it must be enabled for eddsa sequence to work.")
+        sys.exit(0)
 
     args = tc.parser.parse_args()
     seed = tc.set_seed(args)
