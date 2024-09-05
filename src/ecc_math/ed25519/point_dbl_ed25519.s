@@ -50,13 +50,13 @@ point_dbl_ed25519:
     ADDP        r2,  r2,  r2                    ; r2 = r2 + r2  r2 = C
 
     ADDP        r3,  r0,  r1                    ; r3 = A+B      r3 = A+B = H
-    
+
     ADDP        r4,  r7,  r8                    ; r4 = X1 + Y1
     MUL25519    r4,  r4,  r4                    ; r4 = r4 * r4
     SUBP        r4,  r3,  r4                    ; r4 = r3 - r4  r4 = H-(X1+Y1)^2 = E
 
     SUBP        r0,  r0,  r1                    ; r0 = r0 - r1  r0 = A-B = G
-    
+
     ADDP        r1,  r2,  r0                    ; r1 = r2 + r0  r1 = C+G = F
 
     MUL25519    r7,  r4,  r1                    ; r7 = r4 * r1

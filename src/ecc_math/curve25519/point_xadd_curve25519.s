@@ -18,10 +18,10 @@
 ;   Point P = (r7,  r8)     -> x(P)
 ;   Point Q = (r9,  r10)    -> x(Q)
 ;   Point R = (r11, r12)    -> x(P - Q)
-; 
+;
 ; Output:
 ;   Q = P + Q = (r9, r10) -> x(P + Q)
-; 
+;
 ; Expects:
 ;   Curve25519 prime in r31
 

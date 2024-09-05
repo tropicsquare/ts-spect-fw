@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Key setup for curve Ed25519 (EdDSA)
@@ -55,7 +56,7 @@ ed25519_key_setup_start:
     ; H = SHA512(k)
     HASH_IT
     HASH        r28, r16
-    
+
     ; Mask H[255:0] to become scalar s
     SWE         r29, r29
     MOVI        r0,  7

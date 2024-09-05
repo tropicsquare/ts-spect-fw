@@ -1,12 +1,13 @@
 ; ==============================================================================
 ;  file    ops/clear.s
 ;  author  vit.masek@tropicsquare.com
-;  
+;
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
 ;  This work is subject to the license terms of the LICENSE.txt file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Clears all GPRs, whole Data RAM In / Out, Initialize TMAC and SHA512 core.
@@ -26,7 +27,7 @@ clear_data_in_loop:
     MOVI    r2,  12
 clear_data_out_loop:
     SUBI    r1,  r1,  32
-    SBIT    r3,  r1,  r2      
+    SBIT    r3,  r1,  r2
     STR     r0,  r3
     BRNZ    clear_data_out_loop
 

@@ -40,7 +40,7 @@ spm_ed25519_short:
     MOVI    r10, 0
 
     MOVI    r30, 256
-    
+
 spm_ed25519_short_loop:
     ROL     r28, r28
 
@@ -61,4 +61,3 @@ spm_ed25519_short_loop:
     BRNZ    spm_ed25519_short_loop
 
     RET
-    

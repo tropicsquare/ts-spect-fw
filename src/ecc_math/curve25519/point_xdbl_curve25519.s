@@ -12,18 +12,18 @@
 ;
 ; Pseudo x-coordinate only doubling on Curve25519
 ; Follows Algorithm 2 from https://eprint.iacr.org/2017/212.pdf
-; 
+;
 ; Input:
 ;              X   Z
 ;   Point P = (r7, r8)
-; 
+;
 ; Output:
 ;   P = 2.P = (r7, r8)
-; 
+;
 ; Expects:
 ;   Curve25519 prime in r31
 ;   Curve25519 constant a2d4 = (Curve25519.A + 2) / 4 in r6
-; 
+;
 ;   xDBL(XP, ZP):
 ;       V1 = XP + ZP % p
 ;       V1 = V1 ** 2 % p
@@ -48,4 +48,3 @@ point_xdbl_curve25519:
     ADDP        r3,  r3,  r2                    ; V3 = V3 + V2 % p
     MUL25519    r8,  r1,  r3                    ; ZP = V1 * V3 % p
     RET
-    

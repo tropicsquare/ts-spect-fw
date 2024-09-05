@@ -32,7 +32,6 @@ def run_op(cmd_file, cmd_id, test_dir, run_name, break_s=None):
     cmd += f" --program={TS_REPO_ROOT}/{main}"
     cmd += f" --isa-version={isa}"
     cmd += f" --first-address=0x8000"
-    #cmd += f" --const-rom={TS_REPO_ROOT}/{constfile}"
     cmd += f" --data-ram-out={test_dir}/{run_name}_out.hex"
     cmd += f" --shell --cmd-file={test_dir}/iss_cmd"
     cmd += f" > {test_dir}/{run_log}"
@@ -81,7 +80,7 @@ if __name__ == "__main__":
     run_op(cmd_file, 0xA1, test_dir, run_name)
 
     ret_val = tc.read_output(test_dir, run_name, 0x1000, 1)
-    signature = tc.read_output(test_dir, run_name, 0x1020, 16, string=True)    
+    signature = tc.read_output(test_dir, run_name, 0x1020, 16, string=True)
 
     if not(signature_ref == signature):
         print("RET_VAL: ", hex(ret_val))

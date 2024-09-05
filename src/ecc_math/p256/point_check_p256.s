@@ -55,4 +55,3 @@ point_check_p256:
 .endif
 
     RET
-

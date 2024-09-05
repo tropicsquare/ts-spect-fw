@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Map to curve elligator algorithm for Curve25519
@@ -46,7 +47,7 @@ map_to_curve_elligator2_curve25519:
 .ifdef SPECT_ISA_VERSION_2
     XORI        r30, r7,  0
 .endif
-    ; If xd == 0, the resulting point is point at infinity -> 
+    ; If xd == 0, the resulting point is point at infinity ->
     BRZ         curve25519_point_generate_y_final
     LD          r8,  ca_curve25519_a
     MOVI        r30, 0x000
@@ -65,8 +66,8 @@ map_to_curve_elligator2_curve25519:
 
     MOV         r1,  r10
     CALL        inv_p25519_250      ; r1 = pow(tv2, 2^250-1, p)
-    MUL25519    r2,  r2,  r2 
-    MUL25519    r2,  r2,  r2 
+    MUL25519    r2,  r2,  r2
+    MUL25519    r2,  r2,  r2
     MUL25519    r13, r2,  r10       ; y11 = pow(tv2, c4, p)     (gx1 * gxd^7)^((p - 5) / 8)
 
     MUL25519    r13, r13, r12       ; y11 = y11 * tv3  % p      gx1 * gxd^3 * (gx1 * gxd^7)^((p - 5) / 8)
@@ -85,7 +86,7 @@ map_to_curve_elligator2_curve25519:
     XOR         r4, r10, r8
 .endif
     BRNZ        curve25519_point_generate_y1_y12
-    
+
 curve25519_point_generate_y1_y11:
     MOV         r1, r13
     JMP         curve25519_point_generate_y1_next
@@ -150,7 +151,7 @@ curve25519_point_generate_xn_next:
 
 curve25519_point_generate_y_y1:
     MOV         r2,  r1
-    MOVI        r30, 0x001 
+    MOVI        r30, 0x001
     JMP         curve25519_point_generate_y_next
 
 curve25519_point_generate_y_y2:
@@ -159,7 +160,6 @@ curve25519_point_generate_y_y2:
     JMP         curve25519_point_generate_y_next
 
 curve25519_point_generate_y_next:
-            
     MOVI        r0,  0x000
     SUBP        r1,  r0,  r2        ; r1 = -y
     MOVI        r8,  0x001

@@ -128,4 +128,3 @@ inv_q256_loop_lowpart_back:
 
     MOV     r1,  r4
     RET
-    

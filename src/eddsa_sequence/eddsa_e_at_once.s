@@ -43,4 +43,4 @@ op_eddsa_e_at_once:
     CMPI        r9, 32
     BRZ         eddsa_e_finish_pad_in_r18       ; Use the code from e_finish
     MOV         r18, r29
-    JMP         eddsa_e_finish_pad_in_r19 
+    JMP         eddsa_e_finish_pad_in_r19

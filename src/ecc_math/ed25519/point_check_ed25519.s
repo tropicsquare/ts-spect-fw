@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_math/ed25519/point_check_ed25519.s  
+;  file    ecc_math/ed25519/point_check_ed25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)

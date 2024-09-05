@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys
-import binascii
 import hashlib
 import random as rn
 import os

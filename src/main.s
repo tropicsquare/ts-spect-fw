@@ -46,8 +46,9 @@
 .include constants/spect_descriptors_constants.s
 .include constants/l3_result_const.s
 .include constants/spect_ops_status.s
+
 ; ==============================================================================
-; Op ID decoding 
+; Op ID decoding
 ; ==============================================================================
 _start:
     LD      r0, ca_spect_cfg_word
@@ -89,6 +90,7 @@ od_id_check_dbg:
 
     JMP     invalid_op_id
 .endif
+
 ; ==============================================================================
 op_ecc_key:
     CMPI    r1, ecc_key_gen_id
@@ -161,8 +163,8 @@ op_ecdsa:
     BRZ     op_ecdsa_sign
 
     JMP     invalid_op_id
-; ==============================================================================
 
+; ==============================================================================
 invalid_op_id:
     MOVI    r2,  l3_result_invalid_cmd
     CALL    get_output_base

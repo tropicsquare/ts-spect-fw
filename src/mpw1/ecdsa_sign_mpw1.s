@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; ECDSA P-256 Sign for TROPIC01-MP1
@@ -59,7 +60,7 @@ ecdsa_sign_mpw1:
     CMPA        r14, 0
     BRZ         ecdsa_sign_fail_mpw1
 
-    MUL256      r12, r12, r14 
+    MUL256      r12, r12, r14
     MUL256      r13, r13, r14
 
 ; ==============================================================================

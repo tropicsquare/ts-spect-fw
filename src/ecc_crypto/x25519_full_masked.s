@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Fully masked and randomized X25519 algorithm

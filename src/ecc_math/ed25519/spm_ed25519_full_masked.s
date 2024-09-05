@@ -41,7 +41,7 @@
 spm_ed25519_full_masked:
     ; 1) Convert P to randomized extended coordinates
     LD          r31, ca_p25519
-    
+
 spm_ed25519_full_masked_z_randomize:
     GRV         r23
     MOVI        r0,  0

@@ -115,4 +115,3 @@ inv_p25519:
     MUL25519    r1,  r3,  r4
     ; r2 : e = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeb
     RET
-    

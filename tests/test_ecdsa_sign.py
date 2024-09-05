@@ -124,7 +124,7 @@ def test_proc(test_type: str):
         sing_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
         signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, sing_size, string=True)
 
-        if key_remask_check_en:
+        if "ECC_KEY_RERANDOMIZE" in defines_set:
             kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
 
             remasked_d1      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)

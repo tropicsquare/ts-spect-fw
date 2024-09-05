@@ -8,4 +8,4 @@ data/*.hex
 *.swo
 spect_ops_constants.h
 spect_ops_constants.s
-constants_layout.s
+constants_*layout.s

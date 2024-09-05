@@ -7,11 +7,12 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Map to curve algorithm using Simplified Shallue-van de Woestijne-Ulas method
 ; [https://www.rfc-editor.org/rfc/rfc9380.html#name-simplified-swu-method]
-; 
+;
 ; Input:
 ;   u, an element of GF(p256) in r0
 ;
@@ -57,7 +58,6 @@ map_to_curve_simple_swu:
     ; is_gx1_square, y1 = sqrt_ratio_3mod4(r12, r16)
     CALL    sqrt_ratio_3mod4
 bp_swu_after_sqrt_ratio:
-
     MUL256  r18, r11, r20
     MUL256  r18, r18, r10
 

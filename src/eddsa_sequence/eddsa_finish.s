@@ -20,7 +20,7 @@
 op_eddsa_finish:
     LD          r31, ca_q25519
 
-    MOVI        r0,  3
+    ;MOVI        r0,  3
 eddsa_finish_s_randomize:
     ; Compute S = r + e*s1 + e*s2
     LD          r26, ca_eddsa_sign_internal_s1
@@ -41,7 +41,7 @@ eddsa_finish_s_randomize:
     CALL        point_decompress_ed25519
 
     XORI        r30, r1,  0
-    BRNZ        eddsa_finish_fail
+    BRNZ        eddsa_finish_fail_invalid_pubkey
     MOVI        r13, 1
     MUL25519    r14, r11, r12
 
@@ -85,10 +85,10 @@ eddsa_finish_s_randomize:
     ADDI        r30, r0,  eddsa_output_result
 
     LD          r4,  ca_eddsa_sign_internal_R
-    
+
     ; ENC(Q) == ENC(R)
     XOR         r2,  r8,  r4
-    BRNZ        eddsa_finish_fail
+    BRNZ        eddsa_finish_fail_verify
 
     MOVI        r2,  l3_result_ok
     STR         r2,  r30
@@ -103,10 +103,16 @@ eddsa_finish_s_randomize:
     MOVI        r1,  80
     JMP         set_res_word
 
+eddsa_finish_fail_invalid_pubkey:
+    MOVI        r0,  ret_eddsa_err_final_verify
+    JMP         eddsa_finish_fail
+
+eddsa_finish_fail_verify:
+    MOVI        r0,  ret_eddsa_err_final_verify
+
 eddsa_finish_fail:
     MOVI        r2,  l3_result_fail
     STR         r2,  r30
 
-    MOVI        r0,  ret_eddsa_err_final_verify
     MOVI        r1,  1
     JMP         set_res_word

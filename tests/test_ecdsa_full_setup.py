@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import os
 
 import test_common as tc
 import models.p256 as p256
@@ -49,8 +48,6 @@ def key_store(test_dir, run_name, slot, k):
     rng = [rn.randint(1, 2**256-1) for i in range(10)]
     tc.set_rng(test_dir, rng)
 
-    tc.print_run_name(run_name)
-
     tc.start(cmd_file)
 
     input_word = (tc.P256_ID << 24) + (slot << 8) + tc.find_in_list("ecc_key_store", ops_cfg)["id"]
@@ -66,7 +63,7 @@ def key_store(test_dir, run_name, slot, k):
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         return 1
-    
+
     if (SPECT_OP_DATA_OUT_SIZE != 1):
         print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
         return 1
@@ -82,8 +79,6 @@ def key_store(test_dir, run_name, slot, k):
 
 def key_read(test_dir, run_name, keymem, slot):
     cmd_file = tc.get_cmd_file(test_dir)
-
-    tc.print_run_name(run_name)
 
     tc.start(cmd_file)
 
