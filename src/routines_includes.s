@@ -106,7 +106,13 @@
 .include    ops/ecdsa_ops.s
 .include    ops/x25519_ops.s
 .include    ops/clear.s
+
+; ====================================================
+; SPECT Debug Ops
+; ====================================================
+.ifdef DEBUG_OPS
 .include    ops/debug.s
+.endif
 
 ; ====================================================
 ; Others
