@@ -79,8 +79,6 @@
 ; ECC Point Generation
 ; ====================================================
 
-.include    ecc_point_generation/compose_exp_tag.s
-.include    ecc_point_generation/hash_to_field.s
 .include    ecc_point_generation/map_to_curve_elligator2_curve25519.s
 .include    ecc_point_generation/point_generate_curve25519.s
 .include    ecc_point_generation/point_generate_ed25519.s
@@ -118,3 +116,5 @@
 ; Others
 ; ====================================================
 .include    others/tmac_shc_shn.s
+.include    others/compose_exp_tag.s
+.include    others/hash_to_field.s

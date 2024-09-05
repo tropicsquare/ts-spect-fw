@@ -33,7 +33,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return None
+        tc.print_failed()
+        sys.exit(1)
 
     ########################################################################################################
     #   Nonce Init
@@ -48,7 +49,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return None
+        tc.print_failed()
+        sys.exit(1)
 
     ########################################################################################################
     #   Nonce Update
@@ -67,7 +69,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return None
+            tc.print_failed()
+            sys.exit(1)
 
     ########################################################################################################
     #   Nonce Update
@@ -85,7 +88,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return None
+        tc.print_failed()
+        sys.exit(1)
 
     ########################################################################################################
     #   R Part
@@ -103,7 +107,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return None
+        tc.print_failed()
+        sys.exit(1)
 
     if len(message) < 64:
         ########################################################################################################
@@ -121,7 +126,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return None
+            tc.print_failed()
+            sys.exit(1)
     else:
         ########################################################################################################
         #   E Prep
@@ -139,7 +145,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return None
+            tc.print_failed()
+            sys.exit(1)
 
         ########################################################################################################
         #   E Update
@@ -160,13 +167,12 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
             if (SPECT_OP_STATUS):
                 print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-                return None
+                tc.print_failed()
+                sys.exit(1)
 
         ########################################################################################################
         #   E Finish
         ########################################################################################################
-        tc.print_run_name(run_name)
-
         last_block = message_tmp[updates_cnt*128:]
 
         cmd_file = tc.get_cmd_file(test_dir)
@@ -180,13 +186,12 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
         if (SPECT_OP_STATUS):
             print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return None
+            tc.print_failed()
+            sys.exit(1)
 
     ########################################################################################################
     #   Finish
     ########################################################################################################
-    tc.print_run_name(run_name)
-
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
@@ -199,7 +204,8 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return None
+        tc.print_failed()
+        sys.exit(1)
 
     ########################################################################################################
     #   Read and Check
@@ -217,8 +223,6 @@ def key_store(test_dir, run_name, slot, k):
     rng = [rn.randint(1, 2**256-1) for i in range(10)]
     tc.set_rng(test_dir, rng)
 
-    tc.print_run_name(run_name)
-
     tc.start(cmd_file)
 
     input_word = (tc.Ed25519_ID << 24) + (slot << 8) + tc.find_in_list("ecc_key_store", ops_cfg)["id"]
@@ -233,21 +237,21 @@ def key_store(test_dir, run_name, slot, k):
 
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 1
+        tc.print_failed()
+        sys.exit(1)
 
     l3_result = tc.read_output(test_dir, run_name, (outsrc << 12), 1)
     l3_result &= 0xFF
 
     if (l3_result != 0xc3):
         print("L3 RESULT:", hex(l3_result))
-        return 1
+        tc.print_failed()
+        sys.exit(1)
 
     return 0
 
 def key_read(test_dir, run_name, keymem, slot):
     cmd_file = tc.get_cmd_file(test_dir)
-
-    tc.print_run_name(run_name)
 
     tc.start(cmd_file)
 
@@ -260,7 +264,9 @@ def key_read(test_dir, run_name, keymem, slot):
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        return None
+        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        tc.print_failed()
+        sys.exit(1)
 
     key_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
 
@@ -282,6 +288,8 @@ if __name__ == "__main__":
     ops_cfg = tc.get_ops_config()
     test_name = "eddsa_full_setup"
     run_name = test_name
+
+    tc.print_run_name(run_name)
 
     test_dir = tc.make_test_dir(test_name)
 

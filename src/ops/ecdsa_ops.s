@@ -55,12 +55,18 @@ op_ecdsa_sign:
     BRE     ecdsa_sign_kbus_err_fail
     KBO     r25, ecc_kbus_flush
 
+    ; Load message
+    ADDI    r4,  r0,  ecdsa_input_message
+    LDR     r18, r4
+    SWE     r18, r18
+
     ; Rerandomize d part
     LD      r31, ca_q256
-    GRV     r10
-    REDP    r10, r10, r10
-    SUBP    r26, r26, r10
-    ADDP    r21, r21, r10
+    GRV     r2
+    LD      r1, ca_gfp_gen_dst
+    CALL    hash_to_field
+    SUBP    r26, r26, r0
+    ADDP    r21, r21, r0
 
     ; Rerandomize w part
     GRV     r10
@@ -89,9 +95,6 @@ op_ecdsa_sign:
     XOR         r20, r22, r23
 
     ; Load secure channel hasn/nonce
-    ADDI    r4,  r0,  ecdsa_input_message
-    LDR     r18, r4
-    SWE     r18, r18
     LD      r16, ecdsa_sign_input_sch
     SWE     r16, r16
     LD      r17, ecdsa_sign_input_scn

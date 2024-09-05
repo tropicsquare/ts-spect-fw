@@ -43,10 +43,10 @@ spm_ed25519_full_masked:
     LD          r31, ca_p25519
 
 spm_ed25519_full_masked_z_randomize:
-    GRV         r23
-    MOVI        r0,  0
-    REDP        r23, r23, r0                    ; Z
-    ORI         r23, r23, 1                     ; Ensure that Z != 0
+    GRV         r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+    ORI         r23, r0,  1                     ; Ensure that Z != 0
     MUL25519    r21, r21, r23                   ; X = x * Z
     MUL25519    r24, r21, r22                   ; T = x * y * Z = X * y
     MUL25519    r22, r22, r23                   ; Y = y * Z

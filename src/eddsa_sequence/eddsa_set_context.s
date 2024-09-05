@@ -79,10 +79,10 @@ op_eddsa_set_context:
     ; Rerandomize
     LD          r31, ca_q25519
     GRV         r2
-    MOVI        r0,  0
-    REDP        r2,  r0,  r2
-    SUBP        r26, r26, r2
-    ADDP        r29, r29, r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+    SUBP        r26, r26, r0
+    ADDP        r29, r29, r0
 
     GRV         r2
     XOR         r23, r23, r2
@@ -117,6 +117,7 @@ op_eddsa_set_context:
     LD      r17, eddsa_set_context_input_scn
 
     MOVI    r0,  ret_op_success
+    MOVI    r1,  0
     JMP     set_res_word
 
 
