@@ -110,9 +110,11 @@ ecdsa_sign_tmac_padding_loop:
 ; ==============================================================================
 
 ecdsa_sign_mask_k:
-    GRV         r25                             ; t
-    REDP        r25, r25, r25
-    ORI         r25, r25, 1                     ; force mask to be even -> not 0
+    GRV         r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+    MOV         r25, r0                         ; t
+    ORI         r25, r25, 1                     ; force t to be even -> not 0
     MULP        r1,  r25, r27
     CALL        inv_q256                        ; (kt)^(-1)
 

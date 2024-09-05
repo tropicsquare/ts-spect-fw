@@ -57,6 +57,9 @@ _start:
     AND     r1, r0, r4                          ; mask SPECT_OP_ID to r1[7:0]
     ANDI    r4, r1, 0xF0                        ; get only op type id
 
+    ; Load DST template
+    LD      r5, ca_dst_template
+
 op_id_check_clear:
     CMPI    r1, clear_id
     BRZ     op_clear
@@ -93,6 +96,11 @@ od_id_check_dbg:
 
 ; ==============================================================================
 op_ecc_key:
+    ; Compose DST for ecc_key ops
+    ORI     r5,  r5, gfp_gen_dst_ecc_key
+    ROL8    r5,  r5
+    ST      r5,  ca_gfp_gen_dst
+
     CMPI    r1, ecc_key_gen_id
     BRZ     op_ecc_key_gen_store
 
@@ -109,6 +117,11 @@ op_ecc_key:
 
 ; ==============================================================================
 op_x25519:
+    ; Compose DST for x25519 ops
+    ORI     r5,  r5, gfp_gen_dst_x25519
+    ROL8    r5,  r5
+    ST      r5,  ca_gfp_gen_dst
+
     CMPI    r1, x25519_kpair_gen_id
     BRZ     op_x25519_kpair_gen
 
@@ -125,6 +138,11 @@ op_x25519:
 
 ; ==============================================================================
 op_eddsa:
+    ; Compose DST for eddsa ops
+    ORI     r5,  r5, gfp_gen_dst_eddsa
+    ROL8    r5,  r5
+    ST      r5,  ca_gfp_gen_dst
+
     CMPI    r1, eddsa_set_context_id
     BRZ     op_eddsa_set_context
 
@@ -159,6 +177,11 @@ op_eddsa:
 
 ; ==============================================================================
 op_ecdsa:
+    ; Compose DST for ecdsa ops
+    ORI     r5,  r5, gfp_gen_dst_ecdsa
+    ROL8    r5,  r5
+    ST      r5,  ca_gfp_gen_dst
+
     CMPI    r1, ecdsa_sign_id
     BRZ     op_ecdsa_sign
 

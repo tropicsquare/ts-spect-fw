@@ -43,10 +43,10 @@ spm_p256_full_masked:
     LD      r31, ca_p256
 
 spm_p256_full_masked_z_randomize:
-    GRV     r24
-    MOVI    r0,  0
-    REDP    r24, r24, r0
-    ORI     r24, r24, 1         ; Ensure that Z != 0
+    GRV     r2
+    LD      r1, ca_gfp_gen_dst
+    CALL    hash_to_field
+    ORI     r24, r0,  1         ; Ensure that Z != 0
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24
 

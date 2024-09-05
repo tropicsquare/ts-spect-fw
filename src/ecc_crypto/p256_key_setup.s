@@ -104,10 +104,11 @@ p256_key_setup_tmac_padding_loop:
 
     MOVI    r14, 1
 
-    GRV     r14
-    MOVI    r0,  0
-    REDP    r14, r14, r0
-    ORI     r14, r14, 1         ; Ensure that Z != 0
+    GRV     r2
+    LD      r1, ca_gfp_gen_dst
+    CALL    hash_to_field
+
+    ORI     r14, r0,  1         ; Ensure that Z != 0
     MUL256  r12, r12, r14
     MUL256  r13, r13, r14
 
@@ -167,9 +168,10 @@ p256_key_setup_origin_continue:
 
     ; split priv key d
     LD      r31, ca_q256
-    GRV     r1
-    REDP    r1,  r1,  r1
-    SUBP    r28, r28, r1
+    GRV     r2
+    LD      r1, ca_gfp_gen_dst
+    CALL    hash_to_field
+    SUBP    r28, r28, r0
 
     ; mask priv key w
     GRV     r2
@@ -183,7 +185,7 @@ p256_key_setup_origin_continue:
     BRE     p256_key_setup_fail
     STK     r29, r26, ecc_priv_key_2            ; store w
     BRE     p256_key_setup_fail
-    STK     r1,  r26, ecc_priv_key_3            ; store d2
+    STK     r0,  r26, ecc_priv_key_3            ; store d2
     BRE     p256_key_setup_fail
     STK     r2,  r26, ecc_priv_key_4            ; store w mask
     BRE     p256_key_setup_fail

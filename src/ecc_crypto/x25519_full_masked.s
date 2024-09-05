@@ -56,10 +56,10 @@ x25519_full_masked:
 
     ; 2) Randomize P1.z
 x25519_full_masked_z_randomize:
-    GRV         r18
-    MOVI        r0,  0
-    REDP        r18, r18, r0
-    ORI         r18, r18, 1                     ; Ensure that Z != 0
+    GRV         r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+    ORI         r18, r0,  1                     ; Ensure that Z != 0
     MUL25519    r16, r16, r18
     MUL25519    r17, r17, r18
 

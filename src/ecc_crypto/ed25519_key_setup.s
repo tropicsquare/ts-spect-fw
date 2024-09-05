@@ -37,14 +37,14 @@
 ; ==============================================================================
 
 ed25519_key_setup:
-    CMPI    r1, ecc_key_gen_id
-    BRZ     ed25519_key_setup_generate_k
-    ADDI    r4,  r0,  ecc_key_store_input_k
-    LDR     r19, r4
-    JMP     ed25519_key_setup_start
+    CMPI        r1, ecc_key_gen_id
+    BRZ         ed25519_key_setup_generate_k
+    ADDI        r4,  r0,  ecc_key_store_input_k
+    LDR         r19, r4
+    JMP         ed25519_key_setup_start
 
 ed25519_key_setup_generate_k:
-    GRV     r19
+    GRV         r19
 ed25519_key_setup_start:
     ; Add padding to k
     MOVI        r18, 1
@@ -78,10 +78,11 @@ ed25519_key_setup_start:
     LD          r11, ca_ed25519_xG
     LD          r12, ca_ed25519_yG
 
-    GRV         r13                 ; Z
-    MOVI        r0,  0
-    REDP        r13, r13, r0
-    ORI         r13, r13, 1         ; Ensure that Z != 0
+    GRV         r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+
+    ORI         r13, r0,  1         ; Ensure that Z != 0
     MUL25519    r11, r11, r13       ; X = x * Z
     MUL25519    r14, r11, r12       ; T = x * y * Z = X * y
     MUL25519    r12, r12, r13       ; Y = y * Z
@@ -139,10 +140,12 @@ ed25519_key_setup_origin_continue:
     REDP        r30, r0,  r28
 
     ; Split the scalar
-    GRV         r1
-    REDP        r1,  r0,  r1
-    ; Ensure r != 0
-    ORI         r1,  r1,  1
+    GRV         r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+
+    ; Ensure s2 != 0
+    ORI         r1,  r0,  1
     SUBP        r28, r30, r1
     ; Mask prefix
     GRV         r2
