@@ -20,9 +20,23 @@
 ; ==============================================================================
 ; Defines
 ; ==============================================================================
-
+; DEFINES START
+;
 ; Enable ECC key rerandomization in Flash
-; .define ECC_KEY_RERANDOMIZE
+;.define ECC_KEY_RERANDOMIZE
+;
+; Indlude debug operations
+.define DEBUG_OPS
+;
+; Use SPECT_INOUT_SRC[7:4]
+; When disabled, SPECT_INOUT_SRC[7:4] is ignored, and efectively forced to 0x4.
+.define IN_SRC_EN
+;
+; Use SPECT_INOUT_SRC[3:0]
+; When disabled, SPECT_INOUT_SRC[3:0] is ignored, and efectively forced to 0x5.
+.define OUT_SRC_EN
+;
+; DEFINES END
 
 ; ==============================================================================
 ; Constants Includes
@@ -32,8 +46,9 @@
 .include constants/spect_descriptors_constants.s
 .include constants/l3_result_const.s
 .include constants/spect_ops_status.s
+
 ; ==============================================================================
-; Op ID decoding 
+; Op ID decoding
 ; ==============================================================================
 _start:
     LD      r0, ca_spect_cfg_word
@@ -62,6 +77,7 @@ op_id_check_ecdsa:
     CMPI    r4, ecdsa_id
     BRZ     op_ecdsa
 
+.ifdef DEBUG_OPS
 od_id_check_dbg:
     CMPI    r1, x25519_dbg_id
     BRZ     op_x25519_dbg
@@ -73,6 +89,7 @@ od_id_check_dbg:
     BRZ     op_ecdsa_dbg
 
     JMP     invalid_op_id
+.endif
 
 ; ==============================================================================
 op_ecc_key:
@@ -146,8 +163,8 @@ op_ecdsa:
     BRZ     op_ecdsa_sign
 
     JMP     invalid_op_id
-; ==============================================================================
 
+; ==============================================================================
 invalid_op_id:
     MOVI    r2,  l3_result_invalid_cmd
     CALL    get_output_base
@@ -160,12 +177,29 @@ invalid_op_id:
 ; Routines for geting fields from SPECT_CFG_WORD
 ; ==============================================================================
 get_input_base:
+.ifdef IN_SRC_EN
     LD      r0,  ca_spect_cfg_word
     MOVI    r1,  0xF0
     ROL8    r1,  r1
     AND     r0,  r0,  r1
+.else
+.ifdef DEBUG_OPS
+    LD      r0, ca_spect_cfg_word
+    MOVI    r1, 0x80
+    AND     r0, r0, r1                          ; mask SPECT_OP_ID[7:4]
+    BRZ     get_input_base_app                  ; current op is a application op, force 0x4
+    ; else it is debug op, force 0x0
+    MOVI    r0,  0
     RET
+get_input_base_app:
+.endif
+    MOVI    r0,  0x40
+    ROL8    r0,  r0
+.endif
+    RET
+
 get_output_base:
+.ifdef OUT_SRC_EN
     LD      r0,  ca_spect_cfg_word
     MOVI    r1,  0xF0
     ROL8    r1,  r1
@@ -174,6 +208,21 @@ get_output_base:
     LSL     r0,  r0
     LSL     r0,  r0
     AND     r0,  r0,  r1
+.else
+.ifdef DEBUG_OPS
+    LD      r0, ca_spect_cfg_word
+    MOVI    r1, 0x80
+    AND     r0, r0, r1                          ; mask SPECT_OP_ID[7:4]
+    BRZ     get_output_base_app                 ; current op is a application op, force 0x5
+    ; else it is debug op, force 0x1
+    MOVI    r0,  0x10
+    ROL8    r0,  r0
+    RET
+get_output_base_app:
+.endif
+    MOVI    r0,  0x50
+    ROL8    r0,  r0
+.endif
     RET
 get_data_in_size:
     LD      r0,  ca_spect_cfg_word

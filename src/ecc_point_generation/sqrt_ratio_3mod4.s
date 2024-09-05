@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    
+;  file    ecc_point_generation/sqrt_ratio_3mod4.s
 ;  author  vit.masek@tropicsquare.com
 
 ;
@@ -8,6 +8,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Square root ratio algorithm for GF(p) where p = 3 mod 4
@@ -33,7 +34,7 @@
 ;   Constants:
 ;   1. c1 = (q - 3) // 4
 ;   2. c2 = sqrt(-Z)
-;           
+;
 ;   Procedure:
 ;   1. tv1 = v^2
 ;   2. tv2 = u * v

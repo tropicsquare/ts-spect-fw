@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Routine for EdDSA signature verification for boot-up firmware.
@@ -54,7 +55,7 @@ eddsa_verify:
     SWE         r21, r25
     SWE         r22, r26
     SWE         r23, r27
-    
+
     HASH_IT
     HASH        r28, r20
 

@@ -8,6 +8,11 @@ import models.p256 as p256
 
 if __name__ == "__main__":
 
+    defines_set = tc.get_main_defines()
+    if "DEBUG_OPS" not in defines_set:
+        tc.print_test_skipped("Debug ops are disabled.")
+        sys.exit(0)
+
     args = tc.parser.parse_args()
 
     ops_cfg = tc.get_ops_config()
@@ -29,7 +34,6 @@ if __name__ == "__main__":
     else:
         seed = tc.set_seed(args)
         rn.seed(seed)
-        print("Randomization...")
         print("seed:", seed)
         # Generate test vector
         d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
@@ -43,22 +47,10 @@ if __name__ == "__main__":
     cmd_file = tc.get_cmd_file(test_dir)
 
     tc.set_rng(test_dir, rng_list)
-    
-    #print()
-    #print("\td:   ", hex(d))
-    #print("\tw:   ", w.hex())
-    #print("\tsch: ", sch.hex())
-    #print("\tscn: ", scn.hex())
-    #print("\tz:   ", z.hex())
-    #print("\tAx:  ", hex(Ax))
-    #print("\tAy:  ", hex(Ay))
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
 
     signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')
-    #print()
-    #print("r_ref:", hex(r_ref))
-    #print("s_ref:", hex(s_ref))
 
     # Write Keys and inputs
     slot = rn.randint(0, 7)
@@ -104,10 +96,6 @@ if __name__ == "__main__":
 
     signature = tc.read_output(test_dir, run_name, (outsrc<<12) + 0x10, 16, string=True)
 
-    #print()
-    #print(signature_ref.hex())
-    #print(signature.hex())
-
     if not(signature_ref == signature):
         tc.print_failed()
         sys.exit(1)
@@ -117,4 +105,4 @@ if __name__ == "__main__":
     if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
         os.system(f"rm -r {test_dir}")
 
-    sys.exit(0), 
+    sys.exit(0)

@@ -7,7 +7,7 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
-def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""):
+def eddsa_dbg_sequence(s, prefix, A, sch, scn, message, run_name_suffix=""):
 
     insrc = 0x0
     outsrc = 0x1
@@ -19,7 +19,7 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     ########################################################################################################
     run_name = "eddsa_set_context_dbg" + run_name_suffix
     tc.print_run_name(run_name)
-    
+
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
@@ -78,8 +78,6 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     ########################################################################################################
     #   Nonce Update
     ########################################################################################################
-    m_blocks_tmac = []
-
     updates_cnt = len(message) // 144
     for i in range(0, updates_cnt):
         block = message[i*144:i*144+144]
@@ -195,9 +193,6 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
-    #break_s = tc.dump_gpr_on(cmd_file, "bp_dump_eA", [11, 12, 13, 14])
-    #break_s += tc.dump_gpr_on(cmd_file, "bp_dump_sG", [7, 8, 9, 10])
-
     ctx = tc.run_op(
         cmd_file, "eddsa_finish", insrc, outsrc, 0, ops_cfg, test_dir,
         run_name=run_name, old_context=ctx
@@ -218,16 +213,19 @@ def eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix=""
     ########################################################################################################
 
     result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    #print("result:", hex(result))
-
-    #print("signature_ref:", sign_ref.hex())
 
     signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16, string=True)
-    #print("signature:    ", signature.hex())
 
     return sign_ref == signature
 
 if __name__ == "__main__":
+    defines_set = tc.get_main_defines()
+    if "DEBUG_OPS" not in defines_set:
+        tc.print_test_skipped("Debug ops are disabled.")
+        sys.exit(0)
+    if "IN_SRC_EN" not in defines_set or "OUT_SRC_EN" not in defines_set:
+        tc.print_test_skipped("INOUT SRC feature disabled, it must be enabled for eddsa sequence to work.")
+        sys.exit(0)
 
     args = tc.parser.parse_args()
     seed = tc.set_seed(args)
@@ -248,8 +246,6 @@ if __name__ == "__main__":
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
 
-    slot = rn.randint(0, 7)
-
     ########################################################################################################
     #   Test message len < 64
     ########################################################################################################
@@ -257,7 +253,7 @@ if __name__ == "__main__":
     msg_bitlen = rn.randint(1, 63)*8
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
-    if not eddsa_dbg_sequence(s, prefix, A, slot, sch, scn, message):
+    if not eddsa_dbg_sequence(s, prefix, A, sch, scn, message):
         tc.print_failed()
         ret = 1
     else:

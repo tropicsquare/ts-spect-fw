@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import numpy as np
 import os
 
 import test_common as tc
@@ -34,13 +33,6 @@ if __name__ == "__main__":
     stpriv_scalar = models.x25519.int2scalar(stpriv)
     stpub = models.x25519.x25519(stpriv_scalar, 9)
 
-    #print("ehpriv:", hex(ehpriv))
-    #print("ehpub:", hex(ehpub))
-    #print("shpriv:", hex(shpriv))
-    #print("shpub:", hex(shpub))
-    #print("stpriv:", hex(stpriv))
-    #print("stpub:", hex(stpub))
-
 # ===================================================================================
 #   x25519_kpair_gen
 # ===================================================================================
@@ -58,7 +50,7 @@ if __name__ == "__main__":
     ctx = tc.run_op(cmd_file, "x25519_kpair_gen", 0x0, 0x1, 0, ops_cfg, test_dir)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, "x25519_kpair_gen")
-    
+
     if (SPECT_OP_STATUS):
         print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
         tc.print_failed()

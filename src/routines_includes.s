@@ -7,7 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
-;
+
 ; ==============================================================================
 ;
 ; Includes of all source files for Application Firmware
@@ -35,7 +35,7 @@
 .include   ecc_math/ed25519/spm_ed25519_short.s
 .include   ecc_math/ed25519/spm_ed25519_long.s
 .include   ecc_math/ed25519/spm_ed25519_full_masked.s
-.include    ecc_math/ed25519/point_check_ed25519.s
+.include   ecc_math/ed25519/point_check_ed25519.s
 
 ; .......... P256 ..........
 
@@ -106,7 +106,13 @@
 .include    ops/ecdsa_ops.s
 .include    ops/x25519_ops.s
 .include    ops/clear.s
+
+; ====================================================
+; SPECT Debug Ops
+; ====================================================
+.ifdef DEBUG_OPS
 .include    ops/debug.s
+.endif
 
 ; ====================================================
 ; Others

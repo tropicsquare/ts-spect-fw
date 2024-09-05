@@ -33,7 +33,7 @@ get_y_curve25519:
     MUL25519    r0,  r0,  r16
     MUL25519    r1,  r16, r16
     ADDP        r1,  r1,  r0
-    MOVI        r0,  1 
+    MOVI        r0,  1
     ADDP        r1,  r1,  r0
     MUL25519    r1,  r1,  r16                   ; r1 = x*(x^2 + A*x + 1)
 

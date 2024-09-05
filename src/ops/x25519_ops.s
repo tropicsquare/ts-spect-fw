@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; X25519 Ops:
@@ -111,4 +112,3 @@ op_x25519_sc_st_eh:
     BRNZ    op_x25519_end
     ST      r11, x25519_sc_st_eh_output_r3
     JMP     op_x25519_end
-

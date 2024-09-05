@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import os
 import itertools
 
 import test_common as tc
@@ -14,10 +13,13 @@ ecc_key_origin = {
     "ecc_key_store" : 0x2
 }
 
+defines_set = tc.get_main_defines()
+
 def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False):
+
     cmd_file = tc.get_cmd_file(test_dir)
 
-    rng = [rn.randint(1, 2**256-1) for i in range(10)]
+    rng = [rn.randint(1, 2**256-1) for _ in range(10)]
     tc.set_rng(test_dir, rng)
 
     k = rng[0].to_bytes(32, 'little')
@@ -33,6 +35,12 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
 
     tc.print_run_name(run_name)
 
+    if "ram" in run_id and (
+        ("IN_SRC_EN" not in defines_set) or ("OUT_SRC_EN" not in defines_set)
+    ):
+        tc.print_test_skipped("INOUT_SRC debug feature is disabled.")
+        return 0
+
     if key_type == tc.Ed25519_ID:
         priv1_ref, priv2_ref = ed25519.secret_expand(k)
         pub1_ref = ed25519.secret_to_public(k)
@@ -40,9 +48,6 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
         pub2_ref = 0
         priv1_ref = priv1_ref % ed25519.q
         priv2_ref = int.from_bytes(priv2_ref, 'big')
-        #print("s:       ", hex(priv1_ref))
-        #print("prefix:  ", hex(priv2_ref))
-        #print("A:       ", hex(pub1_ref))
     else:
         if op == "ecc_key_gen":
             k = rng[1].to_bytes(32, 'big') + rng[0].to_bytes(32, 'big')
@@ -50,10 +55,6 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
             k = (rng[0] % p256.q).to_bytes(32, 'little')
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
         priv2_ref = int.from_bytes(priv2_ref, 'big')
-        #print("d:   ", hex(priv1_ref))
-        #print("w:   ", hex(priv2_ref))
-        #print("Ax:  ", hex(pub1_ref))
-        #print("Ay:  ", hex(pub2_ref))
 
     tc.start(cmd_file)
     tc.gpr_preload(cmd_file)
@@ -166,7 +167,7 @@ if __name__ == "__main__":
     seed = tc.set_seed(args)
     rn.seed(seed)
     print("seed:", seed)
-    
+
     ops_cfg = tc.get_ops_config()
     test_name = "ecc_key_gen_store"
 
@@ -183,7 +184,7 @@ if __name__ == "__main__":
     fail_flag = 0
 
     src = {0x0: "ram", 0x4: "cpb"}
-    curve_str = {tc.Ed25519_ID: "ed25519", tc.P256_ID: "p256"} 
+    curve_str = {tc.Ed25519_ID: "ed25519", tc.P256_ID: "p256"}
 
     for tst_comb in all_comb:
         op = tst_comb[0]

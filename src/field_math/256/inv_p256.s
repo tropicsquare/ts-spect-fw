@@ -49,7 +49,7 @@ inv_p256_loop_10_1:
     BRNZ    inv_p256_loop_10_1
 
     MUL256  r3,  r3,  r5
-    
+
     MOVI    r30, 10
 inv_p256_loop_10_2:
     MUL256  r3,  r3,  r3
@@ -60,7 +60,7 @@ inv_p256_loop_10_2:
     MUL256  r5,  r3,  r5
     ; r5 : e = 0x3fffffff
 
-    MUL256  r3,  r5,  r5 
+    MUL256  r3,  r5,  r5
     MUL256  r3,  r3,  r3
     MUL256  r2,  r3,  r4
     ; r2 : e = 0xffffffff

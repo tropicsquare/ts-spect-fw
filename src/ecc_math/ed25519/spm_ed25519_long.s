@@ -84,4 +84,3 @@ spm_ed25519_long_loop_255_0:
     BRNZ    spm_ed25519_long_loop_255_0
 
     RET
-    

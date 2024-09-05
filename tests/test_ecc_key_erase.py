@@ -11,14 +11,24 @@ if __name__ == "__main__":
     seed = tc.set_seed(args)
     rn.seed(seed)
     print("seed:", seed)
-    
+
+    defines_set = tc.get_main_defines()
+
     ops_cfg = tc.get_ops_config()
     test_name = "ecc_key_erase"
 
     test_dir = tc.make_test_dir(test_name)
 
-    insrc = tc.insrc_arr[rn.randint(0,1)]
-    outsrc = tc.outsrc_arr[rn.randint(0,1)]
+    insrc = 0x4
+    if "IN_SRC_EN" in defines_set:
+        insrc = tc.insrc_arr[rn.randint(0,1)]
+
+    outsrc = 0x5
+    if "OUT_SRC_EN" in defines_set:
+        outsrc = tc.outsrc_arr[rn.randint(0,1)]
+
+    print("insrc:", insrc)
+    print("outsrc:", outsrc)
 
 # ===================================================================================
 #   Full Slot

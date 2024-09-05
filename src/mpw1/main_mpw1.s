@@ -6,7 +6,8 @@
 ;  This work is subject to the license terms of the LICENSE.txt file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
-;  obtain one at (https://tropicsquare.com/license). 
+;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ;  Main for MPW1 tests
@@ -204,7 +205,7 @@ x25519_scm_mpw1:
     LD          r31, ca_p25519
 
     CMPI        r0,  x25519_scm_masked_id_mpw1
-    BRZ         x25519_scm_masked_mpw1        
+    BRZ         x25519_scm_masked_mpw1
 x25519_scm_pure_mpw1:
     CALL        spm_curve25519_short
     JMP         x25519_scm_mpw1_end

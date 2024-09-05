@@ -86,7 +86,7 @@ eddsa_e_finish_last_hash:
     ; decode as little endian integer mod q
     SWE         r16, r16
     SWE         r17, r17
-    REDP        r25, r16, r17   
+    REDP        r25, r16, r17
 
     MOVI        r0, ret_op_success
     MOVI        r1,  0

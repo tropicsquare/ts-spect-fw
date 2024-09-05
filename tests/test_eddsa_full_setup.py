@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import os
 
 import test_common as tc
 
@@ -54,8 +53,6 @@ def eddsa_sequence(test_dir, run_name, keymem, slot, sch, scn, message):
     ########################################################################################################
     #   Nonce Update
     ########################################################################################################
-    m_blocks_tmac = []
-
     updates_cnt = len(message) // 144
     for i in range(0, updates_cnt):
         block = message[i*144:i*144+144]

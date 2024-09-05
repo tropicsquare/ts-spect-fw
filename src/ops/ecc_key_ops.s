@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; ECC Key Ops:
@@ -38,7 +39,7 @@ op_ecc_key_gen_store:
     ; check if priv key slot is empty
     KBO     r25, ecc_kbus_verify_erase
     BRE     op_key_fail
-    
+
     ADDI    r26, r25, 1                     ; physical pub key slot
 
     ; check if pub key slot is empty
@@ -73,7 +74,7 @@ ecc_key_gen_p256_call:
     BRZ     ecc_key_gen_p256_call_ok
     MOVI    r2,  l3_result_fail
     JMP     op_key_setup_end
-    
+
 ecc_key_gen_p256_call_ok:
     MOVI    r2,  l3_result_ok
     JMP     op_key_setup_end

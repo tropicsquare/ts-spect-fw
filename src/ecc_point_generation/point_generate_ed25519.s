@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Point Generate on Ed25519
@@ -19,7 +20,7 @@
 ;
 ; Intermediate value registers:
 ;   r0,..,r14
-; 
+;
 ; See spect_fw/str2point.md for detailed description.
 ;
 ; ==============================================================================
@@ -43,13 +44,13 @@ ed25519_point_generate:
     LD          r30, ca_pg_map2ed25519_c5
                                                 ; xn = xMn * yMd    (yMd = 1 every time)
     MUL25519    r10, r3,  r30                   ; xn = xn * c5
-    MUL25519    r13, r7,  r11                   ; xd = xMd * yMn    xn / xd = c1 * xM / yM 
+    MUL25519    r13, r7,  r11                   ; xd = xMd * yMn    xn / xd = c1 * xM / yM
     SUBP        r12, r3,  r7                    ; yn = xMn - xMd
     ADDP        r14, r3,  r7                    ; yd = xMn + xMd    (n / d - 1) / (n / d + 1) = (n - d) / (n + d)
     MUL25519    r0,  r13, r14                   ; tv1 = xd * yd = z'
     XORI        r30, r0,  0                     ; e = tv1 == 0
     BRZ         ed25519_point_generate
-    
+
     MUL25519    r11, r10, r14                   ; x' = xn * yd
     MUL25519    r12, r12, r13                   ; y' = yn * xd
     MUL25519    r14, r11, r12                   ; t = x' * y'

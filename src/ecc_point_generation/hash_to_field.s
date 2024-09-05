@@ -7,6 +7,7 @@
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
+;
 ; ==============================================================================
 ;
 ; Hash arbitrary 256-bit string in to an element of GF(2^255 - 19)
@@ -20,11 +21,12 @@
 ;   a = SHA512(EXP_TAG || x || 0x02 || DST || 0x1E) mod p
 ;
 ; Input:
+;   "0x02 || DST || 0x1E" in r1
 ;   x in r2
 ;
 ; Output:
 ;   a, an element of GF(2^255 - 19) in r0
-; 
+;
 ; Expects:
 ;   p in r31
 ;

@@ -7,17 +7,21 @@ import test_common as tc
 
 import models.ed25519 as ed25519
 
-key_remask_check_en = False
+defines_set = tc.get_main_defines()
 
 def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
-    insrc = tc.insrc_arr[rn.randint(0,1)]
-    outsrc = tc.outsrc_arr[rn.randint(0,1)]
+    insrc = 0x4
+    if "IN_SRC_EN" in defines_set:
+        insrc = tc.insrc_arr[rn.randint(0,1)]
+
+    outsrc = 0x5
+    if "OUT_SRC_EN" in defines_set:
+        outsrc = tc.outsrc_arr[rn.randint(0,1)]
 
     smodq = s % ed25519.q
 
     sign_ref = ed25519.sign(s, prefix, A, sch, scn, message)
-    #print("Msg size:", len(message))
 
     ########################################################################################################
     #   Set Context
@@ -97,7 +101,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
             print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
             return 0
 
-        if key_remask_check_en:
+        if "ECC_KEY_RERANDOMIZE" in defines_set:
             kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
 
             remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
@@ -145,8 +149,6 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     ########################################################################################################
     #   Nonce Update
     ########################################################################################################
-    m_blocks_tmac = []
-
     updates_cnt = len(message) // 144
     for i in range(0, updates_cnt):
         block = message[i*144:i*144+144]
@@ -328,9 +330,6 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
-    #break_s = tc.dump_gpr_on(cmd_file, "bp_dump_eA", [11, 12, 13, 14])
-    #break_s += tc.dump_gpr_on(cmd_file, "bp_dump_sG", [7, 8, 9, 10])
-
     ctx = tc.run_op(cmd_file, "eddsa_finish", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
@@ -348,17 +347,12 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
     ########################################################################################################
 
     l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    #print("result:", hex(result))
 
     if (l3_result != 0xc3):
         print("L3 RESULT:", hex(l3_result))
-        tc.print_failed()
-        return 1
-
-    #print("signature_ref:", sign_ref.hex())
+        return 0
 
     signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, (SPECT_OP_DATA_OUT_SIZE-16)//4, string=True)
-    #print("signature:    ", signature.hex())
 
     return sign_ref == signature
 

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import numpy as np
 import os
-import binascii
 
 import test_common as tc
 
 import models.x25519
 
 if __name__ == "__main__":
+    defines_set = tc.get_main_defines()
+    if "DEBUG_OPS" not in defines_set:
+        tc.print_test_skipped("Debug ops are disabled.")
+        sys.exit(0)
 
     args = tc.parser.parse_args()
 
@@ -30,7 +32,6 @@ if __name__ == "__main__":
     else:
         seed = tc.set_seed(args)
         rn.seed(seed)
-        print("Randomization...")
         print("seed:", seed)
         priv = rn.randint(0, 2**256-1)
         priv_scalar = models.x25519.int2scalar(priv)

@@ -60,4 +60,3 @@ spm_p256_short_loop:
     BRNZ    spm_p256_short_loop
 
     RET
-    

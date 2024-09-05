@@ -77,14 +77,14 @@ eddsa_nonce_finish_exact:                       ; message was exactly multiple o
     SBIT        r1,  r1,  r3
     ORI         r1,  r1,  0x80
 
-    JMP         eddsa_nonce_finish_last_update  
+    JMP         eddsa_nonce_finish_last_update
 
 eddsa_nonce_finish_padding_1:
     MOVI        r2,  0x84
     ROR8        r2,  r2
     ROLIN       r1,  r1,  r2
 
-    JMP         eddsa_nonce_finish_last_update  
+    JMP         eddsa_nonce_finish_last_update
 
 eddsa_nonce_finish_last_update:
     TMAC_UP     r1

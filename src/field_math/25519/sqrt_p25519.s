@@ -58,5 +58,3 @@ sqrt_p25519:
 sqrt_p25519_final_correction:
     MOV         r1, r3
     RET
-
-

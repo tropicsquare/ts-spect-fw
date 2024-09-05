@@ -10,6 +10,7 @@ from argparse import SUPPRESS, ArgumentParser
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 OPS_CONFIG = TS_REPO_ROOT+"/spect_ops_config.yml"
+SPECT_FW_MAIN = TS_REPO_ROOT+"/src/main.s"
 
 Ed25519_ID = 0x02
 P256_ID = 0x01
@@ -93,8 +94,22 @@ def get_released_file(prefix):
 
     if len(matching_files) > 1:
         print(f"Found more than one file of type \'{prefix}*.hex\'!")
-    
+
     return matching_files[0]
+
+def get_main_defines() -> set:
+    defines_set = set()
+    with open(SPECT_FW_MAIN, 'r') as fmain:
+        in_defines = False
+        for line in fmain:
+            if not in_defines:
+                in_defines = "DEFINES START" in line
+                continue
+            if in_defines:
+                if line.startswith(".define"):
+                    defines_set.add(line.split()[1])
+                elif "DEFINES END" in line:
+                    return defines_set
 
 def print_passed():
     print("\033[92m{}\033[00m".format("PASSED"))
@@ -102,8 +117,11 @@ def print_passed():
 def print_failed():
     print("\033[91m{}\033[00m".format("FAILED"))
 
-def print_warning(text):
+def print_warning(text: str):
     print("\033[93mWarning: {}\033[00m".format(text))
+
+def print_test_skipped(text: str):
+    print("\033[93m{} {}\033[00m".format("SKIPPED:", text))
 
 def print_run_name(run_name: str):
     print("\033[94m{}\033[00m".format(f"running {run_name}"))
@@ -445,7 +463,7 @@ def run_op(
             print("Const:  ", release_const[1])
 
     cmd = iss
-    
+
     if ("TS_SPECT_FW_TEST_RELEASE" not in os.environ.keys()) and (break_s or main):
         if not main:
             main = "src/main.s"

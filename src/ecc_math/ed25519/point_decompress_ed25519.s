@@ -81,14 +81,14 @@ point_decompress_ed25519_sqr:
     SUBP        r20, r16, r1                    ; r20 = r16 - 1
     MUL25519    r16, r16, r6
     ADDP        r21, r16, r1                    ; r21 = r16 + 1
-    
+
     ; u = r20  v = r21
 
     MUL25519    r18, r21, r21
     MUL25519    r18, r18, r21                   ; r18 = v^3
 
     MUL25519    r19, r18, r20                   ; r19 = u*v^3
-    
+
     MUL25519    r18, r18, r18
     MUL25519    r18, r18, r21                   ; r18 = v^7
 
@@ -194,6 +194,6 @@ point_decompress_ed25519_success:
     MOVI        r1, 0
     RET
 
-point_decompress_ed25519_fail: 
+point_decompress_ed25519_fail:
     MOVI        r1, 1
     RET
