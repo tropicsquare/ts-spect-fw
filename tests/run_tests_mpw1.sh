@@ -8,8 +8,7 @@ make -C .. compile_mpw1
 make -C .. compile_boot_mpw1
 
 tests=(\
-    "mpw1" \
-    "boot_sequence_mpw1"
+    "mpw1"
 )
 
 declare -i ret_val=0

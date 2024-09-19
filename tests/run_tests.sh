@@ -18,7 +18,8 @@ tests=(\
     "ecdsa_full_setup" \
     "x25519_dbg" \
     "eddsa_dbg" \
-    "ecdsa_dbg"
+    "ecdsa_dbg" \
+    "eddsa_verify"
 )
 
 declare -i ret_val=0
