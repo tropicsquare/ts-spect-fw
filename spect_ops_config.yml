@@ -150,11 +150,8 @@
     - name : pubkey
       address : 0x60
       base : 0x0000
-    - name : message0
+    - name : message
       address : 0x80
-      base : 0x0000
-    - name : message1
-      address : 0xA0
       base : 0x0000
   output :
     - name : result

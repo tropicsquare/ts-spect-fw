@@ -16,10 +16,11 @@
 ; Inputs:
 ;   Signature (R,S) : 0x0020-0x005F
 ;   Public key      : 0x0060-0x007F
-;   Message         : 0x0080-0x00BF
+;   Message         : 0x0080-0x009F
 ;
 ; Outputs:
-;   Fail/Success : 0x0 (0: Verified, else fail)
+;   Result 1 : 0x0 (0x0B5E55ED => verified)
+;   Result 2 : 0x4 (0xBA11FADE => verified)
 ;
 ; ==============================================================================
 
@@ -46,27 +47,21 @@ eddsa_verify:
 ; ==============================================================================
 ;   E = SHA512(ENC(R)||ENC(A)||M) mod q
 ; ==============================================================================
-    LD          r24, eddsa_verify_input_message1
-    LD          r25, eddsa_verify_input_message0
+    LD          r25, eddsa_verify_input_message
     LD          r26, eddsa_verify_input_pubkey
     LD          r27, eddsa_verify_input_R
 
-    SWE         r20, r24
     SWE         r21, r25
     SWE         r22, r26
     SWE         r23, r27
 
+    ; Padding
+    MOVI        r20, 1
+    ROR         r20, r20
+    ORI         r20, r20, 0x300      ; length of message = 3*256 = 768 = 0x300
+
     HASH_IT
     HASH        r28, r20
-
-    ; SHA512 padding
-    MOVI        r3,  0x80
-    ROR8        r3,  r3
-    MOVI        r2,  0
-    MOVI        r1,  0
-    MOVI        r0,  1024
-
-    HASH        r28, r0
 
     ; encode as little-endian and reduce mod q
     SWE         r28, r28
@@ -82,6 +77,8 @@ eddsa_verify:
     LD          r31, ca_p25519
     MOV         r12, r26
     CALL        point_decompress_ed25519
+
+    CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0);
 
 .ifdef SPECT_ISA_VERSION_1
     CMPA        r1,  0
@@ -123,6 +120,7 @@ eddsa_verify:
 ; ==============================================================================
 ;   Final comparison -> ENC(R) = ENC(S.B - SHA512(R, A, M).A)
 ; ==============================================================================
+    CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0)
 
 .ifdef SPECT_ISA_VERSION_1
     LD          r31, ca_ffff
@@ -139,6 +137,20 @@ eddsa_verify_fail:
     JMP         set_res_word
 
 eddsa_verify_success:
-    MOVI        r2,  0
+    MOVI        r2,  0xBA
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x11
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0xFA
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0xDE
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x0B
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x5E
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x55
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0xED
     ST          r2,  eddsa_verify_output_result
     JMP         set_res_word

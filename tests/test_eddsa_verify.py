@@ -1,7 +1,61 @@
 #!/usr/bin/env python3
 import sys
+import random as rn
 
 import test_common as tc
+import models.ed25519 as ed25519
+
+def __run_test(test_dir:str, run_name:str):
+
+    def __bytes_modify(b: bytes, index: int) -> bytes:
+        b = bytearray(b)
+        b[index] = ~b[index] & 0xFF
+        b = bytes(b)
+        return b
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    tc.print_run_name(run_name)
+
+    secret = int.to_bytes(rn.randint(0, 2**256-1), 32, 'little')
+    msg = int.to_bytes(rn.randint(0, 2**256-1), 32, 'little')
+    signature, pub_key = ed25519.sign_standard(secret, msg)
+
+    if run_name.endswith("invalid_r"):
+        signature = __bytes_modify(signature, 0)
+    elif run_name.endswith("invalid_s"):
+        signature = __bytes_modify(signature, -1)
+    elif run_name.endswith("invalid_pub_key"):
+        pub_key = __bytes_modify(pub_key, -1)
+    elif run_name.endswith("invalid_msg"):
+        msg = __bytes_modify(msg, -1)
+
+    tc.start(cmd_file)
+    tc.write_bytes(cmd_file, signature, 0x0020)
+    tc.write_bytes(cmd_file, pub_key, 0x0060)
+    tc.write_bytes(cmd_file, msg, 0x0080)
+    _ = tc.run_op(
+        cmd_file, "eddsa_verify", 0x0, 0x1, 128, ops_cfg, test_dir, run_name=run_name,
+        main="src/boot_main.s", tag="Boot2"
+    )
+
+    if run_name.endswith("_ok"):
+        if tc.read_output(test_dir, run_name, 0x1000, 1) != 0x0B5E55ED:
+            tc.print_failed()
+            return 1
+        elif tc.read_output(test_dir, run_name, 0x1004, 1) != 0xBA11FADE:
+            tc.print_failed()
+            return 1
+        else:
+            tc.print_passed()
+            return 0
+    else:
+        if tc.read_output(test_dir, run_name, 0x1000, 1) == 0x0B5E55ED:
+            tc.print_failed()
+            return 1
+        else:
+            tc.print_passed()
+            return 0
 
 if __name__ == "__main__":
 
@@ -16,155 +70,10 @@ if __name__ == "__main__":
     # Valid Signature
     #######################################################################################
 
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    run_name = f"{test_name}_valid"
-    tc.print_run_name(run_name)
-
-    R = "2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623a"
-    S = "86031e5bffd2b8fa2b5daf20a09dae43994d209d24042a34ba17cc6cea8ce40f"
-    A = "f13c21fd271db83863eab2d4d9a9b503fe745dcb15da3ef5a607a27f7478bbd1"
-    M1 = "8f13b3a29344b73d22e681e9faeb3fedb88c94f7504f8f2ac2f17a09fc33a1f6"
-    M2 = "b83275219d83def87aa1f74537c8819db6759c80fff5b4c42aa09b663c5304d9"
-
-    tc.start(cmd_file)
-    tc.write_string(cmd_file, R, 0x0020)
-    tc.write_string(cmd_file, S, 0x0040)
-    tc.write_string(cmd_file, A, 0x0060)
-    tc.write_string(cmd_file, M1, 0x0080)
-    tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name=run_name)
-
-    res = tc.read_output(test_dir, run_name, 0x1000, 1)
-
-    if res != 1:
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    #######################################################################################
-    # Invalid R
-    #######################################################################################
-
-    run_name = f"{test_name}_invR"
-    tc.print_run_name(run_name)
-
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    R = "2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623b"
-    S = "86031e5bffd2b8fa2b5daf20a09dae43994d209d24042a34ba17cc6cea8ce40f"
-    A = "f13c21fd271db83863eab2d4d9a9b503fe745dcb15da3ef5a607a27f7478bbd1"
-    M1 = "8f13b3a29344b73d22e681e9faeb3fedb88c94f7504f8f2ac2f17a09fc33a1f6"
-    M2 = "b83275219d83def87aa1f74537c8819db6759c80fff5b4c42aa09b663c5304d9"
-
-    tc.start(cmd_file)
-    tc.write_string(cmd_file, R, 0x0020)
-    tc.write_string(cmd_file, S, 0x0040)
-    tc.write_string(cmd_file, A, 0x0060)
-    tc.write_string(cmd_file, M1, 0x0080)
-    tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name=run_name)
-
-    res = tc.read_output(test_dir, run_name, 0x1000, 1)
-
-    if res != 0:
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    #######################################################################################
-    # Invalid S
-    #######################################################################################
-
-    run_name = f"{test_name}_invS"
-    tc.print_run_name(run_name)
-
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    R = "2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623a"
-    S = "86031e5bffd2b8fa2b5daf20a09dae43994d209d24042a34ba17cc6cea8ce40e"
-    A = "f13c21fd271db83863eab2d4d9a9b503fe745dcb15da3ef5a607a27f7478bbd1"
-    M1 = "8f13b3a29344b73d22e681e9faeb3fedb88c94f7504f8f2ac2f17a09fc33a1f6"
-    M2 = "b83275219d83def87aa1f74537c8819db6759c80fff5b4c42aa09b663c5304d9"
-
-    tc.start(cmd_file)
-    tc.write_string(cmd_file, R, 0x0020)
-    tc.write_string(cmd_file, S, 0x0040)
-    tc.write_string(cmd_file, A, 0x0060)
-    tc.write_string(cmd_file, M1, 0x0080)
-    tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name=run_name)
-
-    res = tc.read_output(test_dir, run_name, 0x1000, 1)
-
-    if res != 0:
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    #######################################################################################
-    # Invalid A
-    #######################################################################################
-
-    run_name = f"{test_name}_invA"
-    tc.print_run_name(run_name)
-
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    R = "2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623a"
-    S = "86031e5bffd2b8fa2b5daf20a09dae43994d209d24042a34ba17cc6cea8ce40f"
-    A = "f13c21fd271db83863eab2d4d9a9b503fe745dcb15da3ef5a607a27f7478bbd0"
-    M1 = "8f13b3a29344b73d22e681e9faeb3fedb88c94f7504f8f2ac2f17a09fc33a1f6"
-    M2 = "b83275219d83def87aa1f74537c8819db6759c80fff5b4c42aa09b663c5304d9"
-
-    tc.start(cmd_file)
-    tc.write_string(cmd_file, R, 0x0020)
-    tc.write_string(cmd_file, S, 0x0040)
-    tc.write_string(cmd_file, A, 0x0060)
-    tc.write_string(cmd_file, M1, 0x0080)
-    tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name=run_name)
-
-    res = tc.read_output(test_dir, run_name, 0x1000, 1)
-
-    if res != 0:
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    #######################################################################################
-    # Invalid M
-    #######################################################################################
-
-    run_name = f"{test_name}_invM"
-    tc.print_run_name(run_name)
-
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    R = "2ef9ff1d7926588de9c68104492034a8a8edab57686d95729de313fc70a8623a"
-    S = "86031e5bffd2b8fa2b5daf20a09dae43994d209d24042a34ba17cc6cea8ce40f"
-    A = "f13c21fd271db83863eab2d4d9a9b503fe745dcb15da3ef5a607a27f7478bbd1"
-    M1 = "8f13b3a29344b73d22e681e9faeb3fedb88c94f7504f8f2ac2f17a09fc33a1f6"
-    M2 = "b83275219d83def87aa0f74537c8819db6759c80fff5b4c42aa09b663c5304d9"
-
-    tc.start(cmd_file)
-    tc.write_string(cmd_file, R, 0x0020)
-    tc.write_string(cmd_file, S, 0x0040)
-    tc.write_string(cmd_file, A, 0x0060)
-    tc.write_string(cmd_file, M1, 0x0080)
-    tc.write_string(cmd_file, M2, 0x00A0)
-    ctx = tc.run_op(cmd_file, "eddsa_verify", 0x0, 0x1, 160, ops_cfg, test_dir, run_name=run_name)
-
-    res = tc.read_output(test_dir, run_name, 0x1000, 1)
-
-    if res != 0:
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
+    ret |= __run_test(test_dir, f"{test_name}_ok")
+    ret |= __run_test(test_dir, f"{test_name}_invalid_r")
+    ret |= __run_test(test_dir, f"{test_name}_invalid_s")
+    ret |= __run_test(test_dir, f"{test_name}_invalid_pub_key")
+    ret |= __run_test(test_dir, f"{test_name}_invalid_msg")
 
     sys.exit(ret)

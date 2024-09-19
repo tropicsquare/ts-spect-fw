@@ -1,7 +1,7 @@
 #! /bin/bash
 
 tests=(\
-    "boot_sequence" \
+    "eddsa_verify" \
     "x25519_full_sc" \
     "ecc_key_gen_store"  \
     "ecc_key_read" \
