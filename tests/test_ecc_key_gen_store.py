@@ -56,6 +56,9 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
         priv2_ref = int.from_bytes(priv2_ref, 'big')
 
+    priv_metadata_ref = ((slot<<24) | (tc.SLOT_PRIVATE<<16) | (ecc_key_origin[op]<<8) | key_type)
+    pub_metadata_ref = ((slot<<24) | (tc.SLOT_PUBLIC<<16) | (ecc_key_origin[op]<<8) | key_type)
+
     tc.start(cmd_file)
     tc.gpr_preload(cmd_file)
 
@@ -99,6 +102,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
         priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
         priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
         priv4 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+        priv_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=32)
 
         if key_type == tc.Ed25519_ID:
             priv1 = (priv1 + priv3) % ed25519.q
@@ -107,40 +111,41 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
 
         priv2 = priv2 ^ priv4
 
-        pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=8)
+        pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
 
         pub2 = pub2_ref
         if key_type == tc.P256_ID:
-            pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=16)
+            pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=8)
 
-        metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
-        key_type_observed = metadata & 0xFF
-        origin_observed = (metadata >> 8) & 0xFF
+        pub_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=32)
+
+        print("Priv metadata:   ", hex(priv_metadata))
+        print("Pub metadata:    ", hex(pub_metadata))
 
         if not((
             priv1 == priv1_ref and
             priv2 == priv2_ref and
             pub1 == pub1_ref and
             pub2 == pub2_ref and
-            key_type_observed == key_type and
-            origin_observed == ecc_key_origin[op]
+            priv_metadata == priv_metadata_ref and
+            pub_metadata == pub_metadata_ref
         )):
-            print("Curve:  ", hex(metadata & 0xFF))
-            print("Origin: ", hex((metadata >> 8) & 0xFF))
-            print("priv1:    ", hex(priv1))
-            print("priv1_ref:", hex(priv1_ref))
+            print("Priv metadata:   ", hex(priv_metadata))
+            print("Pub metadata:    ", hex(pub_metadata))
+            print("priv1:           ", hex(priv1))
+            print("priv1_ref:       ", hex(priv1_ref))
             print()
-            print("priv2:    ", hex(priv2))
-            print("priv2_ref:", hex(priv2_ref))
+            print("priv2:           ", hex(priv2))
+            print("priv2_ref:       ", hex(priv2_ref))
             print()
-            print("priv3:    ", hex(priv3))
-            print("priv4:    ", hex(priv4))
+            print("priv3:           ", hex(priv3))
+            print("priv4:           ", hex(priv4))
             print()
-            print("pub1:     ", hex(pub1))
-            print("pub1_ref: ", hex(pub1_ref))
+            print("pub1:            ", hex(pub1))
+            print("pub1_ref:        ", hex(pub1_ref))
             print()
-            print("pub2:     ", hex(pub2))
-            print("pub2_ref: ", hex(pub2_ref))
+            print("pub2:            ", hex(pub2))
+            print("pub2_ref:        ", hex(pub2_ref))
             print()
             return 1
 
