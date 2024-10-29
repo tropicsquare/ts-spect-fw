@@ -88,9 +88,9 @@ function hash_to_field(m, DST, p):
 
 SPECT FW use the hash_to_field function to generate masks in ECC algorithms.
 
-1. SPECT needs to generate random masking value in GF(p).
+1. SPECT needs to generate random masking value in $GF(p)$.
 2. SPECT executes GRV instruction and gets 32-bytes of random data.
-3. SPECT interprets the data as string m.
-4. SPECT computes mask = hash_to_field(m, DST, p) with
+3. SPECT interprets the data as a string m.
+4. SPECT computes mask = `hash_to_field(m, DST, p)` with
 DST reflecting the current domain.
 5. SPECT uses the mask.

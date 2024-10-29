@@ -65,4 +65,4 @@ Empty message $X$ shall be padded with $pad = 0x04||0x00^{16}||0x80$
 Size of $z$ is fixed to 32 bytes, thus $pad$ is also fixed to $0x04||0x00^{2}||0x80$.
 
 1. $TMAC\_INIT(w, 0x0B)$
-2. $TMAC\_UPDATE(z[])
+2. $TMAC\_UPDATE(z)$

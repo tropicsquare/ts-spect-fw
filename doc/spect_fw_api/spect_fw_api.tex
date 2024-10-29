@@ -84,8 +84,6 @@
 \pagebreak
 \tableofcontents
 
-\TsSection{SPECT Operations}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPECT Operations
@@ -139,13 +137,14 @@ SPECT comes with two types of firmware:
 \begin{itemize}
     \item \textbf{Boot FW} -- small firmware to support boot-up sequence of the chip.
     \item \textbf{Application FW} -- firmware that is preloaded into SPECTs instruction memory during
-                                     boot-up sequence and used in final application. 
+                                     boot-up sequence and used in final application.
 \end{itemize}
 
 \TropicNote{
-    Besides these, another set of SPECT operations is available for debug purposes. These operations do not use rely on
-    functionality of SCB, CPB nor KBUS.
+    Besides these, another set of SPECT operations is available for debug purposes. These operations do not rely on
+    the functionality of SCB, CPB nor KBUS. EDB can be set to debug mode.
 }
+\vspace{.3cm}
 
 CPU specifies SPECT operation and SPECT firmware parameters by writing\linebreak
 \Register{SPECT_CFG_WORD} on address 0x0100 of SPECTs address space (Data RAM In).
@@ -173,7 +172,7 @@ CPU indicates number of bytes in Command Buffer or Data RAM In via \linebreak
 After SPECT finishes current operation, CPU reads \Register{SPECT_RES_WORD} from address \linebreak
 0x1100 in SPECTs address space (Data RAM Out).
 
-\vspace{.3cm}
+\pagebreak
 \Register{SPECT_RES_WORD:}
 
 \input{tables/table_spect_res_word_layout.tex}
@@ -204,11 +203,11 @@ operation undefined.
 
 SPECT is capable of processing these \LLLCMD{}s by it self:
 \begin{itemize}
-    \item \TsApiCmd{ECC_Key_Generate} -- ecc_key_generate SPECT Op
-    \item \TsApiCmd{ECC_Key_Store} -- ecc_key_store SPECT Op
-    \item \TsApiCmd{ECC_Key_Read} -- ecc_key_read SPECT Op
-    \item \TsApiCmd{ECC_Key_Erase} -- ecc_key_erase SPECT Op
-    \item \TsApiCmd{ECDSA_Sign} -- ecdsa_sign SPECT Op
+    \item \TsApiCmd{ECC_Key_Generate} -- \textbf{ecc_key_generate} SPECT Op
+    \item \TsApiCmd{ECC_Key_Store} -- \textbf{ecc_key_store} SPECT Op
+    \item \TsApiCmd{ECC_Key_Read} -- \textbf{ecc_key_read} SPECT Op
+    \item \TsApiCmd{ECC_Key_Erase} -- \textbf{ecc_key_erase} SPECT Op
+    \item \TsApiCmd{ECDSA_Sign} -- \textbf{ecdsa_sign} SPECT Op
 \end{itemize}
 
 \TropicNote{
@@ -223,7 +222,7 @@ SPECT is capable of processing these \LLLCMD{}s by it self:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
-\TsSubSection{Application Firmware}
+\TsSubSection{SPECT Application Firmware}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control Commands
@@ -254,8 +253,8 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
-    \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
-    \SPECTCommandMem{0x02}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256 - ECDSA, Ed25519 - EdDSA))}
+    \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
+    \SPECTCommandMem{0x03}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256 - ECDSA, Ed25519 - EdDSA))}
 
     \SPECTCommandMemHead{Result Buffer / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
@@ -271,8 +270,8 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
-    \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
-    \SPECTCommandMem{0x02}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256 - ECDSA, Ed25519 - EdDSA))}
+    \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
+    \SPECTCommandMem{0x03}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256 - ECDSA, Ed25519 - EdDSA))}
     \SPECTCommandMem{0x10}{32B}{\TsApiCmdFld{K} ($k$)}
 
     \SPECTCommandMemHead{Result Buffer / Data RAM Out}
@@ -290,7 +289,7 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
-    \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
+    \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
 
     \SPECTCommandMemHead{Result Buffer / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
@@ -308,7 +307,7 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
-    \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
+    \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
 
     \SPECTCommandMemHead{Result Buffer / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
@@ -396,7 +395,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
     }
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
-    \SPECTCommandMem{0x01}{1B}{Key slot $i$}
+    \SPECTCommandMem{0x01}{2B}{Key slot $i$}
 
     \SPECTCommandMemHead{Data RAM In}
     \SPECTCommandMem{0x00A0}{32B}{Secure Channel Hash $SC_H$}
@@ -531,35 +530,34 @@ All SPECT operations in this section are supported only with use of Data RAM In 
     \SPECTCommandHead{ecdsa_sign}{0x70}
 
     \SPECTCommandDescription{
-        Generate signature ($r, s$) of a message digest $z$ with Elliptic Curve Digital Signature Algorithm using
-        ECC keys from slot $i$.
+        Generate ECDSA signature ($r, s$) of a message digest $z$ using ECC keys from slot $i$.
     }
 
     \SPECTCommandMemHead{Command Buffer / Data RAM In}
 
-    \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{SLOT} (ECC Key slot $i$)}
-    \SPECTCommandMem{0x10}{32B}{\TsApiCmdFld{MSG_HASH} (Message digest/hash $z$)}
+    \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (ECC Key slot $i$)}
+    \SPECTCommandMem{0x10}{32B}{\TsApiCmdFld{MSG_HASH} (Message digest $z$)}
 
     \SPECTCommandMemHead{Data RAM In}
-    \SPECTCommandMem{0x00A0}{32B}{Secure Channel Hash $h$}
-    \SPECTCommandMem{0x00C0}{4B}{Secure Channel Nonce $n$}
+    \SPECTCommandMem{0x00A0}{32B}{Secure Channel Hash $SCh$}
+    \SPECTCommandMem{0x00C0}{4B}{Secure Channel Nonce $SCn$}
 
-    \SPECTCommandMemHead{Result Buffer / \Register{SPECT_OP_DATA_OUT}}
+    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
     \SPECTCommandMem{0x0}{1B}{\TsApiCmdFld{RESULT} (Command Result)}
     \SPECTCommandMem{0x10}{64B}{Signature (\TsApiCmdFld{R}, \TsApiCmdFld{S})}
 }
 
 \TropicNote{
-    eddsa_set_context and ecdsa_sign SPECT operation takes Secure Channel Handshake Hash ($h$) and
-    Secure Channel Session Nonce ($n$) always from Data RAM In, never from Command
-    Buffer regardless of \Register{SPECT_INOUT_SRC} value.
+    eddsa_set_context and ecdsa_sign SPECT operation takes Secure Channel Handshake Hash ($SCh$) and
+    Secure Channel Session Nonce ($SCn$) always from Data RAM In, never from Command Buffer regardless
+    of the \Register{SPECT_INOUT_SRC} value.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Boot Firmware
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\TsSubSection{Boot Firmware}
+\TsSubSection{SPECT Boot Firmware}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SHA512
@@ -570,19 +568,22 @@ All SPECT operations in this section are supported only with use of Data RAM In 
     \SPECTCommandHead{eddsa_verify}{0x4B}
 
     \SPECTCommandDescription{
-        Verifies a EdDSA signature of 64 bytes message $M$ using public key $A$.
+        Verifies a EdDSA signature of 32-byte message $M$ using public key $A$.
     }
 
     \SPECTCommandMemHead{Data RAM In}
     \SPECTCommandMem{0x0020}{64B}{Signature (\TsApiCmdFld{R}, \TsApiCmdFld{S})}
     \SPECTCommandMem{0x0060}{32B}{Public key $A$}
-    \SPECTCommandMem{0x0080}{64B}{Message $M$}
+    \SPECTCommandMem{0x0080}{32B}{Message $M$}
 
     \SPECTCommandMemHead{Data RAM Out}
-    \SPECTCommandMem{0x0000}{4B}{Result: 0x0 verified, else failed}
+    \SPECTCommandMem{0x0000}{4B}{Result: 0x0B5E55ED $\Rightarrow$ verified, else failed}
+    \SPECTCommandMem{0x0004}{4B}{Result: 0xBA11FADE $\Rightarrow$ verified, else failed}
 }
 
 \subsubsection*{SHA512 Operations}
+
+\textcolor{red}{Removed since SPECT FW v0.3.0}
 
 \SPECTCommandTable{
     \SPECTCommandHead{sha512_init}{0x51}
@@ -593,6 +594,8 @@ All SPECT operations in this section are supported only with use of Data RAM In 
 
     \SPECTCommandCtx{None}{SHA512 ctx}
 }
+
+\textcolor{red}{Removed since SPECT FW v0.3.0}
 
 \SPECTCommandTable{
     \SPECTCommandHead{sha512_update}{0x52}
@@ -606,6 +609,8 @@ All SPECT operations in this section are supported only with use of Data RAM In 
 
     \SPECTCommandCtx{SHA512 ctx}{SHA512 ctx}
 }
+
+\textcolor{red}{Removed since SPECT FW v0.3.0}
 
 \SPECTCommandTable{
     \SPECTCommandHead{sha512_final}{0x53}
@@ -651,10 +656,10 @@ Let \textbf{M} be a 326 byte data (\texttt{u8 M [326]}). SHA512(\textbf{M}) is c
 % Debug
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\TsSubSection{Debug Operations}
+\TsSubSection{SPECT Debug Operations}
 
 All SPECT operations in this section are supported only with use of Data RAM In / Out
-(\Register{SPECT_INOUT_SRC}=0x10).
+(\Register{SPECT_INOUT_SRC}=0x01).
 
 \SPECTCommandTable{
     \SPECTCommandHead{x25519_dbg}{0x9F}
@@ -707,30 +712,25 @@ All SPECT operations in this section are supported only with use of Data RAM In 
 }
 
 \newpage
-\subsubsection*{Processing \LLLCMD{} using SPECT}
+\TsSubSection{Processing \LLLCMD{} using SPECT}
 
-CPU always issues first 16 byte chunk of \LLLCMD{} to SCB. SCB decrypts the chunk and passes
-it to CPB. CPB checks user access privileges and stores the \Register{CMD_} \LLLCMD{} for SPECT into Command
-Buffer. After first 16 byte chunk, CPU reads \TsApiCmd{CMD_ID} from CPB.
-If \TsApiCmd{CMD_ID} corresponds to Commands to be executed by SPECT, CPU
-invokes according SPECT operation.
-
-CPU always issues first 16 byte chunk of \LLLCMD{}s \Register{CMD_CIPHERTEXT} to SCB. SCB decrypts the chunk and passes
-it to CPB. CPB checks user access privileges and stores the decrypted \Register{CMD_CIPHERTEXT} into
-Command Buffer. Then CPU reads the \LLLCMD{}s \TsApiCmdFld{CMD_ID} from CPB. Following three cases may occur:
+CPU always issues first 16 byte chunk of \LLLCMD{}s \Register{CMD_CIPHERTEXT} to SCB. SCB decrypts
+the chunk and passes it to CPB. CPB checks user access privileges and stores the decrypted
+\Register{CMD_CIPHERTEXT} into Command Buffer. Then CPU reads the \LLLCMD{}s \TsApiCmdFld{CMD_ID}
+from CPB. Following three cases may occur:
 
 \subsubsection*{\TsApiCmdFld{CMD_ID} corresponds to one of \TsApiCmd{ECC_Key_*}}
 
-In this case, CPU issues the rest of \Register{CMD_CIPHERTEXT} to SCB. After that, Command Buffer contains all data
-and information needed for executing the corresponding \linebreak SPECT operation. CPU sets
-\Register{SPECT_INOUT_SRC}=0x54 and invokes SPECT.
+In this case, CPU issues the rest of \Register{CMD_CIPHERTEXT} to SCB. After that, Command Buffer
+contains all data and information needed for execution of the corresponding \linebreak SPECT
+operation. CPU sets \Register{SPECT_INOUT_SRC}=0x45 and invokes SPECT.
 
 SPECT reads Command Buffer and performs the corresponding SPECT operation. Then it stores all output
-data for the \LLLCMD{} to Result Buffer, sets \linebreak \Register{SPECT_OP_DATA_OUT_SIZE} to number of bytes
-it has stored and notifies CPU.
+data for the \LLLRES{} to Result Buffer, sets \linebreak \Register{SPECT_OP_DATA_OUT_SIZE} to number
+of bytes it has stored and notifies CPU.
 
-CPU reads \Register{SPECT_OP_DATA_OUT_SIZE} bytes from Result Buffer, that are encrypted by SCB resulting
-in \Register{RES_CIPHERTEXT} of the \LLLRES{}.
+CPU reads \Register{SPECT_OP_DATA_OUT_SIZE} bytes from Result Buffer, that are encrypted by SCB
+resulting in \Register{RES_CIPHERTEXT} of the \LLLRES{}.
 
 \subsubsection*{\TsApiCmdFld{CMD_ID} corresponds to \TsApiCmd{ECDSA_Sign}}
 
@@ -745,14 +745,14 @@ Therefore the \TsApiCmd{EDDSA_Sign} \LLLCMD{} is processed with a sequence of SP
 \ref{sec:spect_op:eddsa}. We can divide this sequence into 5 phases:
 
 \begin{enumerate}
-    \item Setting context and loading keys -- eddsa_set_context / eddsa_set_context_dbg
-    \item Computing nonce $r$ using TMAC -- eddsa_nonce_*
-    \item Computing signature part \TsApiCmdFld{R} -- eddsa_R_part
-    \item Computing e = SHA512(\TsApiCmdFld{R}, A, \TsApiCmdFld{MSG}) -- eddsa_e_*
-    \item Computing signature part \TsApiCmdFld{S} -- eddsa_finish
+    \item Setting context and loading keys -- \textbf{eddsa_set_context} / \textbf{eddsa_set_context_dbg}
+    \item Computing nonce $r$ using TMAC -- \textbf{eddsa_nonce_*}
+    \item Computing signature part \TsApiCmdFld{R} -- \textbf{eddsa_R_part}
+    \item Computing e = SHA512(\TsApiCmdFld{R}, $A$, \TsApiCmdFld{MSG}) -- \textbf{eddsa_e_*}
+    \item Computing signature part \TsApiCmdFld{S} -- \textbf{eddsa_finish}
 \end{enumerate}
 
-Figures \ref{EdDSA_DF} shows the sequence in a detail.
+Figures \ref{EdDSA_DF} shows the sequence in detail.
 
 \pagebreak
 
