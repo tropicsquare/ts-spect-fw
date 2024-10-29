@@ -50,6 +50,6 @@ Both keys are masked when stored to Flash for the first time.
 
 | offset | ECDSA | EdDSA |
 | - | - | - |
-| 0x00 | **A** (64B) | **A** (32B) |
 | 0x80 | **metadata** | **metadata** |
+| 0xA0 | **A** (64B) | **A** (32B) |
 

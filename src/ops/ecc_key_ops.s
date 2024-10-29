@@ -93,44 +93,68 @@ op_ecc_key_read:
     MOV     r20, r0
     ADDI    r21, r20, ecc_key_output_result
     CALL    ecc_key_parse_input
-    LSL     r25, r25
-    ADDI    r25, r25, 1
+    LSL     r26, r25
+    ADDI    r26, r26, 1
 
     MOVI    r3,  ret_key_err
-
-    KBO     r25, ecc_kbus_verify_erase
+    KBO     r26, ecc_kbus_verify_erase
     BRNE    op_key_read_invalid
 
     ; load kpair metadata
-    LDK     r2,  r25, ecc_key_metadata
+    LDK     r2,  r26, ecc_key_metadata
     BRE     op_key_fail
+
+    ; check metyadata
+    MOVI    r3,  ret_slot_metadata_err
+    MOVI    r30, 0xFF
+    MOV     r5,  r2
+
+    ; 'Origin'
+    ROR8    r5,  r5
+    AND     r4,  r5,  r30
+    CMPI    r4,  ecc_key_origin_gen
+    BRZ     ecc_key_read_check_slot_type
+    CMPI    r4,  ecc_key_origin_st
+    BRNZ    op_key_read_invalid
+
+    ; 'Slot Type'
+ecc_key_read_check_slot_type:
+    ROR8    r5,  r5
+    AND     r4,  r5,  r30
+    CMPI    r4,  ecc_pub_slot_id
+    BRNZ    op_key_read_invalid
+
+    ; 'Slot Number'
+    ROR8    r5,  r5
+    AND     r4,  r5,  r30
+    CMP     r4,  r25
+    BRNZ    op_key_read_invalid
 
     ; mask curve
-    MOVI    r30, 0xFF
+    MOVI    r3,  ret_curve_type_err
     AND     r30, r30, r2
 
-    MOVI    r26, 0
-    MOVI    r1,  48     ; data out size 16 + 32
-
-    ; load pubkey
-    LDK     r16, r25, ecc_pub_key_Ax
-    BRE     op_key_fail
-
-    MOVI    r3,  ret_curve_type_err
-
-    CMPI    r30,  ecc_type_ed25519
-    BRZ     ecc_key_read_skip_second_read
+    CMPI    r30, ecc_type_ed25519
+    BRZ     ecc_key_read_ed25519
 
     CMPI    r30,  ecc_type_p256
     BRNZ    op_key_read_invalid
 
+ecc_key_read_p256:
     MOVI    r1,  80     ; add another 32 byte to data out size for P-256
-    ; load rest of p256 pubkey
-    LDK     r17, r25, ecc_pub_key_Ay
+    LDK     r16, r26, ecc_pub_key_Ax
+    BRE     op_key_fail
+    LDK     r17, r26, ecc_pub_key_Ay
+    BRE     op_key_fail
+    JMP     ecc_key_read_continue
+ecc_key_read_ed25519:
+    ; load ed25519 pubkey
+    MOVI    r1,  48     ; data out size 16 + 32
+    LDK     r16, r26, ecc_pub_key_Ax
     BRE     op_key_fail
 
-ecc_key_read_skip_second_read:
-    KBO     r25, ecc_kbus_flush
+ecc_key_read_continue:
+    KBO     r26, ecc_kbus_flush
     BRE     op_key_fail
 
     ; compose return value
@@ -141,13 +165,13 @@ ecc_key_read_skip_second_read:
 
 op_key_read_invalid:
     MOVI    r2,  l3_result_invalid_key
-    KBO     r25, ecc_kbus_flush
+    KBO     r26, ecc_kbus_flush
     JMP     op_key_setup_end
 
 op_key_fail:
     MOVI    r2,  l3_result_fail
     MOVI    r3,  ret_key_err
-    KBO     r25, ecc_kbus_flush
+    KBO     r26, ecc_kbus_flush
     JMP     op_key_setup_end
 
 op_key_read_end:
@@ -158,7 +182,6 @@ op_key_read_end:
     ADDI    r22, r22, 0x20
     SWE     r17, r17
     STR     r17, r22
-    ;MOVI    r1,  48
     MOVI    r0,  ret_op_success
     JMP     set_res_word
 

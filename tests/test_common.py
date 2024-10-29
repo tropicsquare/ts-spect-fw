@@ -29,6 +29,18 @@ outsrc_arr = [0x1, 0x5]
 
 fw_parity = 2
 
+PRIV_SLOT_LAYOUT = {
+    "k1" : 0*8,
+    "k2" : 1*8,
+    "k3" : 2*8,
+    "k4" : 3*8
+}
+PUB_SLOT_LAYOUT = {
+    "x" : 5*8,
+    "y" : 6*8
+}
+METADATA_OFFSET = 4*8
+
 #############################################################
 #   PARSER
 #############################################################
@@ -345,6 +357,36 @@ def get_key(kmem_array, ktype, slot, offset) -> int:
         w = kmem_array[ktype][slot][offset+i]
         val += (int(w) << (i*32))
     return val
+
+def gen_and_set_metadata(curve, slot, origin, cmd_file, invalid_metadata=None):
+
+    pub_slot_type = SLOT_PUBLIC
+    priv_slot_type = SLOT_PRIVATE
+    slot_number = slot
+    origin_in = origin
+    curve_in = curve
+    padding = 0
+
+    if invalid_metadata == "slot_type":
+        pub_slot_type = 0xFF
+        priv_slot_type = 0xFF
+    elif invalid_metadata == "slot_number":
+        slot_number = slot+1
+    elif invalid_metadata == "origin":
+        origin_in = 0xFF
+    elif invalid_metadata == "curve":
+        curve_in = 0x42
+
+    pub_metadata_ref   = ((padding<<32) | (slot_number<<24) | (pub_slot_type<<16)  | (origin_in<<8) | curve_in)
+    priv_metadata_ref  = ((padding<<32) | (slot_number<<24) | (priv_slot_type<<16) | (origin_in<<8) | curve_in)
+
+    print("pub_metadata_ref", hex(pub_metadata_ref))
+    print("priv_metadata_ref", hex(priv_metadata_ref))
+
+    set_key(cmd_file, priv_metadata_ref, ktype=0x4, slot=(2*slot), offset=METADATA_OFFSET)
+    set_key(cmd_file, pub_metadata_ref, ktype=0x4, slot=(2*slot + 1), offset=METADATA_OFFSET)
+
+    return pub_metadata_ref, priv_metadata_ref
 
 def break_on(cmd_file, bp):
     cmd_file.write(f"break {bp}\n")

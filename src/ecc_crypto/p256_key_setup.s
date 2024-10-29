@@ -135,22 +135,26 @@ p256_key_setup_tmac_padding_loop:
 ;   Write the keys to the slot
 ; ==============================================================================
 
-    ; Compose kpair metadata (origin, curve)
+    ; Compose kpair metadata
+    ROR     r12, r25                        ; User slot
+    ROL8    r12, r12
+    ORI     r12, r12, ecc_pub_slot_id       ; Add public slot id
+    ROL8    r12, r12
     LD      r0,  ca_spect_cfg_word
     MOVI    r4,  0xFF
     AND     r20, r0,  r4                        ; mask SPECT_OP_ID to r20[7:0]
     CMPI    r20, ecc_key_gen_l3_cmd_id
     BRZ     p256_key_setup_origin_gen
 p256_key_setup_origin_st:
-    MOVI    r20, ecc_key_origin_st
+    ORI     r12, r12, ecc_key_origin_st
     JMP     p256_key_setup_origin_continue
 p256_key_setup_origin_gen:
-    MOVI    r20, ecc_key_origin_gen
+    ORI     r12, r12, ecc_key_origin_gen
 
 p256_key_setup_origin_continue:
-    ROL8    r20, r20
-    ORI     r20, r20, ecc_type_p256
-    STK     r20, r26, ecc_key_metadata          ; store metadata
+    ROL8    r12, r12
+    ORI     r12, r12, ecc_type_p256
+    STK     r12, r26, ecc_key_metadata          ; store metadata
     BRE     p256_key_setup_fail
 
     ; Store the pubkey to the slot
@@ -180,6 +184,12 @@ p256_key_setup_origin_continue:
     ; Change slot - needed so the slot register is same for flush in case of error
     MOV     r26, r25
 
+    ; make private slot metadata
+    MOVI    r9,  0xFF
+    ROL8    r9,  r9
+    ROL8    r9,  r9
+    XOR     r12, r12, r9
+
     ; Store private keys to slot
     STK     r28, r26, ecc_priv_key_1            ; store d1
     BRE     p256_key_setup_fail
@@ -188,6 +198,8 @@ p256_key_setup_origin_continue:
     STK     r0,  r26, ecc_priv_key_3            ; store d2
     BRE     p256_key_setup_fail
     STK     r2,  r26, ecc_priv_key_4            ; store w mask
+    BRE     p256_key_setup_fail
+    STK     r12, r26, ecc_key_metadata          ; priv metadata
     BRE     p256_key_setup_fail
     KBO     r26, ecc_kbus_program               ; program
     BRE     p256_key_setup_fail

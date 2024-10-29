@@ -43,8 +43,8 @@ ecc_priv_key_2 .eq 0x401
 ecc_priv_key_3 .eq 0x402
 ecc_priv_key_4 .eq 0x403
 ecc_key_metadata .eq 0x404
-ecc_pub_key_Ax .eq 0x400
-ecc_pub_key_Ay .eq 0x401
+ecc_pub_key_Ax .eq 0x405
+ecc_pub_key_Ay .eq 0x406
 ecc_kbus_program .eq 0x402
 ecc_kbus_flush .eq 0x405
 ecc_kbus_erase .eq 0x403

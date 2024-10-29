@@ -98,11 +98,11 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
             print("Public Key Slot is empty.")
             return 1
 
-        priv1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
-        priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
-        priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
-        priv4 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
-        priv_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=32)
+        priv1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
+        priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
+        priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
+        priv4 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
+        priv_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.METADATA_OFFSET)
 
         if key_type == tc.Ed25519_ID:
             priv1 = (priv1 + priv3) % ed25519.q
@@ -111,16 +111,13 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
 
         priv2 = priv2 ^ priv4
 
-        pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=0)
+        pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["x"])
 
         pub2 = pub2_ref
         if key_type == tc.P256_ID:
-            pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=8)
+            pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["y"])
 
-        pub_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=32)
-
-        print("Priv metadata:   ", hex(priv_metadata))
-        print("Pub metadata:    ", hex(pub_metadata))
+        pub_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=tc.METADATA_OFFSET)
 
         if not((
             priv1 == priv1_ref and

@@ -24,7 +24,7 @@ def ecdsa_sign(test_dir, run_name, keymem, slot, sch, scn, z):
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        print("SPECT_OP_STATUS 1:", hex(SPECT_OP_STATUS))
         tc.print_failed()
         sys.exit(1)
 
@@ -62,7 +62,7 @@ def key_store(test_dir, run_name, slot, k):
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+        print("SPECT_OP_STATUS 2:", hex(SPECT_OP_STATUS))
         tc.print_failed()
         sys.exit(1)
 
@@ -95,7 +95,7 @@ def key_read(test_dir, run_name, keymem, slot):
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
     if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", SPECT_OP_STATUS)
+        print("SPECT_OP_STATUS 3:", SPECT_OP_STATUS)
         tc.print_failed()
         sys.exit(1)
 

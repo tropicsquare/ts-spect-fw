@@ -18,19 +18,19 @@ curve_str = {
 test_name = "ecc_key_read"
 
 METADATA_ERR_TYPE = [
-    "slot_type", "slot_number", "origin", "curve", "padding"
+    "slot_type", "slot_number", "origin", "curve"
 ]
 
 def gen_and_set_key(curve, slot, cmd_file) -> bytes:
     if curve == tc.Ed25519_ID:
         A_ref = rn.randint(1,2**256 - 1)
-        tc.set_key(cmd_file, A_ref, ktype=0x4, slot=(2*slot + 1), offset=0)
+        tc.set_key(cmd_file, A_ref, ktype=0x4, slot=(2*slot + 1), offset=5*8)
         return A_ref.to_bytes(32, 'big')
     else:
         Ax_ref = rn.randint(1,2**256 - 1)
         Ay_ref = rn.randint(1,2**256 - 1)
-        tc.set_key(cmd_file, Ax_ref, ktype=0x4, slot=(2*slot + 1), offset=0)
-        tc.set_key(cmd_file, Ay_ref, ktype=0x4, slot=(2*slot + 1), offset=8)
+        tc.set_key(cmd_file, Ax_ref, ktype=0x4, slot=(2*slot + 1), offset=5*8)
+        tc.set_key(cmd_file, Ay_ref, ktype=0x4, slot=(2*slot + 1), offset=6*8)
         return Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
 
 def read_key(curve, outsrc, run_name) -> bytes:
@@ -39,31 +39,6 @@ def read_key(curve, outsrc, run_name) -> bytes:
     else:
         size = 16
     return tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, size).to_bytes(size*4, 'little')
-
-def gen_and_set_metadata(curve, slot, origin, cmd_file, invalid_metadata=None):
-
-    slot_type = tc.SLOT_PUBLIC
-    slot_number = slot
-    origin_in = origin
-    curve_in = curve
-    padding = 0
-
-    if invalid_metadata == "slot_type":
-        slot_type = tc.SLOT_PRIVATE
-    elif invalid_metadata == "slot_number":
-        slot_number = slot+1
-    elif invalid_metadata == "origin":
-        origin_in = 0xFF
-    elif invalid_metadata == "curve":
-        curve_in = 0x42
-    elif invalid_metadata == "padding":
-        padding = 0x8
-
-    pub_metadata_ref  = ((padding<<32) | (slot_number<<24) | (slot_type<<16)  | (origin_in<<8) | curve_in)
-
-    tc.set_key(cmd_file, pub_metadata_ref, ktype=0x4, slot=(2*slot + 1), offset=32)
-
-    return pub_metadata_ref
 
 def test_process(test_dir, insrc, outsrc, curve, origin, empty_slot=False, invalid_metadata=None):
 
@@ -76,6 +51,8 @@ def test_process(test_dir, insrc, outsrc, curve, origin, empty_slot=False, inval
     run_name = f"{test_name}_{curve_str[curve]}_{origin_str[origin]}"
     if empty_slot:
         run_name += "_empty_slot"
+    if invalid_metadata is not None:
+        run_name += f"_{invalid_metadata}"
 
     tc.print_run_name(run_name)
 
@@ -90,8 +67,8 @@ def test_process(test_dir, insrc, outsrc, curve, origin, empty_slot=False, inval
         )
     else:
         A_ref = gen_and_set_key(curve, slot, cmd_file)
-        pub_metadata_ref = gen_and_set_metadata(curve, slot, origin, cmd_file, invalid_metadata)
-        ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
+        _, _ = tc.gen_and_set_metadata(curve, slot, origin, cmd_file, invalid_metadata)
+        _ = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
 
     SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
 
@@ -100,9 +77,14 @@ def test_process(test_dir, insrc, outsrc, curve, origin, empty_slot=False, inval
             print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
             return 1
 
-        if (SPECT_OP_DATA_OUT_SIZE != 80):
-            print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
-            return 1
+        if curve == tc.Ed25519_ID:
+            if (SPECT_OP_DATA_OUT_SIZE != 48):
+                print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
+                return 1
+        else:
+            if (SPECT_OP_DATA_OUT_SIZE != 80):
+                print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
+                return 1
 
         tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
         l3_result = tmp & 0xFF
