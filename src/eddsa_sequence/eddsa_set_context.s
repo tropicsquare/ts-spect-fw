@@ -40,10 +40,10 @@
 op_eddsa_set_context:
     CALL    get_input_base
     ADDI    r4,  r0,  eddsa_set_context_input_slot
-    LDR     r1,  r4
-    ROR8    r1,  r1
+    LDR     r2,  r4
+    ROR8    r2,  r2
 
-    LSL     r22, r1                             ; priv key slot
+    LSL     r22, r2                             ; priv key slot
     ADDI    r21, r22, 1                         ; pub key slot
 
     MOVI    r1,  0
@@ -51,9 +51,18 @@ op_eddsa_set_context:
     LDK     r16, r21, ecc_key_metadata          ; load slot metadata
     BRE     eddsa_set_context_kbus_fail
     MOVI    r0,  0xFF
-    AND     r16, r16, r0
-    CMPI    r16, ecc_type_ed25519               ; check curve type
+    ; check curve type
+    AND     r17, r16, r0
+    CMPI    r17, ecc_type_ed25519
     BRNZ    eddsa_set_context_curve_type_fail
+    ; Check slot number
+    ROR8    r16, r16
+    ROR8    r16, r16
+    ROR8    r16, r16
+    AND     r17, r16, r0
+    AND     r2,  r2,  r0
+    CMP     r17, r2
+    BRNZ    eddsa_set_context_metadata_fail
 
     ; load public key
     LDK     r25, r21, ecc_pub_key_Ax
@@ -138,4 +147,8 @@ eddsa_set_context_kbus_fail:
 eddsa_set_context_curve_type_fail:
     CALL    eddsa_ret_invalid_key
     MOVI    r0,  ret_curve_type_err
+    JMP     set_res_word
+eddsa_set_context_metadata_fail:
+    CALL    eddsa_ret_invalid_key
+    MOVI    r0,  ret_slot_metadata_err
     JMP     set_res_word

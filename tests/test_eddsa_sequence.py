@@ -44,18 +44,26 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         prefixmask = rn.randint(0, 2**256-1)
         prefix_int = prefix_int ^ prefixmask
 
-        tc.set_key(cmd_file, key=s1,         ktype=0x04, slot=(slot<<1), offset=0)
-        tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=8)
-        tc.set_key(cmd_file, key=s2,         ktype=0x04, slot=(slot<<1), offset=16)
-        tc.set_key(cmd_file, key=prefixmask, ktype=0x04, slot=(slot<<1), offset=24)
+        tc.set_key(cmd_file, key=s1,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
+        tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
+        tc.set_key(cmd_file, key=s2,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
+        tc.set_key(cmd_file, key=prefixmask, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
 
-        if run_name_suffix != "_invalid_curve":
-            metadata = tc.Ed25519_ID
+        if run_name_suffix == "_invalid_curve":
+            invalid_metadata = "curve"
         else:
-            metadata = tc.P256_ID
-        tc.set_key(cmd_file, key=metadata,  ktype=0x04, slot=(slot<<1)+1, offset=0)
+            invalid_metadata = None
+
+        _, _ = tc.gen_and_set_metadata(
+            curve=tc.Ed25519_ID,
+            slot=slot,
+            origin=0x01,
+            cmd_file=cmd_file,
+            invalid_metadata=invalid_metadata
+        )
+
         A_int = int.from_bytes(A, 'big')
-        tc.set_key(cmd_file, key=A_int,     ktype=0x04, slot=(slot<<1)+1, offset=8)
+        tc.set_key(cmd_file, key=A_int,     ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["x"])
 
     input_word = (slot << 8) + tc.find_in_list("eddsa_set_context", ops_cfg)["id"]
 
@@ -104,10 +112,10 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         if "ECC_KEY_RERANDOMIZE" in defines_set:
             kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
 
-            remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
-            remasked_prefix     = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
-            remasked_s2         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
-            remasked_prefixmask = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
+            remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
+            remasked_prefix     = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
+            remasked_s2         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
+            remasked_prefixmask = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
 
             b1 = ((remasked_s1 + remasked_s2) % ed25519.q) == ((s1 + s2) % ed25519.q)
             b2 = (remasked_s1 != s1) and (remasked_s2 != s2)

@@ -105,22 +105,27 @@ ed25519_key_setup_start:
     ; Transform A back to affine coordinates
     CALL        point_compress_ed25519
 
-    ; Compose kpair metadata (origin, curve)
+    ; Compose kpair metadata
+    ROR         r10, r25                        ; User slot
+    ROL8        r10, r10
+    ORI         r10, r10, ecc_pub_slot_id       ; Add public slot id
+    ROL8        r10, r10
     LD          r0,  ca_spect_cfg_word
     MOVI        r4,  0xFF
     AND         r9,  r0,  r4                    ; mask SPECT_OP_ID to r9[7:0]
     CMPI        r9,  ecc_key_gen_l3_cmd_id
     BRZ         ed25519_key_setup_origin_gen
 ed25519_key_setup_origin_st:
-    MOVI        r9,  ecc_key_origin_st
+    ORI         r10, r10, ecc_key_origin_st
     JMP         ed25519_key_setup_origin_continue
 ed25519_key_setup_origin_gen:
-    MOVI        r9,  ecc_key_origin_gen
+    ORI         r10, r10, ecc_key_origin_gen
 
 ed25519_key_setup_origin_continue:
-    ROL8        r9,  r9
-    ORI         r9,  r9,  ecc_type_ed25519
-    STK         r9,  r26, ecc_key_metadata      ; store metadata
+    ROL8        r10, r10
+    ORI         r10, r10, ecc_type_ed25519
+
+    STK         r10, r26, ecc_key_metadata      ; store metadata
     BRE         ed25519_key_setup_kbus_fail
 
     ; Store the pubkey to key slot
@@ -154,17 +159,25 @@ ed25519_key_setup_origin_continue:
     ; Change slot - needed so the slot register is same for flush in case of error
     MOV         r26, r25
 
-    STK         r28, r25, ecc_priv_key_1        ; store s1
+    ; make private slot metadata
+    MOVI        r9,  0xFF
+    ROL8        r9,  r9
+    ROL8        r9,  r9
+    XOR         r10, r10, r9
+
+    STK         r28, r26, ecc_priv_key_1        ; store s1
     BRE         ed25519_key_setup_kbus_fail
-    STK         r29, r25, ecc_priv_key_2        ; store prefix
+    STK         r29, r26, ecc_priv_key_2        ; store prefix
     BRE         ed25519_key_setup_kbus_fail
-    STK         r1,  r25, ecc_priv_key_3        ; store s2
+    STK         r1,  r26, ecc_priv_key_3        ; store s2
     BRE         ed25519_key_setup_kbus_fail
-    STK         r2,  r25, ecc_priv_key_4        ; prefix mask
+    STK         r2,  r26, ecc_priv_key_4        ; prefix mask
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, ecc_kbus_program           ; program
+    STK         r10, r26, ecc_key_metadata      ; priv metadata
     BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, ecc_kbus_flush             ; flush
+    KBO         r26, ecc_kbus_program           ; program
+    BRE         ed25519_key_setup_kbus_fail
+    KBO         r26, ecc_kbus_flush             ; flush
     BRE         ed25519_key_setup_kbus_fail
 
     ; Return success

@@ -29,7 +29,8 @@ op_ecdsa_sign:
     ; Read public key slot
     LDK     r5,  r25, ecc_key_metadata
     BRE     ecdsa_sign_kbus_err_fail
-    ANDI    r5,  r5,  0xFF
+    MOVI    r6,  0xFF
+    AND     r5,  r5,  r6
     CMPI    r5,  ecc_type_p256
     BRNZ    ecdsa_sign_curve_type_fail
 

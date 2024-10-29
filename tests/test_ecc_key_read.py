@@ -5,6 +5,137 @@ import os
 
 import test_common as tc
 
+origin_str = {
+    0x1 : "gen",
+    0x2 : "store"
+}
+
+curve_str = {
+    tc.Ed25519_ID: "ed25519",
+    tc.P256_ID: "p256"
+}
+
+test_name = "ecc_key_read"
+
+METADATA_ERR_TYPE = [
+    "slot_type", "slot_number", "origin", "curve"
+]
+
+def gen_and_set_key(curve, slot, cmd_file) -> bytes:
+    if curve == tc.Ed25519_ID:
+        A_ref = rn.randint(1,2**256 - 1)
+        tc.set_key(cmd_file, A_ref, ktype=0x4, slot=(2*slot + 1), offset=5*8)
+        return A_ref.to_bytes(32, 'big')
+    else:
+        Ax_ref = rn.randint(1,2**256 - 1)
+        Ay_ref = rn.randint(1,2**256 - 1)
+        tc.set_key(cmd_file, Ax_ref, ktype=0x4, slot=(2*slot + 1), offset=5*8)
+        tc.set_key(cmd_file, Ay_ref, ktype=0x4, slot=(2*slot + 1), offset=6*8)
+        return Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
+
+def read_key(curve, outsrc, run_name) -> bytes:
+    if curve == tc.Ed25519_ID:
+        size = 8
+    else:
+        size = 16
+    return tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, size).to_bytes(size*4, 'little')
+
+def test_process(test_dir, insrc, outsrc, curve, origin, empty_slot=False, invalid_metadata=None):
+
+    cmd_file = tc.get_cmd_file(test_dir)
+
+    slot = rn.randint(0, 127)
+    priv_slot = 2*slot
+    pub_slot = priv_slot+1
+
+    run_name = f"{test_name}_{curve_str[curve]}_{origin_str[origin]}"
+    if empty_slot:
+        run_name += "_empty_slot"
+    if invalid_metadata is not None:
+        run_name += f"_{invalid_metadata}"
+
+    tc.print_run_name(run_name)
+
+    tc.start(cmd_file)
+
+    input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
+    tc.write_int32(cmd_file, input_word, (insrc<<12))
+
+    if empty_slot:
+        ctx = tc.run_op(
+            cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name
+        )
+    else:
+        A_ref = gen_and_set_key(curve, slot, cmd_file)
+        _, _ = tc.gen_and_set_metadata(curve, slot, origin, cmd_file, invalid_metadata)
+        _ = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
+
+    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+
+    if empty_slot == False and invalid_metadata is None: # No fault
+        if (SPECT_OP_STATUS):
+            print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
+            return 1
+
+        if curve == tc.Ed25519_ID:
+            if (SPECT_OP_DATA_OUT_SIZE != 48):
+                print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
+                return 1
+        else:
+            if (SPECT_OP_DATA_OUT_SIZE != 80):
+                print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
+                return 1
+
+        tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+        l3_result = tmp & 0xFF
+        r_curve = (tmp >> 8) & 0xFF
+        r_origin = (tmp >> 16) & 0xFF
+
+        if (l3_result != 0xc3):
+            print("L3 RESULT:", hex(l3_result))
+            return 1
+
+        if (r_curve != curve):
+            print("CURVE", hex(r_curve))
+            return 1
+
+        if (r_origin != origin):
+            print("ORIGIN", hex(r_origin))
+            return 1
+
+        A = read_key(curve, outsrc, run_name)
+
+        if (A != A_ref):
+            print("A    ", A.hex())
+            print("A_ref", A_ref.hex())
+            return 1
+
+        return 0
+    else: # Fault
+        if empty_slot == True:
+            status_expected = 0xF2
+        elif invalid_metadata == "curve":
+            status_expected = 0xF4
+        else:
+            status_expected = 0xF6
+
+        if (SPECT_OP_STATUS != status_expected):
+            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+            return 1
+
+        if (SPECT_OP_DATA_OUT_SIZE != 1):
+            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
+            return 1
+
+        tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+        l3_result = tmp & 0xFF
+
+        if (l3_result != 0x12):
+            print("L3 RESULT:", hex(l3_result))
+            return 1
+
+        return 0
+
 if __name__ == "__main__":
 
     args = tc.parser.parse_args()
@@ -32,219 +163,43 @@ if __name__ == "__main__":
     print("insrc:", insrc)
     print("outsrc:", outsrc)
 
-# ===================================================================================
-#   Curve = Ed25519
-# ===================================================================================
-    cmd_file = tc.get_cmd_file(test_dir)
+    fail_flag = 0
 
-    A_ref = rn.randint(1,2**256 - 1)
-    curve_ref = tc.Ed25519_ID
-    origin_ref = 0x01
-
-    slot = rn.randint(0, 127)
-    pubkey_slot = (slot << 1)+1
-
-    print("slot:", slot)
-
-    run_name = test_name + "_ed25519_" + f"{slot}"
-
-    tc.print_run_name(run_name)
-
-    tc.set_key(cmd_file, curve_ref + (origin_ref << 8), ktype=0x4, slot=pubkey_slot, offset=0)
-    tc.set_key(cmd_file, A_ref, ktype=0x4, slot=pubkey_slot, offset=8)
-
-    tc.start(cmd_file)
-
-    input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
-
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
-
-    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS):
-        #print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        ret |= 1
-
-    if (SPECT_OP_DATA_OUT_SIZE != 48):
-        ret |= 2
-
-    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    l3_result = tmp & 0xFF
-    curve = (tmp >> 8) & 0xFF
-    origin = (tmp >> 16) & 0xFF
-
-    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 8, string=True)
-
-    if (l3_result != 0xc3):
-        print("L3 RESULT:", hex(l3_result))
-        ret |= 1
-
-    # Note: SPECT handles byte string naturally in big-endian order so the debug is easier
-    if not(curve == curve_ref and origin == origin_ref and A == A_ref.to_bytes(32, 'big')):
-        ret |= 1
-
-    if not(ret & 1):
-        tc.print_passed()
+    # ===================================================================================
+    #   Curve = Ed25519, Generated
+    # ===================================================================================
+    if(test_process(test_dir, insrc, outsrc, curve=tc.Ed25519_ID, origin=0x1)):
+        tc.print_failed()
+        fail_flag = fail_flag | 1
     else:
-        tc.print_failed()
-
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm {test_dir}/*")
-
-# ===================================================================================
-#   Curve = P256
-# ===================================================================================
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    Ax_ref = rn.randint(1,2**256 - 1)
-    Ay_ref = rn.randint(1,2**256 - 1)
-    A_ref = Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
-    curve_ref = tc.P256_ID
-    origin_ref = 0x02
-
-    slot = rn.randint(0, 127)
-    pubkey_slot = (slot << 1)+1
-
-    run_name = test_name + "_p256_" + f"{slot}"
-
-    tc.print_run_name(run_name)
-
-    tc.set_key(cmd_file, curve_ref + (origin_ref << 8), ktype=0x4, slot=pubkey_slot, offset=0)
-    tc.set_key(cmd_file, Ax_ref, ktype=0x4, slot=pubkey_slot, offset=8)
-    tc.set_key(cmd_file, Ay_ref, ktype=0x4, slot=pubkey_slot, offset=16)
-
-    tc.start(cmd_file)
-
-    input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
-
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
-
-    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS):
-        ret |= 2
-
-    if (SPECT_OP_DATA_OUT_SIZE != 80):
-        ret |= 2
-
-    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    l3_result = tmp & 0xFF
-    curve = (tmp >> 8) & 0xFF
-    origin = (tmp >> 16) & 0xFF
-
-    A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, 16).to_bytes(64, 'little')
-
-    if (l3_result != 0xc3):
-        #print("L3 RESULT:", hex(l3_result))
-        tc.print_failed()
-        ret |= 2
-
-    if not(curve == curve_ref and origin == origin_ref and
-           A == A_ref):
-        tc.print_failed()
-        ret |= 2
-
-    if not(ret & 2):
         tc.print_passed()
 
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm {test_dir}/*")
-
-# ===================================================================================
-#   Invalid Curve Type
-# ===================================================================================
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    curve_ref = 0x66
-    origin_ref = 0x02
-
-    slot = rn.randint(0, 127)
-    pubkey_slot = (slot << 1)+1
-
-    run_name = test_name + "_invalid_curve_" + f"{slot}"
-
-    tc.print_run_name(run_name)
-
-    tc.set_key(cmd_file, curve_ref + (origin_ref << 8), ktype=0x4, slot=pubkey_slot, offset=0)
-
-    tc.start(cmd_file)
-
-    input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
-
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
-
-    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS != 0xF4):
-        ret |= 2
-
-    if (SPECT_OP_DATA_OUT_SIZE != 1):
-        ret |= 2
-
-    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    l3_result = tmp & 0xFF
-
-    if (l3_result != 0x12):
-        print("L3 RESULT:", hex(l3_result))
+    # ===================================================================================
+    #   Curve = P-256, Stored
+    # ===================================================================================
+    if(test_process(test_dir, insrc, outsrc, curve=tc.P256_ID, origin=0x2)):
         tc.print_failed()
-        ret |= 2
-
-    if not(ret & 2):
+        fail_flag = fail_flag | 1
+    else:
         tc.print_passed()
 
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm {test_dir}/*")
-
-# ===================================================================================
-#   Empty Slot
-# ===================================================================================
-    cmd_file = tc.get_cmd_file(test_dir)
-
-    slot = rn.randint(0, 127)
-    pubkey_slot = (slot << 1)+1
-
-    run_name = test_name + "_empty_slot_" + f"{slot}"
-
-    tc.print_run_name(run_name)
-
-    tc.start(cmd_file)
-
-    input_word = (slot << 8) + tc.find_in_list("ecc_key_read", ops_cfg)["id"]
-
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
-
-    ctx = tc.run_op(cmd_file, "ecc_key_read", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS != 0xF2):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
+    # ===================================================================================
+    #   Empty slot
+    # ===================================================================================
+    if(test_process(test_dir, insrc, outsrc, curve=tc.P256_ID, origin=0x2, empty_slot=True)):
         tc.print_failed()
-        ret |= 4
-
-    if (SPECT_OP_DATA_OUT_SIZE != 1):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        tc.print_failed()
-        ret |= 4
-
-    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    l3_result = tmp & 0xFF
-
-    if (l3_result != 0x12):
-        print("L3 RESULT:", hex(l3_result))
-        tc.print_failed()
-        ret |= 4
-
-    if not(ret & 4):
+        fail_flag = fail_flag | 1
+    else:
         tc.print_passed()
 
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm -r {test_dir}")
+    # ===================================================================================
+    #   Invalid metadata
+    # ===================================================================================
+    for medatata_err in METADATA_ERR_TYPE:
+        if(test_process(test_dir, insrc, outsrc, curve=tc.P256_ID, origin=0x2, invalid_metadata=medatata_err)):
+            tc.print_failed()
+            fail_flag = fail_flag | 1
+        else:
+            tc.print_passed()
 
-    sys.exit(ret)
+    sys.exit(fail_flag)

@@ -52,8 +52,8 @@ def test_proc(test_type: str):
 
         return 1
     ########################################################################################################
-
     # Generate test vector
+    ########################################################################################################
     d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
 
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
@@ -67,17 +67,28 @@ def test_proc(test_type: str):
     d2 = rn.randint(0, p256.q)
     d1 = (d - d2) % p256.q
 
-    tc.set_key(cmd_file, key=d1,         ktype=0x04, slot=(slot<<1),  offset=0)
-    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1),  offset=8)
-    tc.set_key(cmd_file, key=d2,         ktype=0x04, slot=(slot<<1),  offset=16)
-    tc.set_key(cmd_file, key=wmask,      ktype=0x04, slot=(slot<<1),  offset=24)
+    tc.set_key(cmd_file, key=d1,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
+    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
+    tc.set_key(cmd_file, key=d2,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
+    tc.set_key(cmd_file, key=wmask,      ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
+
+    print("slot", slot)
 
     if test_type == "invalid_key_type":
-        tc.set_key(cmd_file, key=0x1234, ktype=0x04, slot=(slot<<1)+1, offset=0)
+        invalid_metadata = "curve"
     else:
-        tc.set_key(cmd_file, key=tc.P256_ID, ktype=0x04, slot=(slot<<1)+1, offset=0)
-    tc.set_key(cmd_file, key=Ax,         ktype=0x04, slot=(slot<<1)+1, offset=8)
-    tc.set_key(cmd_file, key=Ay,         ktype=0x04, slot=(slot<<1)+1, offset=16)
+        invalid_metadata = None
+
+    _, _ = tc.gen_and_set_metadata(
+        curve=tc.P256_ID,
+        slot=slot,
+        origin=0x01,
+        cmd_file=cmd_file,
+        invalid_metadata=invalid_metadata
+    )
+
+    tc.set_key(cmd_file, key=Ax, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["x"])
+    tc.set_key(cmd_file, key=Ay, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["y"])
 
     tc.write_bytes(cmd_file, z, (insrc<<12) + 0x10)
     tc.write_bytes(cmd_file, sch, 0x00A0)
