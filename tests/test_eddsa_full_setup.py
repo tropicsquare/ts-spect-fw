@@ -274,6 +274,27 @@ def key_read(test_dir, run_name, keymem, slot):
     l3_result = tmp & 0xFF
     curve = (tmp >> 8) & 0xFF
     origin = (tmp >> 16) & 0xFF
+    padding = (tmp >> 24) & 0xFF
+
+    if l3_result != 0xC3:
+        print("L3 RESULT:", hex(l3_result))
+        tc.print_failed()
+        sys.exit(1)
+
+    if padding != 0:
+        print("Padding: ", hex(padding))
+        tc.print_failed()
+        sys.exit(1)
+
+    if curve not in [0x1, 0x2]:
+        print("Curve: ", hex(curve))
+        tc.print_failed()
+        sys.exit(1)
+
+    if origin not in [0x1, 0x2]:
+        print("Origin: ", hex(origin))
+        tc.print_failed()
+        sys.exit(1)
 
     A = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, key_size).to_bytes(key_size*4, 'little')
 
