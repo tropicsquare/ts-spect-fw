@@ -158,6 +158,8 @@ ecc_key_read_continue:
     BRE     op_key_fail
 
     ; compose return value
+    MOVI    r5,  0xFFF
+    AND     r2,  r2,  r5
     ROL8    r2,  r2
     ORI     r2,  r2,  l3_result_ok
     MOVI    r0,  0
