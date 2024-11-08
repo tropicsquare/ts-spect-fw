@@ -27,11 +27,12 @@
 ; ==============================================================================
 
 ecdsa_sign:
-    GRV         r1
-    GRV         r2
     GRV         r3
     GRV         r4
-    TMAC_IT     r1
+    GRV         r5
+    GRV         r6
+
+    TMAC_IT     r3
     TMAC_IS     r20, tmac_dst_ecdsa_sign
 
     CALL        tmac_sch_scn
@@ -41,9 +42,13 @@ ecdsa_sign:
     MOV         r1,  r18
 
 ; ==============================================================================
-;   Compute Nonce k = TMAC(w, sch || scn || z, 0xB) mod q
+;   Compute Nonce k
+;       k1 = TMAC(w, sch || scn || z, 0xB)
+;       k2 = TMAC(k1, "", 0xB)
+;       k = (k2 * 2^256) + k1 mod q
 ; ==============================================================================
 
+; Get k1
 ecdsa_sign_tmac_z_first_loop:
     ROLIN       r0,  r0,  r1
     ROL8        r1,  r1
@@ -75,10 +80,26 @@ ecdsa_sign_tmac_padding_loop:
 
     TMAC_RD     r27
 
+; Get k2 from k1
+    ; TODO: Using previous mask is not optimal. Come up with better solution how to avoid 4 GRVs
+    TMAC_IT     r3
+
+    TMAC_IS     r27, tmac_dst_ecdsa_sign
+
+    MOVI        r1,  0x04
+    MOVI        r30, 17
+ecdsa_sign_tmac_padding_loop_k2:
+    ROL8        r1,  r1
+    SUBI        r30, r30, 1
+    BRNZ        ecdsa_sign_tmac_padding_loop_k2
+    ORI         r1, r1, 0x80
+
+    TMAC_UP     r1
+    TMAC_RD     r28
+
     ST          r18, ca_ecdsa_sign_internal_z
 
     LD          r31, ca_q256
-    MOVI        r28, 0
     REDP        r27, r28, r27
 
     XORI        r0,  r27, 0
