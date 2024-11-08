@@ -62,7 +62,7 @@ def key_gen(k):
 def sign(d, w, sch, scn, z):
     k1 = tmac(w, sch + scn + z, b"\x0B")
     k2 = tmac(k1, b"", b"\x0B")
-    k = k2 + k1
+    k = k1 + k2
     k_int = int.from_bytes(k, byteorder="big") % q
 
     if k_int == 0:

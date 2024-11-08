@@ -100,7 +100,7 @@ ecdsa_sign_tmac_padding_loop_k2:
     ST          r18, ca_ecdsa_sign_internal_z
 
     LD          r31, ca_q256
-    REDP        r27, r28, r27
+    REDP        r27, r27, r28
 
     XORI        r0,  r27, 0
     BRZ         ecdsa_sign_fail_k

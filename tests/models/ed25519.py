@@ -144,7 +144,7 @@ def sign_standard(secret, msg):
 def sign(s, prefix, A, sch, scn, m):
     r1 = tmac(prefix, sch + scn + m, b"\x0C")
     r2 = tmac(r1, b"", b"\x0C")
-    r = r2 + r1
+    r = r1 + r2
     r_int = int.from_bytes(r, byteorder='big') % q
     R = point_mul(r_int, G)
     Rs = point_compress(R)
