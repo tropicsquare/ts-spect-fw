@@ -180,7 +180,7 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
             return 0
 
     ########################################################################################################
-    #   Nonce Update
+    #   Nonce Finish
     ########################################################################################################
     last_block_tmac = message[updates_cnt*144:]
 

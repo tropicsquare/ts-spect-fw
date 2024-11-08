@@ -91,9 +91,25 @@ eddsa_nonce_finish_last_update:
 
     TMAC_RD     r27
 
+; Get r2 from r1
+_eddsa_tmac_it_bp_2:
+    ; TODO: Using previous mask is not optimal. Come up with better solution how to avoid 4 GRVs
+    TMAC_IT     r7
+    TMAC_IS     r27, tmac_dst_eddsa_sign
+
+    MOVI        r1,  0x04
+    MOVI        r30, 17
+eddsa_nonce_finish_tmac_padding_loop_k2:
+    ROL8        r1,  r1
+    SUBI        r30, r30, 1
+    BRNZ        eddsa_nonce_finish_tmac_padding_loop_k2
+    ORI         r1, r1, 0x80
+
+    TMAC_UP     r1
+    TMAC_RD     r28
+
     LD          r31, ca_q25519
-    MOVI        r0,  0
-    REDP        r27, r0, r27
+    REDP        r27, r28, r27
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  0

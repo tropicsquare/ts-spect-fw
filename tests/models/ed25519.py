@@ -142,12 +142,14 @@ def sign_standard(secret, msg):
 
 
 def sign(s, prefix, A, sch, scn, m):
-    r_bytes = tmac(prefix, sch + scn + m, b"\x0C")
-    r = int.from_bytes(r_bytes, byteorder='big') % q
-    R = point_mul(r, G)
+    r1 = tmac(prefix, sch + scn + m, b"\x0C")
+    r2 = tmac(r1, b"", b"\x0C")
+    r = r2 + r1
+    r_int = int.from_bytes(r, byteorder='big') % q
+    R = point_mul(r_int, G)
     Rs = point_compress(R)
     h = sha512_modq(Rs + A + m)
-    s = (r + h * s) % q
+    s = (r_int + h * s) % q
     signature = Rs + int.to_bytes(s, 32, "little")
     return signature
 

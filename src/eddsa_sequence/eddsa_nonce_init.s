@@ -20,11 +20,12 @@
 ; ==============================================================================
 
 op_eddsa_nonce_init:
-    GRV         r1
-    GRV         r2
-    GRV         r3
-    GRV         r4
-    TMAC_IT     r1
+    GRV         r7
+    GRV         r8
+    GRV         r9
+    GRV         r10
+_eddsa_tmac_it_bp_1:
+    TMAC_IT     r7
 
     TMAC_IS     r20, tmac_dst_eddsa_sign
 
