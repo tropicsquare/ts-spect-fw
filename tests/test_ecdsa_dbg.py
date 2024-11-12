@@ -28,7 +28,7 @@ if __name__ == "__main__":
         sch = bytes.fromhex(data_dir["sch"])
         scn = bytes.fromhex(data_dir["scn"])
         d = data_dir["d"]
-        w = bytes.fromhex(data_dir["w"])
+        w = data_dir["w"]
         Ax = data_dir["Ax"]
         Ay = data_dir["Ay"]
     else:
@@ -55,9 +55,8 @@ if __name__ == "__main__":
     # Write Keys and inputs
     slot = rn.randint(0, 7)
 
-    wint = int.from_bytes(w, 'big')
-    tc.write_int256(cmd_file, d, 0x0040)
-    tc.write_int256(cmd_file, wint, 0x0060)
+    tc.write_int256(cmd_file, d,  0x0040)
+    tc.write_int256(cmd_file, w,  0x0060)
     tc.write_int256(cmd_file, Ax, 0x0160)
     tc.write_int256(cmd_file, Ay, 0x0180)
 

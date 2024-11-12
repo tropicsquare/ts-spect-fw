@@ -43,9 +43,9 @@ ecdsa_sign:
 
 ; ==============================================================================
 ;   Compute Nonce k
-;       k1 = TMAC(w, sch || scn || z, 0xB)
-;       k2 = TMAC(k1, "", 0xB)
-;       k = (k2 * 2^256) + k1 mod q
+;       k1 = int(TMAC(w, sch || scn || z, 0xB))
+;       k2 = int(TMAC(k1, "", 0xB))
+;       k = (k1 + (k2 * 2^256)) mod q
 ; ==============================================================================
 
 ; Get k1
@@ -100,7 +100,7 @@ ecdsa_sign_tmac_padding_loop_k2:
     ST          r18, ca_ecdsa_sign_internal_z
 
     LD          r31, ca_q256
-    REDP        r27, r27, r28
+    REDP        r27, r28, r27
 
     XORI        r0,  r27, 0
     BRZ         ecdsa_sign_fail_k
