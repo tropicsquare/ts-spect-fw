@@ -145,7 +145,7 @@ Outputs:
 
 Steps:
 
-1. Compute $h = \text{SHA-512}(k)$
+1. Compute $h = \text{SHA512}(k)$
 2. Derive $s$ from lower 32 bytes of $h$ as described in [2] section 5.1.5
 3. Reduce $s \pmod{q}$
 4. Derive $prefix$ from upper 32 bytes of $h$ as integer in little-endian encoding
