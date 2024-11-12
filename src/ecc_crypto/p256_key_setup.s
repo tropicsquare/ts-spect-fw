@@ -70,8 +70,7 @@ p256_key_setup_start:
     GRV     r3
 
     TMAC_IT r0
-    SWE     r20, r28
-    TMAC_IS r20, tmac_dst_ecdsa_key_setup
+    TMAC_IS r28, tmac_dst_ecdsa_key_setup
 
     MOVI    r2,  0x04
     MOVI    r30, 17
