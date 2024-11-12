@@ -19,20 +19,28 @@ op_ecdsa_sign:
     CALL    get_input_base
     ADDI    r4,  r0,  ecdsa_input_cmd_in
     LDR     r4,  r4
-    ROR8    r25, r4
-    MOVI    r2,  0xFF
-    AND     r25, r25, r2         ; SLOT
+    ROR8    r2,  r4
+    MOVI    r6,  0xFF
+    AND     r2,  r2,  r6         ; SLOT
 
-    LSL     r25, r25                    ; priv key slot
+    LSL     r25, r2                     ; priv key slot
     ORI     r25, r25, 1                 ; pub key slot
 
     ; Read public key slot
     LDK     r5,  r25, ecc_key_metadata
     BRE     ecdsa_sign_kbus_err_fail
     MOVI    r6,  0xFF
-    AND     r5,  r5,  r6
-    CMPI    r5,  ecc_type_p256
+    ; check curve type
+    AND     r7,  r5,  r6
+    CMPI    r7,  ecc_type_p256
     BRNZ    ecdsa_sign_curve_type_fail
+    ; Check slot number
+    ROR8    r5,  r5
+    ROR8    r5,  r5
+    ROR8    r5,  r5
+    AND     r7,  r5,  r6
+    CMP     r7,  r2
+    BRNZ    ecdsa_sign_metadata_fail
 
     LDK     r5,  r25, ecc_pub_key_Ax
     BRE     ecdsa_sign_kbus_err_fail
@@ -76,24 +84,24 @@ op_ecdsa_sign:
 
 .ifdef ECC_KEY_RERANDOMIZE
     ; Store the rerandomized priv keys back to flash slot
-    KBO         r25, ecc_kbus_erase             ; Erase the slot before writing remasked keys
-    BRE         eddsa_set_context_kbus_fail
-    STK         r21, r25, ecc_priv_key_1        ; store d1
-    BRE         ed25519_key_setup_kbus_fail
-    STK         r22, r25, ecc_priv_key_2        ; store w
-    BRE         ed25519_key_setup_kbus_fail
-    STK         r26, r25, ecc_priv_key_3        ; store d2
-    BRE         ed25519_key_setup_kbus_fail
-    STK         r23, r25, ecc_priv_key_4        ; w mask
-    BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, ecc_kbus_program           ; program
-    BRE         ed25519_key_setup_kbus_fail
-    KBO         r25, ecc_kbus_flush             ; flush
-    BRE         ed25519_key_setup_kbus_fail
+    KBO     r25, ecc_kbus_erase             ; Erase the slot before writing remasked keys
+    BRE     eddsa_set_context_kbus_fail
+    STK     r21, r25, ecc_priv_key_1        ; store d1
+    BRE     ed25519_key_setup_kbus_fail
+    STK     r22, r25, ecc_priv_key_2        ; store w
+    BRE     ed25519_key_setup_kbus_fail
+    STK     r26, r25, ecc_priv_key_3        ; store d2
+    BRE     ed25519_key_setup_kbus_fail
+    STK     r23, r25, ecc_priv_key_4        ; w mask
+    BRE     ed25519_key_setup_kbus_fail
+    KBO     r25, ecc_kbus_program           ; program
+    BRE     ed25519_key_setup_kbus_fail
+    KBO     r25, ecc_kbus_flush             ; flush
+    BRE     ed25519_key_setup_kbus_fail
 .endif
 
     ; unmask w
-    XOR         r20, r22, r23
+    XOR     r20, r22, r23
 
     ; Load secure channel hasn/nonce
     LD      r16, ecdsa_sign_input_sch
@@ -102,6 +110,10 @@ op_ecdsa_sign:
 
     JMP     ecdsa_sign
 
+ecdsa_sign_metadata_fail:
+    KBO     r25, ecc_kbus_flush
+    MOVI    r3,  ret_slot_metadata_err
+    JMP     ecdsa_sign_invalid_key_fail
 ecdsa_sign_curve_type_fail:
     KBO     r25, ecc_kbus_flush
     MOVI    r3,  ret_curve_type_err
