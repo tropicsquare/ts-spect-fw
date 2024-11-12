@@ -56,8 +56,6 @@ def test_proc(test_type: str):
     ########################################################################################################
     d, w, Ax, Ay = p256.key_gen(tc.random_bytes(32))
 
-    print("w", hex(w))
-
     sch = tc.random_bytes(32)
     scn = tc.random_bytes(4)
 
@@ -75,8 +73,6 @@ def test_proc(test_type: str):
     tc.set_key(cmd_file, key=w,          ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
     tc.set_key(cmd_file, key=d2,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
     tc.set_key(cmd_file, key=wmask,      ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
-
-    print("slot", slot)
 
     if test_type == "invalid_key_type":
         invalid_metadata = "curve"

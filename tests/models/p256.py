@@ -61,14 +61,10 @@ def key_gen(k: bytes):
 def get_nonce(z: bytes, sch: bytes, scn: bytes, w: int):
     k1 = tmac_int(w, sch + scn + z, b"\x0B")
     k2 = tmac_int(k1, b"", b"\x0B")
-    print("k1: ", hex(k1))
-    print("k2: ", hex(k2))
     return (k1 | (k2 << 256)) % q
 
 def sign(d: int, w: int, sch: bytes, scn: bytes, z: bytes):
     k = get_nonce(z, sch, scn, w)
-
-    print("nonce k:", hex(k))
 
     if k == 0:
         print("Test Model: k_int = 0. ECDSA Failed.")

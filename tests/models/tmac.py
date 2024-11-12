@@ -426,7 +426,6 @@ ts_keccak = KeccakHash.preset(144, 256, 256, padfn=tmac_padding)
 def tmac(key: bytes, data: bytes, nonce: bytes) -> bytes:
     """TMAC computation function"""
     X = nonce + bytes([len(key)]) + key + b"\x00\x00" + data
-    print("X", X.hex())
     return ts_keccak(X).digest()
 
 def tmac_int(key: int, data: bytes, nonce: bytes) -> int:
