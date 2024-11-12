@@ -321,8 +321,7 @@ if __name__ == "__main__":
     msg_bitlen = rn.randint(64, 200)*8
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
-    s, prefix = ed25519.secret_expand(k)
-    A_ref = ed25519.secret_to_public(k)
+    s, prefix, A_ref = ed25519.key_gen(k)
     sign_ref = ed25519.sign(s, prefix, A_ref, sch, scn, message)
 
     keymem = f"{test_dir}/{run_name}_keymem.hex"

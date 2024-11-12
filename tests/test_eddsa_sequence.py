@@ -40,14 +40,13 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
         s1 = smask
         s2 = (smodq - smask) % ed25519.q
 
-        prefix_int = int.from_bytes(prefix, 'big')
-        prefixmask = rn.randint(0, 2**256-1)
-        prefix_int = prefix_int ^ prefixmask
+        prefix_mask = rn.randint(0, 2**256-1)
+        prefix_masked = prefix ^ prefix_mask
 
-        tc.set_key(cmd_file, key=s1,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
-        tc.set_key(cmd_file, key=prefix_int, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
-        tc.set_key(cmd_file, key=s2,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
-        tc.set_key(cmd_file, key=prefixmask, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
+        tc.set_key(cmd_file, key=s1,            ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
+        tc.set_key(cmd_file, key=prefix_masked, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
+        tc.set_key(cmd_file, key=s2,            ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
+        tc.set_key(cmd_file, key=prefix_mask,   ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
 
         if run_name_suffix == "_invalid_curve":
             invalid_metadata = "curve"
@@ -379,8 +378,7 @@ if __name__ == "__main__":
     test_dir = tc.make_test_dir(test_name)
 
     k = rn.randint(0, 2**256-1).to_bytes(32, 'little')
-    s, prefix = ed25519.secret_expand(k)
-    A = ed25519.secret_to_public(k)
+    s, prefix, A = ed25519.key_gen(k)
 
     sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
     scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')

@@ -109,7 +109,7 @@ eddsa_nonce_finish_tmac_padding_loop_k2:
     TMAC_RD     r28
 
     LD          r31, ca_q25519
-    REDP        r27, r27, r28
+    REDP        r27, r28, r27
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  0
