@@ -54,14 +54,14 @@ def test_proc(test_type: str):
     ########################################################################################################
     # Generate test vector
     ########################################################################################################
-    d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
+    d, w, Ax, Ay = p256.key_gen(tc.random_bytes(32))
 
     print("w", hex(w))
 
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
 
-    z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+    z = tc.random_bytes(32)
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
     signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')

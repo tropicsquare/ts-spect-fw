@@ -62,7 +62,7 @@ if __name__ == "__main__":
     cmd_file = tc.get_cmd_file(test_dir)
 
     d = rn.randint(0, p256.p - 1)
-    z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+    z = tc.random_bytes(32)
     k = rn.randint(1, p256.q - 1)
 
     r_ref, s_ref = p256.sign_mpw1(d, z, k)

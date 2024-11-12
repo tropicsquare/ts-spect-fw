@@ -314,9 +314,9 @@ if __name__ == "__main__":
 
     test_dir = tc.make_test_dir(test_name)
 
-    k = rn.randint(0, 2**256 - 1).to_bytes(32, 'little')
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    k = tc.random_bytes(32)
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
     slot = rn.randint(0, 31)
     msg_bitlen = rn.randint(64, 200)*8
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')

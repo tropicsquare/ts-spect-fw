@@ -380,8 +380,8 @@ if __name__ == "__main__":
     k = rn.randint(0, 2**256-1).to_bytes(32, 'little')
     s, prefix, A = ed25519.key_gen(k)
 
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
 
     slot = rn.randint(0, 7)
 

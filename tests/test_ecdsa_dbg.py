@@ -36,10 +36,10 @@ if __name__ == "__main__":
         rn.seed(seed)
         print("seed:", seed)
         # Generate test vector
-        d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
-        sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-        scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
-        z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+        d, w, Ax, Ay = p256.key_gen(tc.random_bytes(32))
+        sch = tc.random_bytes(32)
+        scn = tc.random_bytes(4)
+        z = tc.random_bytes(32)
 
         rng_list = [rn.randint(0, 2**256-1) for i in range(16)]
 

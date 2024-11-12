@@ -79,6 +79,9 @@ rng_luts = {
 }
 ##################################################################
 
+def random_bytes(n: int):
+    return rn.getrandbits(n*8).to_bytes(n, 'little')
+
 def get_release_version():
     try:
         result = subprocess.run(
