@@ -1,7 +1,7 @@
 import hashlib
 import random as rn
 
-from .tmac import tmac
+from .tmac import tmac_int
 
 p = 2**256 - 2**224 + 2**192 + 2**96 - 1
 q = 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551
@@ -52,23 +52,28 @@ def spm(k, x, y):
 
     return xQ, yQ
 
-def key_gen(k):
+def key_gen(k: bytes):
     d = int.from_bytes(k, 'big') % q
-    db = d.to_bytes(32, 'little')
-    w = tmac(db, b"", b"\x0A")
+    w = tmac_int(d, b"", b"\x0A")
     Ax, Ay = spm(d, xG, yG)
     return d, w, Ax, Ay
 
-def sign(d, w, sch, scn, z):
-    k1 = tmac(w, sch + scn + z, b"\x0B")
-    k2 = tmac(k1, b"", b"\x0B")
-    k = k1 + k2
-    k_int = int.from_bytes(k, byteorder="big") % q
+def get_nonce(z: bytes, sch: bytes, scn: bytes, w: int):
+    k1 = tmac_int(w, sch + scn + z, b"\x0B")
+    k2 = tmac_int(k1, b"", b"\x0B")
+    print("k1: ", hex(k1))
+    print("k2: ", hex(k2))
+    return (k1 | (k2 << 256)) % q
 
-    if k_int == 0:
+def sign(d: int, w: int, sch: bytes, scn: bytes, z: bytes):
+    k = get_nonce(z, sch, scn, w)
+
+    print("nonce k:", hex(k))
+
+    if k == 0:
         print("Test Model: k_int = 0. ECDSA Failed.")
 
-    x, y = spm(k_int, xG, yG)
+    x, _ = spm(k, xG, yG)
     r = x % q
 
     if r == 0:
@@ -76,24 +81,24 @@ def sign(d, w, sch, scn, z):
 
     z_int = int.from_bytes(z, 'big')
 
-    s = ((z_int + d*r) * inv0(k_int, q)) % q
+    s = ((z_int + d*r) * inv0(k, q)) % q
 
     return r, s
 
-def sign_mpw1(d, z, k_int):
-    k_int = k_int % q
+def sign_mpw1(d, z, k):
+    k = k % q
 
-    if k_int == 0:
+    if k == 0:
         print("Test Model: k_int = 0. ECDSA Failed.")
 
-    x, y = spm(k_int, xG, yG)
+    x, y = spm(k, xG, yG)
     r = x % q
 
     if r == 0:
         print("Test Model: r = 0. ECDSA Failed.")
 
     z_int = int.from_bytes(z, 'big')
-    s = ((z_int + d*r) * inv0(k_int, q)) % q
+    s = ((z_int + d*r) * inv0(k, q)) % q
 
     return r, s
 

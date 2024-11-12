@@ -5,7 +5,7 @@
 ## First, some preliminaries that will be needed.
 
 import hashlib
-from .tmac import tmac
+from .tmac import tmac_int
 
 def sha512(s):
     return hashlib.sha512(s).digest()
@@ -114,25 +114,32 @@ def point_decompress(s):
 
 ## These are functions for manipulating the private key.
 
-def secret_expand(secret):
-    if len(secret) != 32:
+def secret_expand(k: bytes):
+    if len(k) != 32:
         raise Exception("Bad size of private key")
-    h = sha512(secret)
-    a = int.from_bytes(h[:32], "little")
-    a &= (1 << 254) - 8
-    a |= (1 << 254)
-    return (a, h[32:])
+    h = sha512(k)
+    s = int.from_bytes(h[:32], "little")
+    s &= (1 << 254) - 8
+    s |= (1 << 254)
+    s = s % q
+    prefix = int.from_bytes(h[32:], 'little')
+    return s, prefix
 
-def secret_to_public(secret):
-    (a, dummy) = secret_expand(secret)
-    return point_compress(point_mul(a, G))
+def secret_to_public(s: int):
+    return point_compress(point_mul(s, G))
+
+def key_gen(k: bytes):
+    s, prefix = secret_expand(k)
+    A = secret_to_public(s)
+    return s, prefix, A
 
 ## The signature function works as below.
 
 def sign_standard(secret, msg):
     a, prefix = secret_expand(secret)
+    prefix_bytes = prefix.to_bytes(32, 'little')
     A = point_compress(point_mul(a, G))
-    r = sha512_modq(prefix + msg)
+    r = sha512_modq(prefix_bytes + msg)
     R = point_mul(r, G)
     Rs = point_compress(R)
     h = sha512_modq(Rs + A + msg)
@@ -140,36 +147,37 @@ def sign_standard(secret, msg):
     signature = Rs + int.to_bytes(s, 32, "little")
     return signature, A
 
+def get_nonce(m: bytes, sch: bytes, scn: bytes, prefix: int):
+    r1 = tmac_int(prefix, sch + scn + m, b"\x0C")
+    r2 = tmac_int(r1, b"", b"\x0C")
+    return (r1 | (r2 << 256)) % q
 
-def sign(s, prefix, A, sch, scn, m):
-    r1 = tmac(prefix, sch + scn + m, b"\x0C")
-    r2 = tmac(r1, b"", b"\x0C")
-    r = r1 + r2
-    r_int = int.from_bytes(r, byteorder='big') % q
-    R = point_mul(r_int, G)
+def sign(s: int, prefix: int, A: bytes, sch: bytes, scn: bytes, m: bytes) -> bytes:
+    r = get_nonce(m, sch, scn, prefix)
+    R = point_mul(r, G)
     Rs = point_compress(R)
     h = sha512_modq(Rs + A + m)
-    s = (r_int + h * s) % q
-    signature = Rs + int.to_bytes(s, 32, "little")
+    S = (r + h * s) % q
+    signature = Rs + int.to_bytes(S, 32, "little")
     return signature
 
 ## And finally the verification function.
 
-def verify(public, msg, signature):
-    if len(public) != 32:
+def verify(A, m, signature):
+    if len(A) != 32:
         raise Exception("Bad public key length")
     if len(signature) != 64:
         Exception("Bad signature length")
-    A = point_decompress(public)
+    A = point_decompress(A)
     if not A:
         return False
     Rs = signature[:32]
     R = point_decompress(Rs)
     if not R:
         return False
-    s = int.from_bytes(signature[32:], "little")
-    if s >= q: return False
-    h = sha512_modq(Rs + public + msg)
-    sB = point_mul(s, G)
+    S = int.from_bytes(signature[32:], "little")
+    if S >= q: return False
+    h = sha512_modq(Rs + A + m)
+    sB = point_mul(S, G)
     hA = point_mul(h, A)
     return point_equal(sB, point_add(R, hA))
