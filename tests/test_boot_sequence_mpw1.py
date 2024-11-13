@@ -101,7 +101,7 @@ if __name__ == "__main__":
     msg_bitlen = rn.randint(2*128, 5*128)*8
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
-    secret = int.to_bytes(rn.randint(0, 2**256-1), 32, 'little')
+    secret = tc.random_bytes(32)
 
     digest_ref = sha512(message)
 

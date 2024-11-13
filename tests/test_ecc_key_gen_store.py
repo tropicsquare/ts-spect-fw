@@ -42,19 +42,17 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
         return 0
 
     if key_type == tc.Ed25519_ID:
-        priv1_ref, priv2_ref = ed25519.secret_expand(k)
-        pub1_ref = ed25519.secret_to_public(k)
+        priv1_ref, priv2_ref, pub1_ref = ed25519.key_gen(k)
         pub1_ref = int.from_bytes(pub1_ref, 'big')
         pub2_ref = 0
-        priv1_ref = priv1_ref % ed25519.q
-        priv2_ref = int.from_bytes(priv2_ref, 'big')
     else:
         if op == "ecc_key_gen":
-            k = rng[1].to_bytes(32, 'big') + rng[0].to_bytes(32, 'big')
+            kbytes = rng[1].to_bytes(32, 'big') + rng[0].to_bytes(32, 'big')
+            kint = int.from_bytes(kbytes, 'big') % p256.q
         else:
-            k = (rng[0] % p256.q).to_bytes(32, 'little')
+            kint = rn.randint(1, p256.q - 1)
+        k = kint.to_bytes(32, 'big')
         priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
-        priv2_ref = int.from_bytes(priv2_ref, 'big')
 
     priv_metadata_ref = ((slot<<24) | (tc.SLOT_PRIVATE<<16) | (ecc_key_origin[op]<<8) | key_type)
     pub_metadata_ref = ((slot<<24) | (tc.SLOT_PUBLIC<<16) | (ecc_key_origin[op]<<8) | key_type)
@@ -69,7 +67,7 @@ def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False)
         tc.set_key(cmd_file, 0x1234, ktype=0x4, slot=slot*2, offset=0)
 
     if op == "ecc_key_store":
-        tc.write_bytes(cmd_file, k, (insrc<<12) +  0x10)
+        tc.write_bytes(cmd_file, k, (insrc<<12) + 0x10)
 
     ctx = tc.run_op(cmd_file, op, insrc, outsrc, 3, ops_cfg, test_dir, run_name=run_name)
 

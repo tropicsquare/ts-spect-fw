@@ -427,3 +427,9 @@ def tmac(key: bytes, data: bytes, nonce: bytes) -> bytes:
     """TMAC computation function"""
     X = nonce + bytes([len(key)]) + key + b"\x00\x00" + data
     return ts_keccak(X).digest()
+
+def tmac_int(key: int, data: bytes, nonce: bytes) -> int:
+    """TMAC computation function using integers"""
+    key_bytes = key.to_bytes(32, 'big')
+    tmac_bytes = tmac(key_bytes, data, nonce)
+    return int.from_bytes(tmac_bytes, 'big')

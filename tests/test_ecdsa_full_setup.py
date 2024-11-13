@@ -157,15 +157,15 @@ if __name__ == "__main__":
 
     slot = rn.randint(0, 7)
 
-    k = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+    k = tc.random_bytes(32)
 
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
 
     d, w, Ax_ref, Ay_ref = p256.key_gen(k)
     A_ref = Ax_ref.to_bytes(32, 'big') + Ay_ref.to_bytes(32, 'big')
 
-    z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+    z = tc.random_bytes(32)
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
 

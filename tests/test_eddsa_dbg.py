@@ -23,9 +23,8 @@ def eddsa_dbg_sequence(s, prefix, A, sch, scn, message, run_name_suffix=""):
     cmd_file = tc.get_cmd_file(test_dir)
     tc.start(cmd_file)
 
-    prefix_int = int.from_bytes(prefix, 'big')
     tc.write_int256(cmd_file, s, 0x0040)
-    tc.write_int256(cmd_file, prefix_int, 0x0060)
+    tc.write_int256(cmd_file, prefix, 0x0060)
 
     A_int = int.from_bytes(A, 'big')
     tc.write_int256(cmd_file, A_int, 0x0300)
@@ -240,11 +239,10 @@ if __name__ == "__main__":
     test_dir = tc.make_test_dir(test_name)
 
     k = rn.randint(0, 2**256-1).to_bytes(32, 'little')
-    s, prefix = ed25519.secret_expand(k)
-    A = ed25519.secret_to_public(k)
+    s, prefix, A = ed25519.key_gen(k)
 
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
 
     ########################################################################################################
     #   Test message len < 64

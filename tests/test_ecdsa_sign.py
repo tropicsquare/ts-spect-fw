@@ -32,7 +32,7 @@ def test_proc(test_type: str):
 
     ########################################################################################################
     # Empty Slot
-    ########################################################################################################    
+    ########################################################################################################
     if test_type == "empty_slot":
         tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
         SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
@@ -54,25 +54,25 @@ def test_proc(test_type: str):
     ########################################################################################################
     # Generate test vector
     ########################################################################################################
-    d, w, Ax, Ay = p256.key_gen(int.to_bytes(rn.randint(0, 2**256-1), 32, 'big'))
+    d, w, Ax, Ay = p256.key_gen(tc.random_bytes(32))
 
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
 
-    z = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
+    z = tc.random_bytes(32)
 
-    wint = int.from_bytes(w, 'big')
+    r_ref, s_ref = p256.sign(d, w, sch, scn, z)
+    signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')
+
     wmask = rn.randint(0, 2**256 - 1)
-    wint = wint ^ wmask
+    w = w ^ wmask
     d2 = rn.randint(0, p256.q)
     d1 = (d - d2) % p256.q
 
     tc.set_key(cmd_file, key=d1,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
-    tc.set_key(cmd_file, key=wint,       ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
+    tc.set_key(cmd_file, key=w,          ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
     tc.set_key(cmd_file, key=d2,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
     tc.set_key(cmd_file, key=wmask,      ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
-
-    print("slot", slot)
 
     if test_type == "invalid_key_type":
         invalid_metadata = "curve"
@@ -94,9 +94,6 @@ def test_proc(test_type: str):
     tc.write_bytes(cmd_file, sch, 0x00A0)
     tc.write_bytes(cmd_file, scn, 0x00C0)
 
-    r_ref, s_ref = p256.sign(d, w, sch, scn, z)
-    signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')
-
     # Run Op
     tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
 
@@ -106,7 +103,7 @@ def test_proc(test_type: str):
 
     ########################################################################################################
     # Invalid Key Type
-    ########################################################################################################    
+    ########################################################################################################
     if test_type == "invalid_key_type":
         if SPECT_OP_STATUS != 0xF4:
             print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
@@ -122,7 +119,7 @@ def test_proc(test_type: str):
         return 1
     ########################################################################################################
     # Valid
-    ########################################################################################################    
+    ########################################################################################################
     else:
         if SPECT_OP_STATUS != 0x00:
             print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
@@ -139,14 +136,14 @@ def test_proc(test_type: str):
             kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
 
             remasked_d1      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
-            remasked_wint    = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
+            remasked_w       = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
             remasked_d2      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
             remasked_wmask   = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
 
             b1 = ((remasked_d1 + remasked_d2) % p256.q) == ((d1 + d2) % p256.q)
             b2 = (remasked_d1 != d1) and (remasked_d2 != d2)
-            b3 = (remasked_wint ^ remasked_wmask) == (wint ^ wmask)
-            b4 = (remasked_wint != wint) and (remasked_wmask != wmask)
+            b3 = (remasked_w ^ remasked_wmask) == (w ^ wmask)
+            b4 = (remasked_w != w) and (remasked_wmask != wmask)
 
             if not(b1 and b2):
                 print("Remasking of d failed.")

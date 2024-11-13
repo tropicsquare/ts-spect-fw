@@ -314,15 +314,14 @@ if __name__ == "__main__":
 
     test_dir = tc.make_test_dir(test_name)
 
-    k = rn.randint(0, 2**256 - 1).to_bytes(32, 'little')
-    sch = int.to_bytes(rn.randint(0, 2**256-1), 32, 'big')
-    scn = int.to_bytes(rn.randint(0, 2**32-1), 4, 'little')
+    k = tc.random_bytes(32)
+    sch = tc.random_bytes(32)
+    scn = tc.random_bytes(4)
     slot = rn.randint(0, 31)
     msg_bitlen = rn.randint(64, 200)*8
     message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
 
-    s, prefix = ed25519.secret_expand(k)
-    A_ref = ed25519.secret_to_public(k)
+    s, prefix, A_ref = ed25519.key_gen(k)
     sign_ref = ed25519.sign(s, prefix, A_ref, sch, scn, message)
 
     keymem = f"{test_dir}/{run_name}_keymem.hex"

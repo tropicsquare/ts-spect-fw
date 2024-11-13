@@ -79,6 +79,9 @@ rng_luts = {
 }
 ##################################################################
 
+def random_bytes(n: int):
+    return rn.getrandbits(n*8).to_bytes(n, 'little')
+
 def get_release_version():
     try:
         result = subprocess.run(
@@ -379,9 +382,6 @@ def gen_and_set_metadata(curve, slot, origin, cmd_file, invalid_metadata=None):
 
     pub_metadata_ref   = ((padding<<32) | (slot_number<<24) | (pub_slot_type<<16)  | (origin_in<<8) | curve_in)
     priv_metadata_ref  = ((padding<<32) | (slot_number<<24) | (priv_slot_type<<16) | (origin_in<<8) | curve_in)
-
-    print("pub_metadata_ref", hex(pub_metadata_ref))
-    print("priv_metadata_ref", hex(priv_metadata_ref))
 
     set_key(cmd_file, priv_metadata_ref, ktype=0x4, slot=(2*slot), offset=METADATA_OFFSET)
     set_key(cmd_file, pub_metadata_ref, ktype=0x4, slot=(2*slot + 1), offset=METADATA_OFFSET)

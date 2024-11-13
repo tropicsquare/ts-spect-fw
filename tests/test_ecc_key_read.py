@@ -160,9 +160,6 @@ if __name__ == "__main__":
     if "OUT_SRC_EN" in defines_set:
         outsrc = tc.outsrc_arr[rn.randint(0,1)]
 
-    print("insrc:", insrc)
-    print("outsrc:", outsrc)
-
     fail_flag = 0
 
     # ===================================================================================

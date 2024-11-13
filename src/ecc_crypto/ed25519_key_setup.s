@@ -57,7 +57,7 @@ ed25519_key_setup_start:
     HASH_IT
     HASH        r28, r16
 
-    ; Mask H[255:0] to become scalar s
+    ; Derive s from H[255:0] to become secret scalar
     SWE         r29, r29
     MOVI        r0,  7
     MOVI        r1,  255
@@ -66,6 +66,9 @@ ed25519_key_setup_start:
     AND         r29, r0, r29
     MOVI        r1,  254
     SBIT        r29, r29, r1
+
+    ; Derive prefix from H[511:256] as little-endian integer
+    SWE         r28, r28
 
     ST          r29, ca_ed25519_key_setup_internal_s
     ST          r28, ca_ed25519_key_setup_internal_prefix

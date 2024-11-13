@@ -17,8 +17,8 @@ def __run_test(test_dir:str, run_name:str):
 
     tc.print_run_name(run_name)
 
-    secret = int.to_bytes(rn.randint(0, 2**256-1), 32, 'little')
-    msg = int.to_bytes(rn.randint(0, 2**256-1), 32, 'little')
+    secret = tc.random_bytes(32)
+    msg = tc.random_bytes(32)
     signature, pub_key = ed25519.sign_standard(secret, msg)
 
     if run_name.endswith("invalid_r"):
