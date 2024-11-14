@@ -1,98 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% Copyright © 2022 Tropic Square s.r.o. (https://tropicsquare.com/)
-%%
-%% This work is subject to the license terms of the LICENSE.txt file in the
-%% root directory of this source tree.
-%%
-%% If a copy of the LICENSE file was not distributed with this work, you can
-%% obtain one at (https://tropicsquare.com/license).
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% LaTex class:
-%    tropic_design_spec
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Specify Tropic Square document class
-\documentclass[notconfidential]{tropic_design_spec}
-\usepackage{textcomp}
-
-\def\SCH{Secure Channel Handshake}
-\def\SCS{Secure Channel Session}
-\def\SCSN{Secure Channel Session Nonce}
-
-\def\LLREQ{L2 Request frame}
-\def\LLRSP{L2 Response frame}
-
-\def\LLLCMD{L3 Command packet}
-\def\LLLRES{L3 Result packet}
-
-% Style of API Commands
-\newcommand{\TsApiCmd}[1]{%
-\mbox{\textit{\textbf{#1}}}%
-}
-
-% Style of protocol / command fields
-\newcommand{\TsApiCmdFld}[1]{%
-\mbox{\textbf{#1}}%
-}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Document properties and title page
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{SPECT Firmware API}
-\author{Vit Masek, Tropic Square}
-\date{March 2024}
-
-% Start of document
-\begin{document}
-
-% Parameters Needed by Design spec class (must be inside document)
-% Set these parameters according to your project.
-\def \projectname {SPECT Firmware}
-\def \documentname {API Documentation}
-\def \versionnumber {0.1}
-
-% Title page
-\maketitle
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Document revisions
-% We revision with GIT, however, it does not mean that major changes in the
-% document should not be kept also with document!
-% In general, when you increase document version number, add also entry to
-% this table with revisions saying what changed!
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Version history}
-
-\begin{TropicRatioLongTable4Col}
-    {0.1}            {0.2}                  {0.2}           {0.5}
-    {Version Tag     & Date                 & Author        &    Description                            }
-     0.1             & 25.3.2024            & Vit Masek     &    Initial version (copy from
-                                                                 TROPIC01 functional specification)     \Ttlb
-\end{TropicRatioLongTable4Col}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Table of contents
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagebreak
-\tableofcontents
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SPECT Operations
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\pagebreak
-\TsSection{SPECT Operations}
-
 \newcommand{\SPECTCommandHead}[2]{
     \multicolumn{4}{|X}{\cellcolor{TropicBlue}\color{white}\textbf{#1}} &
     \multicolumn{1}{|>{\hsize=0.5\hsize}X}{\cellcolor{TropicBlue!70}\color{white}\Register{SPECT_OP_ID}:} &
@@ -127,9 +32,7 @@
     \end{xltabular}
 }
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\TsSection{SPECT Operations}
 
 SPECT provides several operations for CPU that the CPU uses to perform more complex tasks, e. g. execute \LLLCMD{}s.
 
@@ -764,12 +667,3 @@ Figures \ref{EdDSA_DF} shows the sequence in detail.
     \caption{\projectname\space - EDDSA Data Flow }
     \label{EdDSA_DF}
 \end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Open issues
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\TsSection{Open Issues}
-
-\PrintOpenIssueSummary
-
-\end{document}
