@@ -2,8 +2,32 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
+  - build_doc
   - test
   - test_tag
+  - publish
+
+
+
+###################################################################################################
+# Build documentation
+###################################################################################################
+
+build_documentation:
+  stage: build_doc
+  tags:
+    - shell
+  script:
+    - source setup_env
+    - cd doc/spect_fw_api
+    - ts_latex_build.py spect_fw_doc.tex
+
+  artifacts:
+    name: spect_fw_documentation
+    when: always
+    paths:
+      - doc/spect_fw_api/build/pdf/spect_fw_doc.pdf
+
 
 ###################################################################################################
 # Run tests
@@ -30,3 +54,24 @@ run_test_tag:
     - cd tests
     - ./run_tests.sh
     - ./run_tests_mpw1.sh
+
+
+
+###################################################################################################
+# Publish doc to pages
+###################################################################################################
+
+pages:
+    tags:
+        - shell
+    stage: publish
+    when: always
+    script:
+        - echo "Publishing pages..."
+        - mkdir -p public
+        - cp doc/spect_fw_api/build/pdf/spect_fw_doc.pdf public
+
+    artifacts:
+        name: spect_fw_documentation
+        paths:
+            - public
