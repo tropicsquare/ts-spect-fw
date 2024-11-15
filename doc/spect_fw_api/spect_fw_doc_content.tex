@@ -32,22 +32,34 @@
     \end{xltabular}
 }
 
-\TsSection{SPECT Operations}
+\TsSection{SPECT Firmware}\label{SPECTFIRMWARE}
 
-SPECT provides several operations for CPU that the CPU uses to perform more complex tasks, e. g. execute \LLLCMD{}s.
+SPECT stands for Secure Processor of Elliptic Curves for Tropic. It is a micro-coded
+domain-specific CPU which is designed to perform calculation of cryptographic algorithms with elliptic curves such as:
+
+\begin{itemize}
+    \item ECDH - Elliptic Curve Diffie Hellman
+    \item ECDSA - Elliptic Curve Digital Signature Algorithm
+    \item EdDSA - Edwards Curve Digital Signature Algorithm
+\end{itemize}
+
+SPECT provides several operations for the RISC-V CPU (hereafter referred to as 'CPU') that
+it uses to perform more complex tasks, e. g. execute \LLLCMD{}s.
 
 SPECT comes with two types of firmware:
 \begin{itemize}
-    \item \textbf{Boot FW} -- small firmware to support boot-up sequence of the chip.
-    \item \textbf{Application FW} -- firmware that is preloaded into SPECTs instruction memory during
-                                     boot-up sequence and used in final application.
+    \item \textbf{Boot FW} -- small firmware to support boot-up sequence of the chip, it is hard-coded into bootloader and
+          it automatically applies this firmware on chip startup.
+    \item \textbf{Application FW} -- firmware that is stored in FLASH memory and is preloaded into SPECTs instruction memory during
+                                     boot-up sequence by bootloader. It is used in the final application by the CPU firmware and
+                                     can also be updated by the bootloader.
 \end{itemize}
 
-\TropicNote{
-    Besides these, another set of SPECT operations is available for debug purposes. These operations do not rely on
-    the functionality of SCB, CPB nor KBUS. EDB can be set to debug mode.
-}
-\vspace{.3cm}
+This document explains the operations that SPECT exposes to the RISC-V CPU and the way how to inteface with SPECT
+to run these operations and obtain results.
+
+\clearpage
+\TsSubSection{CPU - SPECT interface}
 
 CPU specifies SPECT operation and SPECT firmware parameters by writing\linebreak
 \Register{SPECT_CFG_WORD} on address 0x0100 of SPECTs address space (Data RAM In).
@@ -75,7 +87,6 @@ CPU indicates number of bytes in Command Buffer or Data RAM In via \linebreak
 After SPECT finishes current operation, CPU reads \Register{SPECT_RES_WORD} from address \linebreak
 0x1100 in SPECTs address space (Data RAM Out).
 
-\pagebreak
 \Register{SPECT_RES_WORD:}
 
 \input{tables/table_spect_res_word_layout.tex}
@@ -88,8 +99,9 @@ indicates number of bytes in Data RAM Out or Result Buffer via \linebreak \Regis
     split into multiple SPECT operations), then \Register{SPECT_OP_DATA_IN_SIZE} = \TsApiCmdFld{CMD_SIZE}
     and \Register{SPECT_OP_DATA_OUT_SIZE} = \TsApiCmdFld{RES_SIZE}.
 }
-
 \vspace{.3cm}
+
+\clearpage
 Values of \Register{SPECT_OP_STATUS} after SPECT operation execution can be following:
 
 \input{tables/table_spect_return_value.tex}
@@ -119,13 +131,111 @@ SPECT is capable of processing these \LLLCMD{}s by it self:
     In final implementation, no such bypass shall be possible.
 }
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Boot Firmware
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\TsSubSection{SPECT Boot Firmware}\label{SPECTBOOTFW}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SHA512
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{EdDSA Verify}
+\SPECTCommandTable{
+    \SPECTCommandHead{eddsa_verify}{0x4B}
+
+    \SPECTCommandDescription{
+        Verifies a EdDSA signature of 32-byte message $M$ using public key $A$.
+    }
+
+    \SPECTCommandMemHead{Data RAM In}
+    \SPECTCommandMem{0x0020}{64B}{Signature (\TsApiCmdFld{R}, \TsApiCmdFld{S})}
+    \SPECTCommandMem{0x0060}{32B}{Public key $A$}
+    \SPECTCommandMem{0x0080}{32B}{Message $M$}
+
+    \SPECTCommandMemHead{Data RAM Out}
+    \SPECTCommandMem{0x0000}{4B}{Result: 0x0B5E55ED $\Rightarrow$ verified, else failed}
+    \SPECTCommandMem{0x0004}{4B}{Result: 0xBA11FADE $\Rightarrow$ verified, else failed}
+}
+
+\subsubsection*{SHA512 Operations}
+
+\textcolor{red}{Removed since SPECT FW v0.3.0}
+
+\SPECTCommandTable{
+    \SPECTCommandHead{sha512_init}{0x51}
+
+    \SPECTCommandDescription{
+        Initialize SHA512 unit.
+    }
+
+    \SPECTCommandCtx{None}{SHA512 ctx}
+}
+
+\textcolor{red}{Removed since SPECT FW v0.3.0}
+
+\SPECTCommandTable{
+    \SPECTCommandHead{sha512_update}{0x52}
+
+    \SPECTCommandDescription{
+        Process one 128B block of data with SHA512.
+    }
+
+    \SPECTCommandMemHead{Data RAM In}
+    \SPECTCommandMem{0x10}{128B}{Data}
+
+    \SPECTCommandCtx{SHA512 ctx}{SHA512 ctx}
+}
+
+\textcolor{red}{Removed since SPECT FW v0.3.0}
+
+\SPECTCommandTable{
+    \SPECTCommandHead{sha512_final}{0x53}
+
+    \SPECTCommandDescription{
+        Process last 128B block of data that contains SHA512 padding.
+    }
+
+    \SPECTCommandMemHead{Data RAM In}
+    \SPECTCommandMem{0x10}{128B}{Data}
+
+    \SPECTCommandMemHead{Data RAM Out}
+    \SPECTCommandMem{0x10}{64B}{Digest}
+
+    \SPECTCommandCtx{SHA512 ctx}{None}
+}
+
+\subsubsection*{SHA512 example:}
+
+Let \textbf{M} be a 326 byte data (\texttt{u8 M [326]}). SHA512(\textbf{M}) is computed as follows:
+
+\begin{enumerate}
+    \item Pad the data with SHA512 padding to multiple of 128B, see \ref{fig.sha512_padding}.
+    \item Initialize SPECTs SHA512 unit with \textbf{sha512_init()}.
+    \item Process first chunk with \textbf{sha512_update(M[0:127])}.
+    \item Process second chunk with \textbf{sha512_update(M[128:255])}.
+    \item Process the rest of \textbf{M} with \textbf{sha512_final(M[256:383])}.
+    \item Data RAM Out now contains the SHA512 digest of \textbf{M}.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering%
+    \includegraphics[width=.9\textwidth]{%
+        \detokenize{img/FS_SHA512_PADDING.pdf}%
+    }
+    \caption{SHA512 Padding}%
+    \label{fig.sha512_padding}%
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Application Firmware
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
-\TsSubSection{SPECT Application Firmware}
+\TsSubSection{SPECT Application Firmware}\label{SPECTAPPFW}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control Commands
@@ -455,111 +565,22 @@ All SPECT operations in this section are supported only with use of Data RAM In 
     Secure Channel Session Nonce ($SCn$) always from Data RAM In, never from Command Buffer regardless
     of the \Register{SPECT_INOUT_SRC} value.
 }
+\vspace{.3cm}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Boot Firmware
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\TsSubSection{SPECT Boot Firmware}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SHA512
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Besides these, another set of SPECT operations is available for debug purposes. These operations do not rely on
+the functionality of SCB, CPB nor KBUS. EDB can be set to debug mode. They are explained in the next section.
 
-\subsubsection*{EdDSA Verify}
-\SPECTCommandTable{
-    \SPECTCommandHead{eddsa_verify}{0x4B}
-
-    \SPECTCommandDescription{
-        Verifies a EdDSA signature of 32-byte message $M$ using public key $A$.
-    }
-
-    \SPECTCommandMemHead{Data RAM In}
-    \SPECTCommandMem{0x0020}{64B}{Signature (\TsApiCmdFld{R}, \TsApiCmdFld{S})}
-    \SPECTCommandMem{0x0060}{32B}{Public key $A$}
-    \SPECTCommandMem{0x0080}{32B}{Message $M$}
-
-    \SPECTCommandMemHead{Data RAM Out}
-    \SPECTCommandMem{0x0000}{4B}{Result: 0x0B5E55ED $\Rightarrow$ verified, else failed}
-    \SPECTCommandMem{0x0004}{4B}{Result: 0xBA11FADE $\Rightarrow$ verified, else failed}
-}
-
-\subsubsection*{SHA512 Operations}
-
-\textcolor{red}{Removed since SPECT FW v0.3.0}
-
-\SPECTCommandTable{
-    \SPECTCommandHead{sha512_init}{0x51}
-
-    \SPECTCommandDescription{
-        Initialize SHA512 unit.
-    }
-
-    \SPECTCommandCtx{None}{SHA512 ctx}
-}
-
-\textcolor{red}{Removed since SPECT FW v0.3.0}
-
-\SPECTCommandTable{
-    \SPECTCommandHead{sha512_update}{0x52}
-
-    \SPECTCommandDescription{
-        Process one 128B block of data with SHA512.
-    }
-
-    \SPECTCommandMemHead{Data RAM In}
-    \SPECTCommandMem{0x10}{128B}{Data}
-
-    \SPECTCommandCtx{SHA512 ctx}{SHA512 ctx}
-}
-
-\textcolor{red}{Removed since SPECT FW v0.3.0}
-
-\SPECTCommandTable{
-    \SPECTCommandHead{sha512_final}{0x53}
-
-    \SPECTCommandDescription{
-        Process last 128B block of data that contains SHA512 padding.
-    }
-
-    \SPECTCommandMemHead{Data RAM In}
-    \SPECTCommandMem{0x10}{128B}{Data}
-
-    \SPECTCommandMemHead{Data RAM Out}
-    \SPECTCommandMem{0x10}{64B}{Digest}
-
-    \SPECTCommandCtx{SHA512 ctx}{None}
-}
-
-\pagebreak
-
-\subsubsection*{SHA512 example:}
-
-Let \textbf{M} be a 326 byte data (\texttt{u8 M [326]}). SHA512(\textbf{M}) is computed as follows:
-
-\begin{enumerate}
-    \item Pad the data with SHA512 padding to multiple of 128B, see \ref{fig.sha512_padding}.
-    \item Initialize SPECTs SHA512 unit with \textbf{sha512_init()}.
-    \item Process first chunk with \textbf{sha512_update(M[0:127])}.
-    \item Process second chunk with \textbf{sha512_update(M[128:255])}.
-    \item Process the rest of \textbf{M} with \textbf{sha512_final(M[256:383])}.
-    \item Data RAM Out now contains the SHA512 digest of \textbf{M}.
-\end{enumerate}
-
-\begin{figure}[h]
-    \centering%
-    \includegraphics[width=.9\textwidth]{%
-        \detokenize{img/FS_SHA512_PADDING.pdf}%
-    }
-    \caption{SHA512 Padding}%
-    \label{fig.sha512_padding}%
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Debug
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\TsSubSection{SPECT Debug Operations}
+\TsSubSubSection{SPECT Debug Operations}
+
+\OpenIssue{
+    Decide whether we want to keep the debug operations for production SPECT Firmware.
+}
 
 All SPECT operations in this section are supported only with use of Data RAM In / Out
 (\Register{SPECT_INOUT_SRC}=0x01).
@@ -615,7 +636,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
 }
 
 \newpage
-\TsSubSection{Processing \LLLCMD{} using SPECT}
+\TsSubSubSection{Processing \LLLCMD{} using SPECT}
 
 CPU always issues first 16 byte chunk of \LLLCMD{}s \Register{CMD_CIPHERTEXT} to SCB. SCB decrypts
 the chunk and passes it to CPB. CPB checks user access privileges and stores the decrypted
