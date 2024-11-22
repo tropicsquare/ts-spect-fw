@@ -10,7 +10,7 @@
 ;
 ; ==============================================================================
 ;
-; Updaes EdDSA nonce derivation with next 144B chunk of the message.
+; Updates EdDSA nonce derivation with next 144B chunk of the message.
 ;
 ; ==============================================================================
 

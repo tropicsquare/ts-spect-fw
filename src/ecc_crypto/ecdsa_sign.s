@@ -81,7 +81,10 @@ ecdsa_sign_tmac_padding_loop:
     TMAC_RD     r27
 
 ; Get k2 from k1
-    ; TODO: Using previous mask is not optimal. Come up with better solution how to avoid 4 GRVs
+    ; Use SHA-512 to derive new 816 bit mask from the previous
+    HASH_IT
+    HASH        r3,  r3
+    HASH        r5,  r3
     TMAC_IT     r3
 
     TMAC_IS     r27, tmac_dst_ecdsa_sign
