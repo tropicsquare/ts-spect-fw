@@ -93,7 +93,10 @@ eddsa_nonce_finish_last_update:
 
 ; Get r2 from r1
 _eddsa_tmac_it_bp_2:
-    ; TODO: Using previous mask is not optimal. Come up with better solution how to avoid 4 GRVs
+    ;  Use SHA-512 to derive new 816 bit mask from the previous
+    HASH_IT
+    HASH        r7,  r7
+    HASH        r9,  r7
     TMAC_IT     r7
     TMAC_IS     r27, tmac_dst_eddsa_sign
 

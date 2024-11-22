@@ -1,6 +1,6 @@
 _start:
     HASH_IT
-    HASH     r0, r0
+    HASH    r0, r0
 
     MOVI    r1,  0x800
 data_in_loop:
@@ -12,7 +12,7 @@ data_in_loop:
     MOVI    r2,  12
 data_out_loop:
     SUBI    r1,  r1,  32
-    SBIT    r3,  r1,  r2        
+    SBIT    r3,  r1,  r2
     STR     r0,  r3
     BRNZ    data_out_loop
 
