@@ -6,5 +6,5 @@ cmake 3.23.2
 ts-spect-compiler v0.8
 ts-hw-scripts v0.37
 ts-synthesis-flow v1.6
-ts-latex-lib v0.19
+ts-latex-lib v0.20
 ts-python-env 0.2
