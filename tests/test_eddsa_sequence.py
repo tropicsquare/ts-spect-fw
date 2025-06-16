@@ -118,8 +118,8 @@ def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
 
             b1 = ((remasked_s1 + remasked_s2) % ed25519.q) == ((s1 + s2) % ed25519.q)
             b2 = (remasked_s1 != s1) and (remasked_s2 != s2)
-            b3 = (remasked_prefix ^ remasked_prefixmask) == (prefix_int ^ prefixmask)
-            b4 = (remasked_prefix != prefix_int) and (remasked_prefixmask != prefixmask)
+            b3 = (remasked_prefix ^ remasked_prefixmask) == (prefix ^ prefix_mask)
+            b4 = (remasked_prefix != prefix) and (remasked_prefixmask != prefix_mask)
 
             if not(b1 and b2):
                 print("Remasking of s failed.")
@@ -418,6 +418,17 @@ if __name__ == "__main__":
         tc.print_passed()
 
     if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_invalid_curve"):
+        tc.print_failed()
+        ret = 1
+    else:
+        tc.print_passed()
+
+    ########################################################################################################
+    #   Test message len = 0
+    ########################################################################################################
+
+    message = b''
+    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_null_message"):
         tc.print_failed()
         ret = 1
     else:
