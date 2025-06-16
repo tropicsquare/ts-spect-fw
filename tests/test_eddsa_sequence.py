@@ -423,9 +423,6 @@ if __name__ == "__main__":
     else:
         tc.print_passed()
 
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm -r {test_dir}")
-
     ########################################################################################################
     #   Test message len = 0
     ########################################################################################################
@@ -436,5 +433,8 @@ if __name__ == "__main__":
         ret = 1
     else:
         tc.print_passed()
+
+    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
+        os.system(f"rm -r {test_dir}")
 
     sys.exit(ret)
