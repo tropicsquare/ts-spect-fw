@@ -13,7 +13,7 @@
 ; Scalar Point Multiplication on curve P-256
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
 ;
-; Imputs:
+; Inputs:
 ;   Point P = (r12, r13, r14)
 ;   Scalar k = (r28)
 ;

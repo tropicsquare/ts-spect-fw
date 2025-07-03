@@ -250,6 +250,12 @@ ecdsa_sign_end:
 
 ecdsa_sign_end_not_store:
     MOV         r0,  r3
+    MOVI        r20, 0
+    MOVI        r21, 0
+    MOVI        r26, 0
+    MOVI        r27, 0
+    MOVI        r28, 0
+    MOVI        r29, 0
     JMP         set_res_word
 
 ecdsa_sign_fail_k:

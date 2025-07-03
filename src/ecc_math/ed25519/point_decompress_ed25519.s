@@ -69,9 +69,11 @@ point_decompress_ed25519:
 point_decompress_ed25519_x0_0:
     MOVI        r22, 0                          ; X0 = r22
     JMP         point_decompress_ed25519_sqr
+    JMP         __err_void__
 point_decompress_ed25519_x0_1:
     MOVI        r22, 1
     JMP         point_decompress_ed25519_sqr
+    JMP         __err_void__
 
 point_decompress_ed25519_sqr:
     LSR         r16, r16

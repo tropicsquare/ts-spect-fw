@@ -25,7 +25,7 @@
 ; Enable ECC key rerandomization in Flash
 ;.define ECC_KEY_RERANDOMIZE
 ;
-; Indlude debug operations
+; Include debug operations
 ;.define DEBUG_OPS
 ;
 ; Use SPECT_INOUT_SRC[7:4]
@@ -53,6 +53,7 @@
 _start:
 
     ; First clear the Data RAM Out
+    MOVI    r31, 0
     CALL    clear_data_out
     CALL    clear_emem_out
 
@@ -119,6 +120,7 @@ op_ecc_key:
     BRZ     op_ecc_key_erase
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 op_x25519:
@@ -140,6 +142,7 @@ op_x25519:
     BRZ     op_x25519_sc_st_eh
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 op_eddsa:
@@ -179,6 +182,7 @@ op_eddsa:
     BRZ     op_eddsa_finish
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 op_ecdsa:
@@ -191,6 +195,7 @@ op_ecdsa:
     BRZ     op_ecdsa_sign
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 invalid_op_id:
@@ -261,6 +266,7 @@ get_data_in_size:
     ORI     r1,  r1,  0xFF
     AND     r0,  r0,  r1
     RET
+    JMP     __err_void__
 
 ; ==============================================================================
 ; Routine for setting  SPECT_RES_WORD field
