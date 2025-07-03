@@ -54,7 +54,7 @@
 ;   compressed point with Y coordinate in r12
 ;
 ; Output:
-;   decompresd point (X, Y) = (r11, r12)
+;   decompressed point (X, Y) = (r11, r12)
 ;
 ; Used registers (other than IN/OUT):
 ;   r0-5, r16-22
@@ -195,5 +195,5 @@ point_decompress_ed25519_success:
     RET
 
 point_decompress_ed25519_fail:
-    MOVI        r1, 1
+    MOVI        r1, 0xFFF
     RET
