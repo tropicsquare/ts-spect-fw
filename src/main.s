@@ -51,6 +51,11 @@
 ; Op ID decoding
 ; ==============================================================================
 _start:
+
+    ; First clear the Data RAM Out
+    CALL    clear_data_out
+    CALL    clear_emem_out
+
     LD      r0, ca_spect_cfg_word
     ADDI    r0, r0, 0                           ; force bits [255:32] to 0
     MOVI    r4, 0xFF

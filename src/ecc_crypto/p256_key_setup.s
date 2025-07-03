@@ -187,7 +187,7 @@ p256_key_setup_origin_continue:
     MOVI    r9,  0xFF
     ROL8    r9,  r9
     ROL8    r9,  r9
-    XOR     r12, r12, r9
+    XOR     r10, r12, r9
 
     ; Store private keys to slot
     STK     r28, r26, ecc_priv_key_1            ; store d1
@@ -198,7 +198,7 @@ p256_key_setup_origin_continue:
     BRE     p256_key_setup_fail
     STK     r2,  r26, ecc_priv_key_4            ; store w mask
     BRE     p256_key_setup_fail
-    STK     r12, r26, ecc_key_metadata          ; priv metadata
+    STK     r10, r26, ecc_key_metadata          ; priv metadata
     BRE     p256_key_setup_fail
     KBO     r26, ecc_kbus_program               ; program
     BRE     p256_key_setup_fail

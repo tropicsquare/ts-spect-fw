@@ -112,7 +112,7 @@ eddsa_finish_s_randomize:
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  80
-    JMP         set_res_word
+    JMP         eddsa_finish_clean
 
 eddsa_finish_fail_invalid_pubkey:
     MOVI        r0,  ret_eddsa_err_final_verify
@@ -126,4 +126,9 @@ eddsa_finish_fail:
     STR         r2,  r30
 
     MOVI        r1,  1
+    JMP         eddsa_finish_clean
+
+eddsa_finish_clean:
+    MOVI        r31,  0
+    CALL        clear_data_in
     JMP         set_res_word

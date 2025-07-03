@@ -4,17 +4,26 @@ _start:
 
     MOVI    r1,  0x800
 data_in_loop:
-    SUBI    r1,  r1,  32
     STR     r0,  r1
+    SUBI    r1,  r1,  32
     BRNZ    data_in_loop
 
     MOVI    r1,  0x200
     MOVI    r2,  12
 data_out_loop:
-    SUBI    r1,  r1,  32
     SBIT    r3,  r1,  r2
     STR     r0,  r3
+    SUBI    r1,  r1,  32
     BRNZ    data_out_loop
+
+    MOVI    r1,  0x80
+    MOVI    r2,  0x50
+    ROL8    r2,  r2
+emem_out_loop:
+    OR      r3,  r1,  r2
+    SUBI    r1,  r1,  32
+    STR     r0,  r3
+    BRNZ    emem_out_loop
 
     MOV     r1,  r0
     MOV     r2,  r0

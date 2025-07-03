@@ -153,8 +153,8 @@ ed25519_key_setup_origin_continue:
     CALL        hash_to_field
 
     ; Ensure s2 != 0
-    ORI         r1,  r0,  1
-    SUBP        r28, r30, r1
+    ORI         r0,  r0,  1
+    SUBP        r28, r30, r0
     ; Mask prefix
     GRV         r2
     XOR         r29, r29, r2
@@ -172,7 +172,7 @@ ed25519_key_setup_origin_continue:
     BRE         ed25519_key_setup_kbus_fail
     STK         r29, r26, ecc_priv_key_2        ; store prefix
     BRE         ed25519_key_setup_kbus_fail
-    STK         r1,  r26, ecc_priv_key_3        ; store s2
+    STK         r0,  r26, ecc_priv_key_3        ; store s2
     BRE         ed25519_key_setup_kbus_fail
     STK         r2,  r26, ecc_priv_key_4        ; prefix mask
     BRE         ed25519_key_setup_kbus_fail
@@ -189,10 +189,10 @@ ed25519_key_setup_origin_continue:
 
 ed25519_key_setup_spm_fail:
     KBO         r26, ecc_kbus_flush
-    MOVI        r3, ret_point_integrity_err
+    MOVI        r3,  ret_point_integrity_err
     RET
 
 ed25519_key_setup_kbus_fail:
     KBO         r26, ecc_kbus_flush
-    MOVI        r3, ret_key_err
+    MOVI        r3,  ret_key_err
     RET

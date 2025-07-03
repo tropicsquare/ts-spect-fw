@@ -61,6 +61,11 @@ if __name__ == "__main__":
             print(f"Data RAM Out {hex(i)} is not cleared")
             ret = 1
 
+    for i in range(0, tc.EMEM_OUT_DEPTH, 4):
+        if tc.read_output(test_dir, test_name, 0x5000 + i, 1):
+            print(f"EMEM OUT {hex(i)} is not cleared")
+            ret = 1
+
     if ret:
         tc.print_failed()
     else:
