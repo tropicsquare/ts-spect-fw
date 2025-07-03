@@ -103,7 +103,7 @@ op_ecdsa_sign:
     ; unmask w
     XOR     r20, r22, r23
 
-    ; Load secure channel hasn/nonce
+    ; Load secure channel hash/nonce
     LD      r16, ecdsa_sign_input_sch
     SWE     r16, r16
     LD      r17, ecdsa_sign_input_scn

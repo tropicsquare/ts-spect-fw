@@ -131,3 +131,5 @@ x25519_pubkey_fail:
 x25519_spm_fail:
     MOVI        r0,  ret_point_integrity_err
     RET
+
+    JMP         __err_void__

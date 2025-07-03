@@ -104,7 +104,7 @@ op_ecc_key_read:
     LDK     r2,  r26, ecc_key_metadata
     BRE     op_key_fail
 
-    ; check metyadata
+    ; check metadata
     MOVI    r3,  ret_slot_metadata_err
     MOVI    r30, 0xFF
     MOV     r5,  r2

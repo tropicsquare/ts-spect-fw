@@ -216,8 +216,16 @@ eddsa_sign_verify_continue_dbladd:
     MOVI        r0,  0
     REDP        r12, r0,  r12
 
+    ; Final compare - twice to prevent FI attempts
+    MOVI        r31, 0
+    CMPI        r31, 0          ; clear zero flag
     XOR         r1,  r12, r22
     BRNZ        ecdsa_fail_verify
+
+    CMPI        r31, 0          ; clear zero flag
+    XOR         r1,  r12, r22
+    BRNZ        ecdsa_fail_verify
+    ;
 
     MOVI        r3,  ret_op_success
     MOVI        r2,  l3_result_ok
@@ -260,3 +268,5 @@ ecdsa_sign_fail:
     MOVI        r2,  l3_result_fail
     MOVI        r1,  1
     JMP         ecdsa_sign_end
+
+    JMP         __err_void__
