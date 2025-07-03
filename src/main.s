@@ -26,15 +26,15 @@
 ;.define ECC_KEY_RERANDOMIZE
 ;
 ; Indlude debug operations
-.define DEBUG_OPS
+;.define DEBUG_OPS
 ;
 ; Use SPECT_INOUT_SRC[7:4]
-; When disabled, SPECT_INOUT_SRC[7:4] is ignored, and efectively forced to 0x4.
-.define IN_SRC_EN
+; When disabled, SPECT_INOUT_SRC[7:4] is ignored, and effectively forced to 0x4.
+;.define IN_SRC_EN
 ;
 ; Use SPECT_INOUT_SRC[3:0]
-; When disabled, SPECT_INOUT_SRC[3:0] is ignored, and efectively forced to 0x5.
-.define OUT_SRC_EN
+; When disabled, SPECT_INOUT_SRC[3:0] is ignored, and effectively forced to 0x5.
+;.define OUT_SRC_EN
 ;
 ; DEFINES END
 
