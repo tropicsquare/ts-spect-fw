@@ -41,10 +41,12 @@ spm_curve25519_long:
     ; x1 = P = (r9, r10)
     ; P  = R = (r11, r12)
 
-    MOVI r30, 256
+    MOVI    r30, 256
+    GRV     r27
 
     ; scalar bits 511 downto 256
 spm_curve25519_long_loop_511_256:
+    ROL     r27, r27
     ROL     r29, r29
     CSWAP   r7,  r9
     CSWAP   r8,  r10
@@ -62,6 +64,7 @@ spm_curve25519_long_loop_511_256:
 
     ; scalar bits 255 downto 0
 spm_curve25519_long_loop_255_0:
+    ROL     r27, r27
     ROL     r28, r28
     CSWAP   r7,  r9
     CSWAP   r8,  r10

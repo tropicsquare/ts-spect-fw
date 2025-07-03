@@ -39,9 +39,11 @@ spm_p256_long:
     MOVI    r11, 0
 
     MOVI    r30, 256
+    GRV     r15
 
     ; scalar bits 511 downto 256
 spm_p256_long_loop_511_256:
+    ROL     r15, r15
     ROL     r29, r29
 
     CSWAP   r9,  r12
@@ -62,6 +64,7 @@ spm_p256_long_loop_511_256:
 
     ; scalar bits 255 downto 0
 spm_p256_long_loop_255_0:
+    ROL     r15, r15
     ROL     r28, r28
 
     CSWAP   r9,  r12

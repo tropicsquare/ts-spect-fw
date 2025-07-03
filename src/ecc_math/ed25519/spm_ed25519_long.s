@@ -41,8 +41,11 @@ spm_ed25519_long:
 
     MOVI    r30, 256
 
+    GRV     r15
+
     ; scalar bits 511 downto 256
 spm_ed25519_long_loop_511_256:
+    ROL     r15, r15
     ROL     r29, r29
 
     CSWAP   r7,  r11
@@ -65,6 +68,7 @@ spm_ed25519_long_loop_511_256:
 
     ; scalar bits 255 downto 0
 spm_ed25519_long_loop_255_0:
+    ROL     r15, r15
     ROL     r28, r28
 
     CSWAP   r7,  r11
