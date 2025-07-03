@@ -26,7 +26,6 @@
 ;
 ; ==============================================================================
 
-    JMP         eddsa_verify_fail
 eddsa_verify_final_compare_stage2:
     CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0)
 
