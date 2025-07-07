@@ -25,7 +25,7 @@
 ;   physical pub key slot in r26
 ;
 ; Outputs:
-;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
+;   Populates the ECC key slot (private + public) with new EdDSA key pair.
 ;   spect status in r3
 ;
 ; Masking methods:
@@ -110,7 +110,7 @@ ed25519_key_setup_start:
     ; Transform A back to affine coordinates
     CALL        point_compress_ed25519
 
-    ; Compose kpair metadata
+    ; Compose key pair metadata
     ROR         r10, r25                        ; User slot
     ROL8        r10, r10
     ORI         r10, r10, ecc_pub_slot_id       ; Add public slot id
@@ -133,7 +133,7 @@ ed25519_key_setup_origin_continue:
     STK         r10, r26, ecc_key_metadata      ; store metadata
     BRE         ed25519_key_setup_kbus_fail
 
-    ; Store the pubkey to key slot
+    ; Populate the public slot with the pubkey
     STK         r8,  r26, ecc_pub_key_Ax        ; store A
     BRE         ed25519_key_setup_kbus_fail
 
@@ -157,19 +157,21 @@ ed25519_key_setup_origin_continue:
     ; Ensure s2 != 0
     ORI         r0,  r0,  1
     SUBP        r28, r30, r0
+
     ; Mask prefix
     GRV         r2
     XOR         r29, r29, r2
 
-    ; Change slot - needed so the slot register is same for flush in case of error
+    ; Change slot - needed so the slot register is same for flush in case of an error
     MOV         r26, r25
 
-    ; make private slot metadata
+    ; create private slot metadata
     MOVI        r9,  0xFF
     ROL8        r9,  r9
     ROL8        r9,  r9
     XOR         r10, r10, r9
 
+    ; Populate the private slot with priv keys and masks
     STK         r28, r26, ecc_priv_key_1        ; store s1
     BRE         ed25519_key_setup_kbus_fail
     STK         r29, r26, ecc_priv_key_2        ; store prefix

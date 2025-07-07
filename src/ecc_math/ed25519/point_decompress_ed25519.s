@@ -54,10 +54,13 @@
 ;   compressed point with Y coordinate in r12
 ;
 ; Output:
-;   decompresd point (X, Y) = (r11, r12)
+;   decompressed point (X, Y) = (r11, r12)
 ;
-; Used registers (other than IN/OUT):
-;   r0-5, r16-22
+; Modified registers:
+;   r0,1,3,11,12, r16-22, r30
+;
+; Subroutines:
+;   inv_p25519_250
 ;
 ; ==============================================================================
 

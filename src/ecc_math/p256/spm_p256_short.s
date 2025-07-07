@@ -25,11 +25,15 @@
 ;   P-256 parameter b in r8
 ;       (b = 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b)
 ;
-; Intermediate value registers:
+; Modified registers:
 ;   r0-r7 -> intermediate values for point addition/doubling
 ;   r8 -> parameter b
 ;   (r9, r10, r11) -> Q0
 ;   r30 -> counter
+;
+; Subroutines:
+;   point_add_p256
+;   point_dbl_p256
 ;
 ; =============================================================================
 

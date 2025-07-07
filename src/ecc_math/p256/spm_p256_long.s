@@ -24,11 +24,15 @@
 ;   p256 prime in r31
 ;   P-256 parameter b in r8
 ;
-; Intermediate value registers:
+; Modified registers:
 ;   r0-r7 -> intermediate values for point addition/doubling
 ;   r8 -> parameter b
 ;   (r9, r10, r11) -> Q0
 ;   r30 -> counter
+;
+; Subroutines:
+;   point_add_p256
+;   point_dbl_p256
 ;
 ; ==============================================================================
 

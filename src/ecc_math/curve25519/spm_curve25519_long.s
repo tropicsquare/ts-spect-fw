@@ -28,6 +28,13 @@
 ; Expects:
 ;   Curve25519 prime in r31
 ;
+; Modified registers:
+;   r6, r27, r26, r30
+;
+; Subroutines:
+;   point_xadd_curve25519
+;   point_xdbl_curve25519
+;
 ; ==============================================================================
 
 spm_curve25519_long:

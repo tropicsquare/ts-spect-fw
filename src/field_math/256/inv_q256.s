@@ -19,6 +19,12 @@
 ; Outputs:
 ;   Z^(-1) mod q256 in register r1
 ;
+; Expects:
+;   q256 prime in R31
+;
+; Modified registers:
+;   r2-6, r30 
+;
 ; ==============================================================================
 
 inv_q256:

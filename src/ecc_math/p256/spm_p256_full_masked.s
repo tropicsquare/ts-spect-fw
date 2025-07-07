@@ -20,6 +20,17 @@
 ; Outputs:
 ;   k.P in affine coordinates in (r22, r23)
 ;
+; Modified registers:
+;   r1, r2, r9-14, r24, r27, r28, r30, r31
+;
+; Subroutines:
+;   hash_to_field
+;   p256_point_generate
+;   point_check_p256
+;   spm_p256_long
+;   point_add_p256
+;   inv_p256
+;
 ; Masking methods:
 ;   1) Random Projective Coordinates -- (x, y, z) == (rx, ry, rz)
 ;   2) Group Scalar Randomization -- k' = k + r * #E
@@ -27,7 +38,7 @@
 ;
 ; Full algorithm:
 ;   1) Convert P to randomized projective coordinates
-;   2) Generate randpom point P2 (See str2point.md)
+;   2) Generate random point P2 (See str2point.md)
 ;   3) Mask scalar k as k2 = k + rng2 * #E
 ;   4) Compute k2.P2
 ;   5) Compute P3 = P1 - P2
@@ -50,7 +61,7 @@ spm_p256_full_masked_z_randomize:
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24
 
-    ; 2) Generate randpom point P2 (See str2point.md)
+    ; 2) Generate random point P2 (See str2point.md)
     CALL    p256_point_generate
 
     MOV     r9,  r17

@@ -25,6 +25,9 @@
 ;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
 ;
+; Modified registers:
+;   r0-3
+;
 ; ==============================================================================
 
 point_check_ed25519:

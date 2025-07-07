@@ -30,6 +30,12 @@
 ; Expects:
 ;   p in r31
 ;
+; Modified registers:
+;   r0-3
+;
+; Subroutines:
+;   compose_exp_tag
+;
 ; ==============================================================================
 
 hash_to_field:

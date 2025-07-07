@@ -10,7 +10,7 @@
 ;
 ; ==============================================================================
 ;
-; Point Generate on Curve25519
+; Point Generate on Curve25519. See str2point.md for detailed description.
 ;
 ; Input:
 ;   DST in ca_gfp_gen_dst
@@ -21,10 +21,12 @@
 ; Expects:
 ;   Curve25519 prime in R31
 ;
-; Intermediate value registers:
-;   r0,..,r14
+; Modified registers:
+;   r1, r2, r30
 ;
-; See str2point.md for detailed description.
+; Subroutines
+;   hash_to_field
+;   map_to_curve_elligator2_curve25519
 ;
 ; ==============================================================================
 

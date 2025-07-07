@@ -24,7 +24,11 @@
 ;
 ; Expects:
 ;   Curve25519 prime in r31
-
+;
+; Modified registers:
+;   r0-4
+;
+; Algorithm:
 ;   xADD(XP, ZP, XQ, ZQ, XR, ZR = 1):
 ;       V0 = XP + ZP
 ;       V1 = XQ - ZQ
