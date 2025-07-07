@@ -14,7 +14,7 @@
 ; Solve y = sqrt(x*(x^2 + A*x + 1))
 ;
 ; This algorithm finds one of two possible y.
-; It is used at the begining of X25519 algorithm.
+; It is used at the beginning of X25519 algorithm.
 ;
 ; Inputs:
 ;   Affine coordinate x in r16

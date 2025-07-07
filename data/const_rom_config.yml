@@ -2,6 +2,11 @@ name: constants
 start_addr: 0x3000
 end_addr:   0x37FF
 data:
+  - name : ca_dst_template
+    value : 0x1E2054535F53504543545F445354010000000000000000000000000000000000
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# secp256r1 (NIST P-256)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   - name : ca_p256
     value : 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
   - name : ca_q256
@@ -22,6 +27,9 @@ data:
     value : 0xda538e3be1d89b99c978fc675180aab27b8d1ff84c55d5b62ccd3427e433c47f
   - name : ca_p256_Z
     value : 0xffffffff00000001000000000000000000000000fffffffffffffffffffffff5
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Ed25519 + Curve25519 + W-25519
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   - name : ca_p25519
     value : 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed
   - name : ca_q25519
@@ -52,5 +60,50 @@ data:
     value : 0x71c71c71c71c71c71c71c71c71c71c71c71c71c71c71c71c72221bd565325952
   - name : ca_pg_map2ed25519_c5
     value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
-  - name : ca_dst_template
-    value : 0x1E2054535F53504543545F445354010000000000000000000000000000000000
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# secp256k1 (Bitcoin curve)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  - name : ca_p256k1
+    value : 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
+  - name : ca_q256k1
+    value : 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
+  - name : ca_p256k1_xG
+    value : 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798
+  - name : ca_p256k1_yG
+    value : 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
+  - name : ca_p256k1_c1
+    value : 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0b
+  - name : ca_p256k1_c2
+    value : 0x31fdf302724013e57ad13fb38f842afeec184f00a74789dd286729c8303c4a59
+  - name : ca_p256k1_Z
+    value : 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc24
+  # secp256k1 3-isogeny map constants
+  - name : ca_p256k1_k10
+    value: 0x8e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38daaaaa8c7
+  - name : ca_p256k1_k11
+    value: 0x7d3d4c80bc321d5b9f315cea7fd44c5d595d2fc0bf63b92dfff1044f17c6581
+  - name : ca_p256k1_k12
+    value: 0x534c328d23f234e6e2a413deca25caece4506144037c40314ecbd0b53d9dd262
+  - name : ca_p256k1_k13
+    value: 0x8e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38daaaaa88c
+  #
+  - name : ca_p256k1_k20
+    value: 0xd35771193d94918a9ca34ccbb7b640dd86cd409542f8487d9fe6b745781eb49b
+  - name : ca_p256k1_k21
+  #
+    value: 0xedadc6f64383dc1df7c4b2d51b54225406d36b641f5e41bbc52a56612a8c6d14
+  - name : ca_p256k1_k30
+    value: 0x4bda12f684bda12f684bda12f684bda12f684bda12f684bda12f684b8e38e23c
+  - name : ca_p256k1_k31
+    value: 0xc75e0c32d5cb7c0fa9d0a54b12a0a6d5647ab046d686da6fdffc90fc201d71a3
+  - name : ca_p256k1_k32
+    value: 0x29a6194691f91a73715209ef6512e576722830a201be2018a765e85a9ecee931
+  - name : ca_p256k1_k33
+  #
+    value: 0x2f684bda12f684bda12f684bda12f684bda12f684bda12f684bda12f38e38d84
+  - name : ca_p256k1_k40
+    value: 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffff93b
+  - name : ca_p256k1_k41
+    value: 0x7a06534bb8bdb49fd5e9e6632722c2989467c1bfc8e8d978dfb425d2685c2573
+  - name : ca_p256k1_k42
+    value: 0x6484aa716545ca2cf3a70c3fa8fe337e0a3d21162f0d6299a7bf8192bfd2a76f
