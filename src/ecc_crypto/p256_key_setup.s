@@ -122,6 +122,8 @@ p256_key_setup_tmac_padding_loop:
     LD      r8,  ca_p256_b
 
     CALL    spm_p256_long
+    CMPI    r0,  0
+    BRNZ    p256_key_setup_spm_fail
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail
 

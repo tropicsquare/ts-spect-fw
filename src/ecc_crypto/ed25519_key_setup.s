@@ -102,6 +102,8 @@ ed25519_key_setup_start:
 
     ; Calculate A = s.G and check validity of the result
     CALL        spm_ed25519_long
+    CMPI        r0,  0
+    BRNZ        ed25519_key_setup_spm_fail
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
 

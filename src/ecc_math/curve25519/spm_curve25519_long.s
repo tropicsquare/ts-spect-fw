@@ -12,7 +12,7 @@
 ;
 ; Scalar Point Multiplication on Curve25519 with 512 bit scalar
 ; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
-; Uses diferential x-coordinate only addition/doubling
+; Uses differential x-coordinate only addition/doubling
 ;
 ; Inputs:
 ;               X    Z

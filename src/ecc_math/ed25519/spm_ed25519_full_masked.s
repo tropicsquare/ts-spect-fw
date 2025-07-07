@@ -69,6 +69,8 @@ spm_ed25519_full_masked_z_randomize:
     ST          r14, ca_ed25519_smp_P2t
 
     CALL        spm_ed25519_long
+    CMPI        r0,  0
+    BRNZ        ed25519_spm_fail
     CALL        point_check_ed25519
     BRNZ        ed25519_spm_fail
 
@@ -102,6 +104,8 @@ spm_ed25519_full_masked_z_randomize:
     LD          r6,  ca_ed25519_d
 
     CALL        spm_ed25519_long
+    CMPI        r0,  0
+    BRNZ        ed25519_spm_fail
     CALL        point_check_ed25519
     BRNZ        ed25519_spm_fail
 

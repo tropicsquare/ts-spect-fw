@@ -73,6 +73,8 @@ spm_p256_full_masked_z_randomize:
     MOV     r14, r19
 
     CALL    spm_p256_long
+    CMPI    r0,  0
+    BRNZ    spm_p256_integrity_fail
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
 
@@ -97,6 +99,8 @@ spm_p256_full_masked_z_randomize:
     ; 7) Compute k3.P3
     LD      r31, ca_p256
     CALL    spm_p256_long
+    CMPI    r0,  0
+    BRNZ    spm_p256_integrity_fail
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
 
