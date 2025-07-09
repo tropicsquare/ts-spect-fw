@@ -118,3 +118,4 @@
 .include    others/tmac_shc_shn.s
 .include    others/compose_exp_tag.s
 .include    others/hash_to_field.s
+.include    others/clear_data_buffs.s

@@ -20,6 +20,12 @@
 ; Output:
 ;   Compressed point Q = ENC(P) in r8
 ;
+; Modified registers:
+;   r1,7,8
+;
+; Subroutines:
+;   inv_p25519
+;
 ; ==============================================================================
 
 point_compress_ed25519:

@@ -10,21 +10,24 @@
 ;
 ; ==============================================================================
 ;
-; Point Generate on NIST curve P-256
+; Point Generate on NIST curve P-256.
+; See spect_fw/str2point.md for detailed description.
 ;
 ; Input:
 ;   DST in ca_gfp_gen_dst
 ;
 ; Output:
-;   Random point (x, y, z) on cirve P-256 -- (r17, r18, r19)
+;   Random point (x, y, z) on curve P-256 -- (r17, r18, r19)
 ;
 ; Expects:
 ;   P-256 prime in r31
 ;
-; Intermediate registers:
-;   r0, ..., r
+; Modified registers:
+;   r1, r2, r30
 ;
-; See spect_fw/str2point.md for detailed description.
+; Subroutines:
+;   hash_to_field
+;   map_to_curve_simple_swu
 ;
 ; ==============================================================================
 p256_point_generate:

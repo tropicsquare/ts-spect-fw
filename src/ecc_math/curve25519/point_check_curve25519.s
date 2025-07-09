@@ -18,7 +18,11 @@
 ;               X   Z   Y
 ;   Point P = (r7, r8, r9)
 ;
-; Sets Zero flag if P is a valid point
+; Output:
+;   Sets Zero flag if P is a valid point
+;
+; Modified registers:
+;   r0,1,2
 ;
 ; ==============================================================================
 

@@ -25,16 +25,16 @@
 ; Enable ECC key rerandomization in Flash
 ;.define ECC_KEY_RERANDOMIZE
 ;
-; Indlude debug operations
-.define DEBUG_OPS
+; Include debug operations
+;.define DEBUG_OPS
 ;
 ; Use SPECT_INOUT_SRC[7:4]
-; When disabled, SPECT_INOUT_SRC[7:4] is ignored, and efectively forced to 0x4.
-.define IN_SRC_EN
+; When disabled, SPECT_INOUT_SRC[7:4] is ignored, and effectively forced to 0x4.
+;.define IN_SRC_EN
 ;
 ; Use SPECT_INOUT_SRC[3:0]
-; When disabled, SPECT_INOUT_SRC[3:0] is ignored, and efectively forced to 0x5.
-.define OUT_SRC_EN
+; When disabled, SPECT_INOUT_SRC[3:0] is ignored, and effectively forced to 0x5.
+;.define OUT_SRC_EN
 ;
 ; DEFINES END
 
@@ -51,6 +51,12 @@
 ; Op ID decoding
 ; ==============================================================================
 _start:
+
+    ; First clear the Data RAM Out
+    MOVI    r31, 0
+    CALL    clear_data_out
+    CALL    clear_emem_out
+
     LD      r0, ca_spect_cfg_word
     ADDI    r0, r0, 0                           ; force bits [255:32] to 0
     MOVI    r4, 0xFF
@@ -114,6 +120,7 @@ op_ecc_key:
     BRZ     op_ecc_key_erase
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 op_x25519:
@@ -135,6 +142,7 @@ op_x25519:
     BRZ     op_x25519_sc_st_eh
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 op_eddsa:
@@ -174,6 +182,7 @@ op_eddsa:
     BRZ     op_eddsa_finish
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 op_ecdsa:
@@ -186,6 +195,7 @@ op_ecdsa:
     BRZ     op_ecdsa_sign
 
     JMP     invalid_op_id
+    JMP     __err_void__
 
 ; ==============================================================================
 invalid_op_id:
@@ -256,6 +266,7 @@ get_data_in_size:
     ORI     r1,  r1,  0xFF
     AND     r0,  r0,  r1
     RET
+    JMP     __err_void__
 
 ; ==============================================================================
 ; Routine for setting  SPECT_RES_WORD field
@@ -269,3 +280,8 @@ set_res_word:
 ; ==============================================================================
 
 .include    routines_includes.s
+
+; ==============================================================================
+; Pointer to the end of program. Used for throwing generic error.
+; ==============================================================================
+__err_void__:

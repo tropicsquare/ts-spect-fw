@@ -24,6 +24,10 @@
 ;   Curve25519 prime in r31
 ;   Curve25519 constant a2d4 = (Curve25519.A + 2) / 4 in r6
 ;
+; Modified registers:
+;   r1,2,3
+;
+; Algorithm:
 ;   xDBL(XP, ZP):
 ;       V1 = XP + ZP % p
 ;       V1 = V1 ** 2 % p

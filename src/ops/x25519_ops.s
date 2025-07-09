@@ -104,4 +104,7 @@ op_x25519_sc_st_eh:
     CMPI    r0,  0
     BRNZ    op_x25519_end
     ST      r11, x25519_sc_st_eh_output_r3
+    MOVI    r19, 0
+    MOVI    r29, 0
+    MOVI    r28, 0
     JMP     op_x25519_end

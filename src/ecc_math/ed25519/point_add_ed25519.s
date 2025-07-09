@@ -39,7 +39,7 @@
 ;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
 ;
-; Intermediate value registers:
+; Modified registers:
 ;   r0-4
 ;
 ; ==============================================================================

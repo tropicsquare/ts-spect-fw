@@ -26,6 +26,12 @@
 ; Expects:
 ;   Curve25519 prime in R31
 ;
+; Modified registers:
+;   r0, r1, r2, r17
+;
+; Subroutines:
+;   sqrt_p25519
+;
 ; ==============================================================================
 
 get_y_curve25519:
