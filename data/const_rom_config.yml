@@ -28,13 +28,13 @@ data:
   - name : ca_p256_Z
     value : 0xffffffff00000001000000000000000000000000fffffffffffffffffffffff5
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Ed25519 + Curve25519 + W-25519
+# Ed25519 + Curve25519 + W-25519 + Ristretto255
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   - name : ca_p25519
     value : 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed
   - name : ca_q25519
     value : 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed
-  - name : ca_q25519_8
+  - name : ca_q25519_8                  # q * 8
     value : 0x80000000000000000000000000000000a6f7cef517bce6b2c09318d2e7ae9f68
   - name : ca_ed25519_d
     value : 0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3
@@ -42,12 +42,10 @@ data:
     value : 0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a
   - name : ca_ed25519_yG
     value : 0x6666666666666666666666666666666666666666666666666666666666666658
-  - name : ca_p25519_c3
+  - name : ca_p25519_c3                 # 2^( (p-1) / 4 ), also SQRT_M1 for Ristretto
     value : 0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0
   - name : ca_x25519_a24
     value : 121665
-  - name : ca_ffff
-    value : 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
   - name : ca_curve25519_a
     value : 486662
   - name : ca_curve25519_a2d4
@@ -58,8 +56,18 @@ data:
     value : 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa984914a144
   - name : ca_w25519_3b
     value : 0x71c71c71c71c71c71c71c71c71c71c71c71c71c71c71c71c72221bd565325952
-  - name : ca_pg_map2ed25519_c5
+  - name : ca_pg_map2ed25519_c5           # sqrt(-486664)
     value : 0x0f26edf460a006bbd27b08dc03fc4f7ec5a1d3d14b7d1a82cc6e04aaff457e06
+  - name : ca_ed25519_invsqrt_amd         # sqrt(a-d)^(-1)
+    value : 0x786c8905cfaffca216c27b91fe01d8409d2f16175a4172be99c8fdaa805d40ea
+  - name : ca_pg_map2ristretto_sqrt_adm1  # sqrt(a*d - 1)
+    value : 0x4896ce40d47cb753f0c30336ce0a2e02506271f3e487ab428168095fb684d1d2
+  - name : ca_ristretto_sqrt_ad_m1
+    value : 0x376931bf2b8348ac0f3cfcc931f5d1fdaf9d8e0c1b7854bd7e97f6a0497b2e1b
+  - name : ca_ristretto_1m_dsq            # 1 - d^2
+    value : 0x29072a8b2b3e0d79994abddbe70dfe42c81a138cd5e350fe27c09c1945fc176
+  - name : ca_ristretto_dmq
+    value : 0x5968b37af66c22414cdcd32f529b4eebd29e4a2cb01e199931ad5aaa44ed4d20
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # secp256k1 (Bitcoin curve)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -71,17 +79,19 @@ data:
     value : 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798
   - name : ca_p256k1_yG
     value : 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
-  - name : ca_p256k1_c1
-    value : 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0b
   - name : ca_p256k1_c2
     value : 0x31fdf302724013e57ad13fb38f842afeec184f00a74789dd286729c8303c4a59
   - name : ca_p256k1_Z
     value : 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc24
   # secp256k1 3-isogeny map constants
+  - name : ca_p256k1_isomap_a
+    value : 0x3f8731abdd661adca08a5558f0f5d272e953d363cb6f0e5d405447c01a444533
+  - name : ca_p256k1_isomap_b
+    value : 1771
   - name : ca_p256k1_k10
     value: 0x8e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38daaaaa8c7
   - name : ca_p256k1_k11
-    value: 0x7d3d4c80bc321d5b9f315cea7fd44c5d595d2fc0bf63b92dfff1044f17c6581
+    value: 0x07d3d4c80bc321d5b9f315cea7fd44c5d595d2fc0bf63b92dfff1044f17c6581
   - name : ca_p256k1_k12
     value: 0x534c328d23f234e6e2a413deca25caece4506144037c40314ecbd0b53d9dd262
   - name : ca_p256k1_k13
@@ -90,8 +100,8 @@ data:
   - name : ca_p256k1_k20
     value: 0xd35771193d94918a9ca34ccbb7b640dd86cd409542f8487d9fe6b745781eb49b
   - name : ca_p256k1_k21
-  #
     value: 0xedadc6f64383dc1df7c4b2d51b54225406d36b641f5e41bbc52a56612a8c6d14
+  #
   - name : ca_p256k1_k30
     value: 0x4bda12f684bda12f684bda12f684bda12f684bda12f684bda12f684b8e38e23c
   - name : ca_p256k1_k31
@@ -99,8 +109,8 @@ data:
   - name : ca_p256k1_k32
     value: 0x29a6194691f91a73715209ef6512e576722830a201be2018a765e85a9ecee931
   - name : ca_p256k1_k33
-  #
     value: 0x2f684bda12f684bda12f684bda12f684bda12f684bda12f684bda12f38e38d84
+  #
   - name : ca_p256k1_k40
     value: 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffff93b
   - name : ca_p256k1_k41
