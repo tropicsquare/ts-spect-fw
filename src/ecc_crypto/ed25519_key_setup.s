@@ -25,7 +25,7 @@
 ;   physical pub key slot in r26
 ;
 ; Outputs:
-;   Writes the key set (s, prefix, s mod q, A) to ECC key slot via KBUS
+;   Populates the ECC key slot (private + public) with new EdDSA key pair.
 ;   spect status in r3
 ;
 ; Masking methods:
@@ -102,13 +102,15 @@ ed25519_key_setup_start:
 
     ; Calculate A = s.G and check validity of the result
     CALL        spm_ed25519_long
+    CMPI        r0,  0
+    BRNZ        ed25519_key_setup_spm_fail
     CALL        point_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
 
     ; Transform A back to affine coordinates
     CALL        point_compress_ed25519
 
-    ; Compose kpair metadata
+    ; Compose key pair metadata
     ROR         r10, r25                        ; User slot
     ROL8        r10, r10
     ORI         r10, r10, ecc_pub_slot_id       ; Add public slot id
@@ -131,7 +133,7 @@ ed25519_key_setup_origin_continue:
     STK         r10, r26, ecc_key_metadata      ; store metadata
     BRE         ed25519_key_setup_kbus_fail
 
-    ; Store the pubkey to key slot
+    ; Populate the public slot with the pubkey
     STK         r8,  r26, ecc_pub_key_Ax        ; store A
     BRE         ed25519_key_setup_kbus_fail
 
@@ -153,26 +155,28 @@ ed25519_key_setup_origin_continue:
     CALL        hash_to_field
 
     ; Ensure s2 != 0
-    ORI         r1,  r0,  1
-    SUBP        r28, r30, r1
+    ORI         r0,  r0,  1
+    SUBP        r28, r30, r0
+
     ; Mask prefix
     GRV         r2
     XOR         r29, r29, r2
 
-    ; Change slot - needed so the slot register is same for flush in case of error
+    ; Change slot - needed so the slot register is same for flush in case of an error
     MOV         r26, r25
 
-    ; make private slot metadata
+    ; create private slot metadata
     MOVI        r9,  0xFF
     ROL8        r9,  r9
     ROL8        r9,  r9
     XOR         r10, r10, r9
 
+    ; Populate the private slot with priv keys and masks
     STK         r28, r26, ecc_priv_key_1        ; store s1
     BRE         ed25519_key_setup_kbus_fail
     STK         r29, r26, ecc_priv_key_2        ; store prefix
     BRE         ed25519_key_setup_kbus_fail
-    STK         r1,  r26, ecc_priv_key_3        ; store s2
+    STK         r0,  r26, ecc_priv_key_3        ; store s2
     BRE         ed25519_key_setup_kbus_fail
     STK         r2,  r26, ecc_priv_key_4        ; prefix mask
     BRE         ed25519_key_setup_kbus_fail
@@ -189,10 +193,10 @@ ed25519_key_setup_origin_continue:
 
 ed25519_key_setup_spm_fail:
     KBO         r26, ecc_kbus_flush
-    MOVI        r3, ret_point_integrity_err
+    MOVI        r3,  ret_point_integrity_err
     RET
 
 ed25519_key_setup_kbus_fail:
     KBO         r26, ecc_kbus_flush
-    MOVI        r3, ret_key_err
+    MOVI        r3,  ret_key_err
     RET

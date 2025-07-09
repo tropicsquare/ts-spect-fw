@@ -27,6 +27,12 @@
 ; Outputs:
 ;   Point Q = (XQ, ZQ, YQ) = (r7, r8, r9)
 ;
+; Expects:
+;   Curve25519 prime in r31
+;
+; Modified registers:
+;   r0-6
+;
 ; Algorithm:
 ;   C = XQ * ZP
 ;   D = XP * ZQ

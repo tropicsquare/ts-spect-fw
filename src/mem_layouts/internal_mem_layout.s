@@ -10,7 +10,7 @@
 ;
 ; ==============================================================================
 ;
-; Momory constants (layout) for internal intermediate values.
+; Mwmory constants (layout) for internal intermediate values.
 ;
 ; ==============================================================================
 ca_addr_base .eq 0x0100
@@ -61,3 +61,11 @@ ca_ecdsa_sign_internal_z .eq 0x0120
 ca_ecdsa_sign_internal_s .eq 0x0140
 ca_ecdsa_sign_internal_Ax .eq 0x0160
 ca_ecdsa_sign_internal_Ay .eq 0x0180
+
+; ==============================================================================
+;   Scalar Point Multiplication
+; ==============================================================================
+ca_spm_internal_Px .eq 0x500
+ca_spm_internal_Py .eq 0x520
+ca_spm_internal_Pz .eq 0x540
+ca_spm_internal_Pt .eq 0x580

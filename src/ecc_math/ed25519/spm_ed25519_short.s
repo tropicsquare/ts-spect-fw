@@ -24,11 +24,15 @@
 ;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
 ;
-; Intermediate value registers:
+; Modified registers:
 ;   r0-r4 -> intermediate values for point addition/doubling
 ;   r6 -> parameter d
 ;   (r7,  r8,  r9,  r10) -> Q0
 ;   r30 -> counter
+;
+; Subroutines:
+;   point_add_ed25519
+;   point_dbl_ed25519
 ;
 ; ==============================================================================
 

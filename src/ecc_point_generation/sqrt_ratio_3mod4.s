@@ -15,7 +15,7 @@
 ; [https://www.rfc-editor.org/rfc/rfc9380.html#name-optimized-sqrt_ratio-for-q-]
 ;
 ; Inputs:
-;   u, v alements of GF(p) in r12, r16, where p = P-256 prime
+;   u, v, elements of GF(p) in r12, r16, where p = P-256 prime
 ;
 ; Outputs:
 ;   y in r10, where
@@ -27,8 +27,11 @@
 ; Expects:
 ;   NIST P-256 prime in r31
 ;
-; Used registers:
-;   r0...10
+; Modified registers:
+;   r0-10
+;
+; Subroutines:
+;   inv_p256_c1
 ;
 ; Algorithm:
 ;   Constants:

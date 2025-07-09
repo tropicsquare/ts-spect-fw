@@ -36,7 +36,7 @@
 ; Expects:
 ;   Ed25519 prime in r31
 ;
-; Intermediate value registers:
+; Modified registers:
 ;   r0-4
 ;
 ; ==============================================================================

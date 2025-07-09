@@ -22,7 +22,7 @@
 ;   p256 prime in r31
 ;   P-256 parameter b in r8
 ;
-; Intermediate value registers:
+; Modified registers:
 ;   r0-7
 ;
 ; ==============================================================================

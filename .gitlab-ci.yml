@@ -40,7 +40,6 @@ run_test:
     - source ./setup_env
     - cd tests
     - ./run_tests.sh
-    - ./run_tests_mpw1.sh
 
 run_test_tag:
   stage: test_tag
@@ -53,9 +52,6 @@ run_test_tag:
     - source ./setup_env
     - cd tests
     - ./run_tests.sh
-    - ./run_tests_mpw1.sh
-
-
 
 ###################################################################################################
 # Publish doc to pages

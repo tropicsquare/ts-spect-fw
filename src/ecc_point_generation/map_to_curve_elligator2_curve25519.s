@@ -14,26 +14,38 @@
 ; Follows algorithm
 ; [https://www.rfc-editor.org/rfc/rfc9380.html#name-curve25519-q-5-mod-8-k-1]
 ;
-; Input: u, an element of GF(2^255-19).
+; Inputs: u, an element of GF(2^255-19) in r0.
+;
 ; Output: (xn, xd, yn, yd) such that (xn / xd, yn / yd) is a point on curve25519.
 ;         return (r3, r7, r11, r8) = (xn, xd, y, 1)
 ;
+; Expects:
+;   Curve25519 prime in R31
+;
+; Modified registers:
+;   r0-4, r6-14, r30
+;
+;   r0    u, y2
+;   r1    y1, -y
+;   r2    x2n, y
+;   r3    y21, xn
+;   r4    y22
+;   r6    tv1, gx2
+;   r7    xd
+;   r8    gx1
+;   r9    x1n
+;   r10   tv2
+;   r11   gxd
+;   r12   rv3
+;   r13   y11
+;   r14   y12
+;
+; Subroutines:
+;   inv_p25519_250
+;
 ; ==============================================================================
 
-; r0    u, y2
-; r1    y1, -y
-; r2    x2n, y
-; r3    y21, xn
-; r4    y22
-; r6    tv1, gx2
-; r7    xd
-; r8    gx1
-; r9    x1n
-; r10   tv2
-; r11   gxd
-; r12   rv3
-; r13   y11
-; r14   y12
+
 map_to_curve_elligator2_curve25519:
 
     MUL25519    r6,  r0,  r0        ; tv1 = pow(u, 2, p)

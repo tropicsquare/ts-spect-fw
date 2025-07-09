@@ -20,6 +20,16 @@
 ; Outputs:
 ;   k.p in affine coordinates in (r21, r22)
 ;
+; Modified registers:
+;   r0-4, r6-14, r21-24, r27, r28, r30, r31
+;
+; Subroutines:
+;   hash_to_field
+;   ed25519_point_generate
+;   spm_ed25519_long
+;   point_check_ed25519
+;   point_add_ed25519
+;
 ; Masking methods:
 ;   1) Randomized Coordinates       -- (x, y, z, t) == (rx, ry, rz, rt)
 ;   2) Group Scalar Randomization   -- k' = k + r * #E
@@ -27,7 +37,7 @@
 ;
 ; Full algorithm:
 ;   1) Convert P to randomized extended coordinates
-;   2) Generate randpom point P2 (See str2point.md)
+;   2) Generate random point P2 (See str2point.md)
 ;   3) Mask scalar k as k2 = k + rng2 * #E
 ;   4) Compute k2.P2
 ;   5) Compute P3 = P1 - P2
@@ -69,6 +79,8 @@ spm_ed25519_full_masked_z_randomize:
     ST          r14, ca_ed25519_smp_P2t
 
     CALL        spm_ed25519_long
+    CMPI        r0,  0
+    BRNZ        ed25519_spm_fail
     CALL        point_check_ed25519
     BRNZ        ed25519_spm_fail
 
@@ -102,6 +114,8 @@ spm_ed25519_full_masked_z_randomize:
     LD          r6,  ca_ed25519_d
 
     CALL        spm_ed25519_long
+    CMPI        r0,  0
+    BRNZ        ed25519_spm_fail
     CALL        point_check_ed25519
     BRNZ        ed25519_spm_fail
 

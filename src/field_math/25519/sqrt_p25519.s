@@ -12,6 +12,9 @@
 ;
 ; Square root in GF(p25519)
 ;
+; Computes Z^((p - 1) / 2) to r0
+; Computes Z^((p + 3) / 8) or Z^((p + 3) / 8) * 2^((p-1) / 4) to r1
+;
 ; Inputs:
 ;   Z in register r1
 ;
@@ -22,8 +25,11 @@
 ; Expects:
 ;   p25519 in register r31
 ;
-; Computes Z^((p - 1) / 2) to r0
-; Computes Z^((p + 3) / 8) or Z^((p + 3) / 8) * 2^((p-1) / 4) to r1
+; Modified registers:
+;   r0-4
+;
+; Subroutines:
+;   inv_p25519_250
 ;
 ; ==============================================================================
 

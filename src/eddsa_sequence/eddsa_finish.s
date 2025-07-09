@@ -33,7 +33,10 @@ eddsa_finish_s_randomize:
 
     ST          r3,  ca_eddsa_sign_internal_S
 
-    ; decompres public key to extended coordinates
+; ==============================================================================
+;   Verify the signature
+; ==============================================================================
+    ; decompress public key to extended coordinates
     LD          r31, ca_p25519
     LD          r6,  ca_ed25519_d
     LD          r12, ca_eddsa_sign_internal_A
@@ -87,8 +90,16 @@ eddsa_finish_s_randomize:
     LD          r4,  ca_eddsa_sign_internal_R
 
     ; ENC(Q) == ENC(R)
+    MOVI        r31,  0xFFF
+    ; Compare twice to prevent FI attempts
+    CMPI        r31,  0     ; Clear zero flag
     XOR         r2,  r8,  r4
     BRNZ        eddsa_finish_fail_verify
+
+    CMPI        r31,  0     ; Clear zero flag
+    XOR         r2,  r8,  r4
+    BRNZ        eddsa_finish_fail_verify
+    ;
 
     MOVI        r2,  l3_result_ok
     STR         r2,  r30
@@ -101,7 +112,7 @@ eddsa_finish_s_randomize:
 
     MOVI        r0,  ret_op_success
     MOVI        r1,  80
-    JMP         set_res_word
+    JMP         eddsa_finish_clean
 
 eddsa_finish_fail_invalid_pubkey:
     MOVI        r0,  ret_eddsa_err_final_verify
@@ -115,4 +126,9 @@ eddsa_finish_fail:
     STR         r2,  r30
 
     MOVI        r1,  1
+    JMP         eddsa_finish_clean
+
+eddsa_finish_clean:
+    MOVI        r31,  0
+    CALL        clear_data_in
     JMP         set_res_word

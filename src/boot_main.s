@@ -61,3 +61,5 @@ op_eddsa_verify:
 .include    ecc_math/ed25519/point_compress_ed25519.s
 .include    ecc_math/ed25519/point_decompress_ed25519.s
 .include    ecc_crypto/eddsa_verify.s
+
+__err_void__:

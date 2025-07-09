@@ -22,6 +22,12 @@
 ; Expects:
 ;   P-256 prime in r31
 ;
+; Modified registers:
+;   r0-4, r11-20
+;
+; Subroutines:
+;   sqrt_ratio_3mod4
+;
 ; ==============================================================================
 
 map_to_curve_simple_swu:

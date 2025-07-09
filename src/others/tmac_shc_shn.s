@@ -17,6 +17,12 @@
 ;   Secure Channel Hash in r16
 ;   Secure Channel Nonce in r17
 ;
+; Outputs:
+;   Updated TMAC state with (sch || scn)
+;
+; Modified registers:
+;   r0, r1, r16, r30
+;
 ; ==============================================================================
 
 tmac_sch_scn:

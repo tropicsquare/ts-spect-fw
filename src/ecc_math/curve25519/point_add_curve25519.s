@@ -11,8 +11,8 @@
 ; ==============================================================================
 ;
 ; General point addition on Curve25519
-; Uses Algorithm 1 from https://eprint.iacr.org/2015/1060.pdf with 
-; birrational mapping Curve25519 <-> W-25519
+; Uses Algorithm 1 from https://eprint.iacr.org/2015/1060.pdf with
+; birational mapping Curve25519 <-> W-25519
 ;
 ; Inputs:
 ;               X    Z    Y
@@ -24,6 +24,9 @@
 ;
 ; Expects:
 ;   Curve25519 prime in r31
+;
+; Modified registers
+;   r0-6, r20-22
 ;
 ; ==============================================================================
 

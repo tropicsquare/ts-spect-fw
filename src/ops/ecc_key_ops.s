@@ -85,7 +85,7 @@ op_key_setup_end:
     MOVI    r1,  1
     STR     r2,  r0
     MOV     r0,  r3
-    JMP     set_res_word
+    JMP     op_ecc_key_clean
 
 ; ECC Key Read from slot
 op_ecc_key_read:
@@ -104,7 +104,7 @@ op_ecc_key_read:
     LDK     r2,  r26, ecc_key_metadata
     BRE     op_key_fail
 
-    ; check metyadata
+    ; check metadata
     MOVI    r3,  ret_slot_metadata_err
     MOVI    r30, 0xFF
     MOV     r5,  r2
@@ -185,7 +185,7 @@ op_key_read_end:
     SWE     r17, r17
     STR     r17, r22
     MOVI    r0,  ret_op_success
-    JMP     set_res_word
+    JMP     op_ecc_key_clean
 
 ; ECC Key Erase from slot
 op_ecc_key_erase:
@@ -216,4 +216,15 @@ op_ecc_key_erase:
 
     MOVI    r1,  1
     MOVI    r0,  ret_op_success
+    JMP     op_ecc_key_clean
+
+op_ecc_key_clean:
+    MOVI    r31, 0
+    ; Clear Data Ram In
+    CALL    clear_data_in
+    ; Clear key registers
+    MOVI    r28, 0
+    MOVI    r29, 0
+    MOVI    r2,  0
+    MOVI    r10, 0
     JMP     set_res_word

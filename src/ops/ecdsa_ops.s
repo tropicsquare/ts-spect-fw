@@ -103,7 +103,7 @@ op_ecdsa_sign:
     ; unmask w
     XOR     r20, r22, r23
 
-    ; Load secure channel hasn/nonce
+    ; Load secure channel hash/nonce
     LD      r16, ecdsa_sign_input_sch
     SWE     r16, r16
     LD      r17, ecdsa_sign_input_scn
@@ -122,6 +122,8 @@ ecdsa_sign_kbus_err_fail:
     KBO     r25, ecc_kbus_flush
     MOVI    r3,  ret_key_err
 ecdsa_sign_invalid_key_fail:
+    MOVI    r31, 0
+    CALL    clear_data_in
     KBO     r25, ecc_kbus_flush
     CALL    get_output_base
     ADDI    r30, r0,  ecdsa_output_result
@@ -129,4 +131,9 @@ ecdsa_sign_invalid_key_fail:
     STR     r2,  r30
     MOV     r0,  r3
     MOVI    r1,  1
+    MOVI    r20, 0
+    MOVI    r21, 0
+    MOVI    r22, 0
+    MOVI    r26, 0
+    MOVI    r23, 0
     JMP     set_res_word

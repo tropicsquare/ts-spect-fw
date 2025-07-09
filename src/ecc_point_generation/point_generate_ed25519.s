@@ -10,18 +10,20 @@
 ;
 ; ==============================================================================
 ;
-; Point Generate on Ed25519
+; Point Generate on Ed25519. See spect_fw/str2point.md for detailed description.
 ;
 ; Input:
-;   DST in co_gfp_gen_dst
+;   DST in ca_gfp_gen_dst
 ;
 ; Output:
 ;   Random point (x, y, z, t) on Ed25519 -- (r11, r12, r13, r14)
 ;
-; Intermediate value registers:
-;   r0,..,r14
+; Modified registers:
+;   r0-2, r10, r30, r31
 ;
-; See spect_fw/str2point.md for detailed description.
+; Subroutines:
+;   hash_to_field
+;   map_to_curve_elligator2_curve25519
 ;
 ; ==============================================================================
 
