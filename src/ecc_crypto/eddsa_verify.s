@@ -19,11 +19,56 @@
 ;   Message         : 0x0080-0x009F
 ;
 ; Outputs:
-;   Result 1 : 0x0 (0x0B5E55ED => verified)
-;   Result 2 : 0x4 (0xBA11FADE => verified)
+;   Result 1 : 0x0 (0x0B5E55ED => verified 1)
+;   Result 2 : 0x4 (0xBA11FADE => verified 2)
+;
+;   If verified 1 and 2 holds, the verification is successful
 ;
 ; ==============================================================================
 
+eddsa_verify_final_compare_stage2:
+    CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0)
+
+.ifdef SPECT_ISA_VERSION_1
+    LD          r31, ca_ffff
+    SUBP        r5,  r23, r8
+    CMPA        r5,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XOR         r5,  r23, r8
+.endif
+    BRZ         eddsa_verify_success_compose_result
+    JMP         eddsa_verify_fail
+; Is unreachable unless fault injection
+    NOP
+    NOP
+    JMP         eddsa_verify_fail
+;
+
+eddsa_verify_success_store_result:
+    ST          r2,  eddsa_verify_output_result
+    JMP         set_res_word
+eddsa_verify_success_compose_result:
+    MOVI        r2,  0xBA
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x11
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0xFA
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0xDE
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x0B
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x5E
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0x55
+    ROL8        r2,  r2
+    ORI         r2,  r2,  0xED
+    JMP         eddsa_verify_success_store_result
+
+; ==============================================================================
+;   Start of EdDSA Verification
+; ==============================================================================
 eddsa_verify:
     ; load and set needed parameters
     LD          r28, eddsa_verify_input_S
@@ -78,15 +123,25 @@ eddsa_verify:
     MOV         r12, r26
     CALL        point_decompress_ed25519
 
+; Check the validity twice
     CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0);
-
 .ifdef SPECT_ISA_VERSION_1
     CMPA        r1,  0
 .endif
 .ifdef SPECT_ISA_VERSION_2
-    XORI        r1, r1, 0
+    XORI        r2, r1, 0
 .endif
     BRNZ        eddsa_verify_fail
+
+    CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0);
+.ifdef SPECT_ISA_VERSION_1
+    CMPA        r1,  0
+.endif
+.ifdef SPECT_ISA_VERSION_2
+    XORI        r2, r1, 0
+.endif
+    BRNZ        eddsa_verify_fail
+; -------------------------------------
     MOVI        r13, 1
     MUL25519    r14, r11, r12
 
@@ -120,37 +175,30 @@ eddsa_verify:
 ; ==============================================================================
 ;   Final comparison -> ENC(R) = ENC(S.B - SHA512(R, A, M).A)
 ; ==============================================================================
+    MOVI        r2, 1
+eddsa_verify_success_stage1:
     CMPI        r31,  0     ; Clear zero flag (r31 is for sure not 0)
 
 .ifdef SPECT_ISA_VERSION_1
     LD          r31, ca_ffff
-    SUBP        r2,  r23, r8
-    CMPA        r2,  0
+    SUBP        r5,  r23, r8
+    CMPA        r5,  0
 .endif
 .ifdef SPECT_ISA_VERSION_2
-    XOR         r2,  r23, r8
+    XOR         r5,  r23, r8
 .endif
-    BRZ         eddsa_verify_success
+    BRZ         eddsa_verify_final_compare_stage2
+
 eddsa_verify_fail:
+; Store twice to be sure in case of FI attempt
     MOVI        r2,  1
     ST          r2,  eddsa_verify_output_result
+    NOP
+    MOVI        r3,  1
+    ST          r3,  eddsa_verify_output_result
     JMP         set_res_word
-
-eddsa_verify_success:
-    MOVI        r2,  0xBA
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0x11
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0xFA
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0xDE
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0x0B
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0x5E
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0x55
-    ROL8        r2,  r2
-    ORI         r2,  r2,  0xED
-    ST          r2,  eddsa_verify_output_result
+; Is unreachable unless fault injection
+    NOP
+    NOP
     JMP         set_res_word
+; -------------------------------------

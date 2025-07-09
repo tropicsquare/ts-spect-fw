@@ -1,9 +1,13 @@
 SRC_DIR = ${TS_REPO_ROOT}/src
 FIT_DIR = ${TS_REPO_ROOT}/fit
+
 BUILD_DIR_MPW1 = ${TS_REPO_ROOT}/build_mpw1
 BUILD_DIR = ${TS_REPO_ROOT}/build
+
+BUILD_DIR_BOOT = ${TS_REPO_ROOT}/build_boot
+BUILD_DIR_MPW1_BOOT = ${TS_REPO_ROOT}/build_mpw1_boot
+
 RELEASE_DIR = ${TS_REPO_ROOT}/release
-MPW1_BOOT_DIR = ${TS_REPO_ROOT}/build_mpw1_boot
 
 COMPILER = spect_compiler
 ISS = spect_iss
@@ -33,7 +37,8 @@ check_env:
 clear: check_env
 	rm -rf ${BUILD_DIR_MPW1}
 	rm -rf ${BUILD_DIR}
-	rm -rf ${MPW1_BOOT_DIR}
+	rm -rf ${BUILD_DIR_MPW1_BOOT}
+	rm -rf ${BUILD_DIR_BOOT}
 	rm -rf ${RELEASE_DIR}
 	rm -f ${TS_REPO_ROOT}/data/*.hex
 	rm -f ${SRC_DIR}/mem_layouts/constants_layout.s
@@ -72,6 +77,18 @@ compile: check_env const_rom ops_constants
 	--dump-program=${BUILD_DIR}/program_dump.s \
 	--dump-symbols=${BUILD_DIR}/symbols_dump.s \
 	${SRC_DIR}/${MAIN} > ${BUILD_DIR}/compile.log
+
+compile_boot: check_env const_rom ops_constants
+	rm -rf ${BUILD_DIR_BOOT}
+	mkdir ${BUILD_DIR_BOOT}
+	mv ${TS_REPO_ROOT}/data/constants.hex ${BUILD_DIR_BOOT}/constants.hex
+	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${BUILD_DIR_BOOT}/spect_boot-${FW_VERSION}.hex \
+	--first-address=${FW_BASE_ADDR} \
+	--parity=${FW_PARITY} \
+	--dump-program=${BUILD_DIR_BOOT}/program_dump_boot.s \
+	--dump-symbols=${BUILD_DIR_BOOT}/symbols_dump_boot.s \
+	${SRC_DIR}/boot_main.s
+# > ${BUILD_DIR_BOOT}/compile_boot.log
 
 ############################################################################################################
 #		Final APP+BOOT FW Release
@@ -114,13 +131,13 @@ compile_mpw1: check_env data_ram_in_const
 	${SRC_DIR}/mpw1/main_mpw1.s > ${BUILD_DIR_MPW1}/compile.log
 
 compile_boot_mpw1: check_env data_ram_in_const_boot ops_constants
-	rm -rf ${MPW1_BOOT_DIR}
-	mkdir ${MPW1_BOOT_DIR}
-	mkdir ${MPW1_BOOT_DIR}/dump
-	mv ${TS_REPO_ROOT}/data/constants_data_in_boot.hex ${MPW1_BOOT_DIR}/constants.hex
-	${COMPILER} --isa-version=1 --hex-format=1 --hex-file=${MPW1_BOOT_DIR}/spect_boot_mpw1.hex \
+	rm -rf ${BUILD_DIR_MPW1_BOOT}
+	mkdir ${BUILD_DIR_MPW1_BOOT}
+	mkdir ${BUILD_DIR_MPW1_BOOT}/dump
+	mv ${TS_REPO_ROOT}/data/constants_data_in_boot.hex ${BUILD_DIR_MPW1_BOOT}/constants.hex
+	${COMPILER} --isa-version=1 --hex-format=1 --hex-file=${BUILD_DIR_MPW1_BOOT}/spect_boot_mpw1.hex \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
-	--dump-program=${MPW1_BOOT_DIR}/dump/program_dump.s \
-	--dump-symbols=${MPW1_BOOT_DIR}/dump/symbols_dump.s \
-	${SRC_DIR}/boot_main.s > ${MPW1_BOOT_DIR}/compile.log
+	--dump-program=${BUILD_DIR_MPW1_BOOT}/dump/program_dump.s \
+	--dump-symbols=${BUILD_DIR_MPW1_BOOT}/dump/symbols_dump.s \
+	${SRC_DIR}/boot_main.s > ${BUILD_DIR_MPW1_BOOT}/compile.log

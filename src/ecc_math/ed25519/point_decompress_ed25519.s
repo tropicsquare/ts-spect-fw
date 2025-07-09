@@ -200,5 +200,5 @@ point_decompress_ed25519_success:
     RET
 
 point_decompress_ed25519_fail:
-    MOVI        r1, 1
+    MOVI        r1, 0xFFF
     RET

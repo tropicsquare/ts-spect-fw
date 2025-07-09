@@ -21,13 +21,20 @@
 .include constants/spect_ops_constants.s
 .include constants/spect_descriptors_constants.s
 _start:
+    ; Set result as FAIL (twice to be sure in case of FI attempt)
+    MOVI    r0, 1
+    ST      r0, eddsa_verify_output_result
+    MOVI    r1, 1
+    ST      r1, eddsa_verify_output_result
+
+    ; Read the input config word
     LD      r0, ca_spect_cfg_word
     MOVI    r4, 0xFF
     AND     r0, r0, r4
-
+    ; OP_ID == EdDSA Verify
     CMPI    r0, eddsa_verify_id
     BRZ     op_eddsa_verify
-
+    ; Else:
     MOVI    r0, ret_op_id_err
     MOVI    r1, 1
 
@@ -40,13 +47,19 @@ set_res_word:
 
 op_eddsa_verify:
     JMP     eddsa_verify
+; Is unreachable unless fault injection
+    NOP
+    NOP
+    JMP     eddsa_verify
+    JMP     eddsa_verify_fail
+; -------------------------------------
 
 .include    field_math/25519/inv_p25519.s
 .include    ecc_math/ed25519/spm_ed25519_short.s
 .include    ecc_math/ed25519/point_add_ed25519.s
 .include    ecc_math/ed25519/point_dbl_ed25519.s
-.include    ecc_crypto/eddsa_verify.s
 .include    ecc_math/ed25519/point_compress_ed25519.s
 .include    ecc_math/ed25519/point_decompress_ed25519.s
+.include    ecc_crypto/eddsa_verify.s
 
 __err_void__:
