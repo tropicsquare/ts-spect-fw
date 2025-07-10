@@ -98,5 +98,5 @@ github_mirror:
       - git remote add github git@github.com:tropicsquare/ts-spect-fw.git
 
       # Push - Use SSH key created for this purpose
-      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror_ts_spect_fw.id_rsa.pub" git push github
-      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror_ts_spect_fw.id_rsa.pub" git push github --tags
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror_ts_spect_fw.id_rsa" git push github
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror_ts_spect_fw.id_rsa" git push github --tags
