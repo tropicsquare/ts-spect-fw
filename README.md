@@ -1,23 +1,29 @@
 # TS SPECT Firmware
 
-This repository contains the Makefile and associated scripts necessary to build firmware for a specific project. The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling, releasing, and managing the firmware.
+This repository contains the Makefile and associated scripts necessary to build firmware for a specific project.
+
+The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling,
+releasing, and managing the firmware.
 
 [**SPECT Firmware API**](https://tropic-gitlab.corp.sldev.cz/internal/sw-design/ts-spect-fw/-/jobs/artifacts/master/raw/public/spect_fw_doc.pdf?job=pages)
 
 ## Table of Contents
 
-1. [Licensing](#license)
-2. [Repository structure](#repostruct)
-3. [Prerequisites](#prereq)
-4. [Build firmware](#fwbuild)
-5. [Release](#release)
-6. [Test/Simulate firmware](#fwtestsim)
-   1. [Test vectors](#testvec)
+- [TS SPECT Firmware](#ts-spect-firmware)
+  - [Table of Contents](#table-of-contents)
+  - [Licensing ](#licensing-)
+  - [Repository structure ](#repository-structure-)
+  - [Prerequisites ](#prerequisites-)
+  - [Build firmware ](#build-firmware-)
+  - [Release ](#release-)
+  - [Test/Simulate firmware ](#testsimulate-firmware-)
+    - [Test Vectors ](#test-vectors-)
 
 
 ## Licensing <a name="license"></a>
 ---
-Everything in this repository is licensed under the Apache License, Version 2.0, unless otherwise stated (for the complete wording, see [LICENSE file](LICENSE)).
+See [LICENSE file](LICENSE),
+
 
 ## Repository structure <a name="repostruct"></a>
 
@@ -31,12 +37,13 @@ Everything in this repository is licensed under the Apache License, Version 2.0,
 - [`src`](src/) : all firmware source files
 - [`tests`](tests/) : all python tests, models and custom test vectors
 
+
 ## Prerequisites <a name="prereq"></a>
 ---
 1. Cloning repository and setting the environment variable `TS_REPO_ROOT` to the repository root.
 
    ```bash
-   # clone the spect firmware repository 
+   # clone the spect firmware repository
    git clone https://github.com/tropicsquare/ts-spect-fw.git --recurse-submodules
 
    # set env var TS_REPO_ROOT from root of repository
@@ -127,7 +134,7 @@ Python tests expects firmware to be build before using `make`. Besides python te
 
 Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models).
 
-Test vectors can be also specified using YAML file and `--testvec` option to define parameters of test (private, public key, z coordinate, randomization). 
+Test vectors can be also specified using YAML file and `--testvec` option to define parameters of test (private, public key, z coordinate, randomization).
 
 See [`testvec`](tests/testvec) for test vector examples.
 
@@ -137,7 +144,7 @@ See [`testvec`](tests/testvec) for test vector examples.
    ```bash
    cd tests
    ```
-   
+
    ```bash
    ./test_x25519_dbg.py --testvec testvec/x25519_dbg_testvec.yml
    ```
