@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_math/ed25519/point_check_ed25519.s
+;  file    ecc_math/ed25519/point_valid_check_ed25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
@@ -30,7 +30,7 @@
 ;
 ; ==============================================================================
 
-point_check_ed25519:
+point_valid_check_ed25519:
     MUL25519    r0,  r7,  r7                    ; X^2
     MUL25519    r1,  r8,  r8                    ; Y^2
     MUL25519    r2,  r9,  r9                    ; Z^2
@@ -49,7 +49,7 @@ point_check_ed25519:
 .ifdef SPECT_ISA_VERSION_2
     XOR         r3,  r3,  r0
 .endif
-    BRNZ        point_check_ed25519_ret
+    BRNZ        point_valid_check_ed25519_ret
 
     MUL25519    r0,  r7,  r8                    ; X*Y
     MUL25519    r3,  r9,  r10                   ; Z*T
@@ -61,5 +61,5 @@ point_check_ed25519:
     XOR         r3,  r3,  r0
 .endif
 
-point_check_ed25519_ret:
+point_valid_check_ed25519_ret:
     RET

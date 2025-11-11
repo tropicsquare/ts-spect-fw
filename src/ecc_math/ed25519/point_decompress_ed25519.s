@@ -193,9 +193,9 @@ point_decompress_ed25519_x_is_p_minus_x:
     JMP         point_decompress_ed25519_success
 
 point_decompress_ed25519_success:
-    MOVI        r1, 0
+    MOVI        r1, pass_val
     RET
 
 point_decompress_ed25519_fail:
-    MOVI        r1, 0xFFF
+    MOVI        r1, fail_val
     RET

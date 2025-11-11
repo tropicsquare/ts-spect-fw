@@ -131,9 +131,7 @@ ecdsa_sign_invalid_key_fail:
     STR     r2,  r30
     MOV     r0,  r3
     MOVI    r1,  1
-    MOVI    r20, 0
-    MOVI    r21, 0
-    MOVI    r22, 0
-    MOVI    r26, 0
-    MOVI    r23, 0
+    MOVI    r31, 0
+    CALL    clear_data_in
+    CALL    clear_regs_before_return
     JMP     set_res_word

@@ -35,7 +35,9 @@
 .include   ecc_math/ed25519/spm_ed25519_short.s
 .include   ecc_math/ed25519/spm_ed25519_long.s
 .include   ecc_math/ed25519/spm_ed25519_full_masked.s
-.include   ecc_math/ed25519/point_check_ed25519.s
+.include   ecc_math/ed25519/point_valid_check_ed25519.s
+;.include   ecc_math/ed25519/point_order_check_ed25519.s
+.include   ecc_math/ed25519/point_check_infinity_ed25519.s
 
 ; .......... P256 ..........
 

@@ -27,6 +27,15 @@ op_eddsa_R_part:
     LD          r22, ca_ed25519_yG
 
     CALL        spm_ed25519_full_masked
+    ; spm retcode check
+    CMPI        r0,  ret_op_success
+    BRNZ        eddsa_R_part_fail
+    ; call check
+    LD          r4, ca_call_check_level_2
+    CMPI        r4, call_check_level_2_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_2
+    BRNZ        eddsa_R_part_fail
 
     ; Encode R
     MOVI        r1,  1
@@ -37,5 +46,10 @@ op_eddsa_R_part:
 
     ST          r22, ca_eddsa_sign_internal_R
 
+eddsa_R_part_pass:
     MOVI        r1,  0
+    JMP         set_res_word
+
+eddsa_R_part_fail:
+    MOVI        r1,  ret_point_integrity_err
     JMP         set_res_word

@@ -27,7 +27,7 @@
 ;   hash_to_field
 ;   ed25519_point_generate
 ;   spm_ed25519_long
-;   point_check_ed25519
+;   point_valid_check_ed25519
 ;   point_add_ed25519
 ;
 ; Masking methods:
@@ -49,6 +49,10 @@
 ; ==============================================================================
 
 spm_ed25519_full_masked:
+    ; Store call check
+    MOVI        r0,  call_check_level_2_id
+    ST          r0,  ca_call_check_level_2
+
     ; 1) Convert P to randomized extended coordinates
     LD          r31, ca_p25519
 
@@ -79,9 +83,9 @@ spm_ed25519_full_masked_z_randomize:
     ST          r14, ca_ed25519_smp_P2t
 
     CALL        spm_ed25519_long
-    CMPI        r0,  0
+    CMPI        r0,  pass_val
     BRNZ        ed25519_spm_fail
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_spm_fail
 
     ; 5) Compute P3 = P1 - P2
@@ -114,9 +118,9 @@ spm_ed25519_full_masked_z_randomize:
     LD          r6,  ca_ed25519_d
 
     CALL        spm_ed25519_long
-    CMPI        r0,  0
+    CMPI        r0,  pass_val
     BRNZ        ed25519_spm_fail
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_spm_fail
 
     ; 8) Compute k.P = k2.P2 + k3.P3
@@ -131,7 +135,7 @@ spm_ed25519_full_masked_z_randomize:
     MOV         r8,  r12
     MOV         r9,  r13
     MOV         r10, r14
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_spm_fail
 
     ; 9) Convert k.P to affine coordinates

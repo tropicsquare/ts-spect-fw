@@ -30,7 +30,6 @@ eddsa_finish_ctx_ok:
 
     LD          r31, ca_q25519
 
-    ;MOVI        r0,  3
 eddsa_finish_s_randomize:
     ; Compute S = r + e*s1 + e*s2
     LD          r26, ca_eddsa_sign_internal_s1
@@ -53,7 +52,9 @@ eddsa_finish_s_randomize:
     SWE         r12, r12
     CALL        point_decompress_ed25519
 
-    XORI        r30, r1,  0
+    ; Check decompress success
+    CMPI        r31, 0      ; CLEAR zero flag
+    CMPI        r1,  pass_val
     BRNZ        eddsa_finish_fail_invalid_pubkey
     MOVI        r13, 1
     MUL25519    r14, r11, r12
@@ -88,6 +89,18 @@ eddsa_finish_s_randomize:
     MUL25519    r14, r11, r12
 
     CALL        spm_ed25519_short
+    ; spm invariant check
+    CMPI        r0,  pass_val
+    BRNZ        eddsa_finish_fail_verify
+    ; call check
+    LD          r4, ca_call_check_level_1
+    CMPI        r4, call_check_level_1_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_1
+    BRNZ        eddsa_finish_fail_verify
+    ; check Q1 != O
+    CALL        point_check_infinity_ed25519
+    BRZ         eddsa_finish_fail_verify
 
     LD          r11, ca_eddsa_sign_internal_EAx
     LD          r12, ca_eddsa_sign_internal_EAy
@@ -106,22 +119,22 @@ eddsa_finish_s_randomize:
     ; ENC(Q)
     CALL        point_compress_ed25519
 
-    CALL        get_output_base
-    ADDI        r30, r0,  eddsa_output_result
-
     LD          r4,  ca_eddsa_sign_internal_R
 
     ; ENC(Q) == ENC(R)
     MOVI        r31,  0xFFF
     ; Compare twice to prevent FI attempts
-    CMPI        r31,  0     ; Clear zero flag
+    CMPI        r31, 0     ; Clear zero flag
     XOR         r2,  r8,  r4
     BRNZ        eddsa_finish_fail_verify
 
     CMPI        r31,  0     ; Clear zero flag
-    XOR         r2,  r8,  r4
+    XOR         r2,  r4,  r8
     BRNZ        eddsa_finish_fail_verify
     ;
+
+    CALL        get_output_base
+    ADDI        r30, r0,  eddsa_output_result
 
     MOVI        r2,  l3_result_ok
     STR         r2,  r30
@@ -137,11 +150,16 @@ eddsa_finish_s_randomize:
     JMP         eddsa_finish_clean
 
 eddsa_finish_fail_invalid_pubkey:
-    MOVI        r0,  ret_eddsa_err_final_verify
+    MOVI        r1,  ret_eddsa_err_final_verify
     JMP         eddsa_finish_fail
 
 eddsa_finish_fail_verify:
-    MOVI        r0,  ret_eddsa_err_final_verify
+    MOVI        r1,  ret_eddsa_err_final_verify
+    JMP         eddsa_finish_fail
+
+eddsa_ctx_fail:
+    MOVI        r1,  ret_ctx_err
+    JMP         eddsa_finish_fail
 
 eddsa_finish_fail:
     ; Clear OP Link context
@@ -153,10 +171,12 @@ eddsa_finish_fail:
     MOVI        r2,  l3_result_fail
     STR         r2,  r30
 
+    MOV         r0,  r1
     MOVI        r1,  1
     JMP         eddsa_finish_clean
 
 eddsa_finish_clean:
-    MOVI        r31,  0
+    MOVI        r31, 0
     CALL        clear_data_in
+    CALL        clear_regs_before_return
     JMP         set_res_word

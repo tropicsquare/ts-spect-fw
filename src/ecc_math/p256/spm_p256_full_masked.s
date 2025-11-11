@@ -50,10 +50,12 @@
 ; ==============================================================================
 
 spm_p256_full_masked:
+    ; Store call check
+    MOVI    r0,  call_check_level_2_id
+    ST      r0,  ca_call_check_level_2
+
     ; 1) Convert P to randomized projective coordinates
     LD      r31, ca_p256
-
-spm_p256_full_masked_z_randomize:
     GRV     r2
     LD      r1,  ca_gfp_gen_dst
     CALL    hash_to_field
@@ -84,7 +86,7 @@ spm_p256_full_masked_z_randomize:
     MOV     r14, r19
 
     CALL    spm_p256_long
-    CMPI    r0,  0
+    CMPI    r0,  pass_val
     BRNZ    spm_p256_integrity_fail
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
@@ -110,7 +112,7 @@ spm_p256_full_masked_z_randomize:
     ; 7) Compute k3.P3
     LD      r31, ca_p256
     CALL    spm_p256_long
-    CMPI    r0,  0
+    CMPI    r0,  pass_val
     BRNZ    spm_p256_integrity_fail
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
@@ -134,10 +136,9 @@ spm_p256_full_masked_z_randomize:
     MUL256  r22, r12, r1
     MUL256  r23, r13, r1
 
-    MOVI    r0,  0
-
+    MOVI    r0,  pass_val
     RET
 
 spm_p256_integrity_fail:
-    MOVI    r0,  ret_point_integrity_err
+    MOVI    r0,  fail_val
     RET

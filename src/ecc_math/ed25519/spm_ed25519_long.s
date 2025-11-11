@@ -38,6 +38,10 @@
 ; ==============================================================================
 
 spm_ed25519_long:
+    ; Store call check
+    MOVI        r0,  call_check_level_1_id
+    ST          r0,  ca_call_check_level_1
+
     ; Store P for Montgomery ladder invariant check (Q1 - Q0 = P)
     ; No need of T coordinate for the check
     ST          r11, ca_spm_internal_Px
@@ -50,7 +54,8 @@ spm_ed25519_long:
     MOVI        r9,  1
     MOVI        r10, 0
 
-    MOVI        r30, 256
+    MOVI        r30, 256    ; i
+    MOVI        r16, 0      ; j
 
     GRV         r15
 
@@ -72,10 +77,11 @@ spm_ed25519_long_loop_511_256:
     CSWAP       r9,  r13
     CSWAP       r10, r14
 
-    SUBI        r30, r30, 1
-    BRNZ        spm_ed25519_long_loop_511_256
-
-    MOVI        r30, 256
+    ADDI        r16, r16, 1     ; j++
+    SUBI        r30, r30, 1     ; i--
+    BRNZ        spm_ed25519_long_loop_511_256       ; i == 0 ?
+    CMPI        r16, 256                            ; j == 256 ?
+    BRNZ        spm_ed25519_long_invariant_failed
 
     ; scalar bits 255 downto 0
 spm_ed25519_long_loop_255_0:
@@ -95,19 +101,22 @@ spm_ed25519_long_loop_255_0:
     CSWAP       r9,  r13
     CSWAP       r10, r14
 
-    SUBI        r30, r30, 1
-    BRNZ        spm_ed25519_long_loop_255_0
+    ADDI        r30, r30, 1     ; i++
+    SUBI        r16, r16, 1     ; j--
+    BRNZ        spm_ed25519_long_loop_255_0         ; j == 0 ?
+    CMPI        r30, 256                            ; i == 256 ?
+    BRNZ        spm_ed25519_long_invariant_failed
 
     ; === Check Montgomery ladder invariant ===
-    MOVI        r30,  0
-    SUBP        r7,  r30, r7                    ;
-    SUBP        r10, r30, r10                   ; Q0 -> -Q0
+    ; R16 is 0 from the counter
+    SUBP        r7,  r16, r7                    ;
+    SUBP        r10, r16, r10                   ; Q0 -> -Q0
 
     CALL        point_add_ed25519               ; -Q0 + Q1 -> (r11, r12, r13, r14)
 
     ; Fix the Q0 back
-    SUBP        r7,  r30, r7
-    SUBP        r10, r30, r10
+    SUBP        r7,  r16, r7
+    SUBP        r10, r16, r10
 
     ; Load the input point P
     LD          r0,  ca_spm_internal_Px
@@ -126,9 +135,9 @@ spm_ed25519_long_loop_255_0:
     XOR         r30, r1,  r12
     BRNZ        spm_ed25519_long_invariant_failed
 
-    MOVI        r0,  0
+    MOVI        r0,  pass_val
     RET
 
 spm_ed25519_long_invariant_failed:
-    MOVI        r0,  1
+    MOVI        r0,  fail_val
     RET

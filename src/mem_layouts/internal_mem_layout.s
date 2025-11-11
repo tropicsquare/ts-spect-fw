@@ -10,12 +10,10 @@
 ;
 ; ==============================================================================
 ;
-; Mwmory constants (layout) for internal intermediate values.
+; Memory constants (layout) for internal intermediate values.
 ;
 ; ==============================================================================
 ca_addr_base .eq 0x0100
-
-ca_gfp_gen_dst .eq 0x0500
 
 ; ==============================================================================
 ;   Full masked Ed25519 scalar point multiplication

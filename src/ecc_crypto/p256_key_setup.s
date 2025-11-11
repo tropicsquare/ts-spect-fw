@@ -86,6 +86,7 @@ p256_key_setup_tmac_padding_loop:
 
     TMAC_UP r2
     TMAC_RD r29
+    TMAC_IT r7      ; Destroy the TMAC state
 
     ST      r28, ca_p256_key_setup_internal_d
     ST      r29, ca_p256_key_setup_internal_w
@@ -127,7 +128,7 @@ p256_key_setup_tmac_padding_loop:
     LD      r8,  ca_p256_b
 
     CALL    spm_p256_long
-    CMPI    r0,  0
+    CMPI    r0,  pass_val
     BRNZ    p256_key_setup_spm_fail
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail

@@ -74,6 +74,18 @@ x25519_full_masked_z_randomize:
 
     ; 5) Compute sP2 = s2.P2
     CALL        spm_curve25519_long
+    ; invariant check
+    CMPI        r0,  0
+    BRNZ        x25519_spm_fail
+    ; call check
+    LD          r4,  ca_call_check_level_1
+    CMPI        r4,  call_check_level_1_id
+    MOVI        r4,  0
+    ST          r4,  ca_call_check_level_1
+    BRNZ        x25519_spm_fail
+    ; sP2 != O
+    XOR         r4,  r4,  r8
+    BRZ         x25519_spm_fail
 
     ; 6) Recover sP2.y
     CALL        y_recovery_curve25519
@@ -97,6 +109,18 @@ x25519_full_masked_z_randomize:
     ; 9) Compute sP3.x = s3.P3
     LD          r31, ca_p25519
     CALL        spm_curve25519_long
+    ; invariant check
+    CMPI        r0,  0
+    BRNZ        x25519_spm_fail
+    ; call check
+    LD          r4, ca_call_check_level_1
+    CMPI        r4, call_check_level_1_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_1
+    BRNZ        x25519_spm_fail
+    ; sP3 != O
+    XOR         r4,  r4,  r8
+    BRZ         x25519_spm_fail
 
     ;10) Recover sP3.y
     CALL        y_recovery_curve25519
@@ -121,7 +145,7 @@ x25519_full_masked_z_randomize:
     CALL        point_check_curve25519
     BRNZ        x25519_spm_fail
 
-    MOVI        r0,  0
+    MOVI        r0,  ret_op_success
 
     RET
 x25519_pubkey_fail:

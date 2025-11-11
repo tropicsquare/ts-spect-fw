@@ -31,7 +31,6 @@ ecdsa_sign:
     CALL        extend_tmac_mask
     TMAC_IT     r7
 
-    TMAC_IT     r3
     TMAC_IS     r20, tmac_dst_ecdsa_sign
 
     CALL        tmac_sch_scn
@@ -103,7 +102,9 @@ ecdsa_sign_tmac_padding_loop_k2:
     LD          r31, ca_q256
     REDP        r27, r28, r27
 
-    XORI        r0,  r27, 0
+    ; check k != 0
+    MOVI        r0,  0
+    XOR         r0,  r27, r0
     BRZ         ecdsa_sign_fail_k
 
 ; ==============================================================================
@@ -114,14 +115,22 @@ ecdsa_sign_tmac_padding_loop_k2:
     LD          r23, ca_p256_yG
 
     CALL        spm_p256_full_masked
-    MOV         r3,  r0
-    CMPI        r0,  0
-    BRNZ        ecdsa_sign_fail
+    ; call check
+    LD          r4, ca_call_check_level_2
+    CMPI        r4, call_check_level_2_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_2
+    BRNZ        ecdsa_sign_generic_fail
+    ; spm retcode check
+    CMPI        r0,  pass_val
+    BRNZ        ecdsa_sign_generic_fail
 
     LD          r31, ca_q256
     MOVI        r0, 0
     REDP        r22, r0, r22
-    XORI        r0, r22, 0
+
+    ; check r != 0
+    XOR         r0,  r22, r0
     BRZ         ecdsa_sign_fail_r
 
 ; ==============================================================================
@@ -134,77 +143,83 @@ ecdsa_sign_mask_k:
     LD          r1, ca_gfp_gen_dst
     CALL        hash_to_field
     MOV         r25, r0                         ; t
-    ORI         r25, r25, 1                     ; force t to be even -> not 0
+    ORI         r25, r25, 2                     ; force t to not be 0 nor 1
     MULP        r1,  r25, r27
     CALL        inv_q256                        ; (kt)^(-1)
 
     LD          r18, ca_ecdsa_sign_internal_z
-    MULP        r10, r18, r25                   ; zt
     MULP        r11, r22, r25                   ; rt
     MULP        r12, r26, r11                   ; rtd1
     MULP        r13, r21, r11                   ; rtd2
     ADDP        r11, r12, r13                   ; rtd1 + rtd2 = rtd
-    ADDP        r10, r10, r11                   ; zt + rtd
-    MULP        r10, r1,  r10                   ; (zt + rtd) / (kt)
 
-    XORI        r0, r10,  0
+    MULP        r10, r18, r25                   ; zt
+
+    ADDP        r13, r10, r11                   ; zt + rtd
+    MULP        r13, r1,  r13                   ; (zt + rtd) / (kt)
+
+    ; Check s != 0 and z != rd
+    MOVI        r0,  0
+    XOR         r0,  r13, r0
+    XOR         r1,  r10, r11
+    OR          r0,  r0,  r1
     BRZ         ecdsa_sign_fail_s
 
 ; ==============================================================================
 ;   Verify the signature
 ; ==============================================================================
 
-    ST          r10, ca_ecdsa_sign_internal_s
-    MOV         r1,  r10
+    ST          r13, ca_ecdsa_sign_internal_s
+    MOV         r1,  r13
     CALL        inv_q256                        ; r1 = s^(-1)
 
-    MULP        r28, r18, r1                    ; r2 = e s^(-1) = u1
-    MULP        r27, r22, r1                    ; r3 = r s^(-1) = u2
+    MULP        r28, r18, r1                    ; r28 = z s^(-1) = u1
+    MULP        r27, r22, r1                    ; r27 = r s^(-1) = u2
 
     LD          r31, ca_p256
-    ; P1 = u1.G to (r15, r16, r17)
+    ; P1 = u1.G to (r19, r20, r21)
     LD          r12, ca_p256_xG
     LD          r13, ca_p256_yG
     MOVI        r14, 1
 
     CALL        spm_p256_short
+    ; call check
+    LD          r4, ca_call_check_level_1
+    CMPI        r4, call_check_level_1_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_1
+    BRNZ        ecdsa_fail_verify
+    ; spm invariant check
+    CMPI        r0,  pass_val
+    BRNZ        ecdsa_fail_verify
 
-    MOV         r15, r9
-    MOV         r16, r10
-    MOV         r17, r11
+    MOV         r19, r9
+    MOV         r20, r10
+    MOV         r21, r11
 
-    ; P1 = u2.A to (r9, r10, r11)
+    ; P2 = u2.A to (r9, r10, r11)
     LD          r12, ca_ecdsa_sign_internal_Ax
     LD          r13, ca_ecdsa_sign_internal_Ay
     MOVI        r14, 1
 
     MOV         r28, r27
     CALL        spm_p256_short
+    ; call check
+    LD          r4,  ca_call_check_level_1
+    CMPI        r4,  call_check_level_1_id
+    MOVI        r4,  0
+    ST          r4,  ca_call_check_level_1
+    BRNZ        ecdsa_fail_verify
+    ; spm invariant check
+    CMPI        r0,  pass_val
+    BRNZ        ecdsa_fail_verify
 
-    ; check if P1x == P2x
-    MUL256      r2,  r15, r11
-    MUL256      r3,  r9,  r17
-    XOR         r0,  r2,  r3
-    BRNZ        eddsa_sign_verify_continue_add  ; P1x != P2x -> use add
-    MUL256      r2,  r16, r11
-    MUL256      r3,  r10, r17
-    XOR         r0,  r2,  r3
-    BRNZ        ecdsa_fail_verify               ; P1x == -P2x -> fail
-    ; P1x == P2x -> use dbl
-eddsa_sign_verify_continue_dbl:
-    CALL        point_dbl_p256
-    MOV         r12, r9
-    MOV         r13, r10
-    MOV         r14, r11
-    JMP         eddsa_sign_verify_continue_dbladd
-
-eddsa_sign_verify_continue_add:
-    MOV         r12, r15
-    MOV         r13, r16
-    MOV         r14, r17
+    ; P1 + P2
+    MOV         r12, r19
+    MOV         r13, r20
+    MOV         r14, r21
 
     CALL        point_add_p256
-eddsa_sign_verify_continue_dbladd:
 
     MOV         r1,  r14
     CALL        inv_p256
@@ -214,13 +229,12 @@ eddsa_sign_verify_continue_dbladd:
     MOVI        r0,  0
     REDP        r12, r0,  r12
 
-    ; Final compare - twice to prevent FI attempts
-    MOVI        r31, 0
-    CMPI        r31, 0          ; clear zero flag
+    ; Final compare
+    CMPI        r31, 0          ; CLEAR zero flag
     XOR         r1,  r12, r22
     BRNZ        ecdsa_fail_verify
-
-    CMPI        r31, 0          ; clear zero flag
+    ; (FI redundancy)
+    CMPI        r31, 0          ; CLEAR zero flag
     XOR         r1,  r12, r22
     BRNZ        ecdsa_fail_verify
     ;
@@ -232,9 +246,16 @@ ecdsa_sign_end:
 
     ADDI        r30, r0,  ecdsa_output_result
     STR         r2,  r30
-    CMPI        r3,  ret_op_success
     MOVI        r1,  1
+
+    CMPI        r31, 0          ; Clear zero flag
+    CMPI        r3,  ret_op_success
     BRNZ        ecdsa_sign_end_not_store
+    ; FI Redundancy
+    CMPI        r31, 0          ; Clear zero flag
+    CMPI        r3,  ret_op_success
+    BRNZ        ecdsa_sign_end_not_store
+
     MOVI        r1,  80
 
     ADDI        r30, r0,  ecdsa_sign_output_signature
@@ -248,12 +269,9 @@ ecdsa_sign_end:
 
 ecdsa_sign_end_not_store:
     MOV         r0,  r3
-    MOVI        r20, 0
-    MOVI        r21, 0
-    MOVI        r26, 0
-    MOVI        r27, 0
-    MOVI        r28, 0
-    MOVI        r29, 0
+    MOVI        r31, 0
+    CALL        clear_data_in
+    CALL        clear_regs_before_return
     JMP         set_res_word
 
 ecdsa_sign_fail_k:
@@ -267,6 +285,9 @@ ecdsa_sign_fail_s:
     JMP         ecdsa_sign_fail
 ecdsa_fail_verify:
     MOVI        r3,  ret_ecdsa_err_final_verify
+    JMP         ecdsa_sign_fail
+ecdsa_sign_generic_fail:
+    MOVI        r3,  ret_ecdsa_err_generic
     JMP         ecdsa_sign_fail
 ecdsa_sign_fail:
     MOVI        r2,  l3_result_fail

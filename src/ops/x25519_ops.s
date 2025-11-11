@@ -19,12 +19,23 @@
 ; ==============================================================================
 
 op_x25519_end:
-    MOVI    r1, 32
+    MOVI    r1,  32
+    JMP     set_res_word
+
+op_x25519_fail:
+    MOVI    r31, 0
+    CALL    clear_data_in
+    CALL    clear_regs_before_return
+    MOVI    r1,  0
     JMP     set_res_word
 
 op_x25519_key_fail:
     MOVI    r0,  ret_key_err
-    JMP     op_x25519_end
+    JMP     op_x25519_fail
+
+op_x25519_ctx_fail:
+    MOVI    r0,  ret_ctx_err
+    JMP     op_x25519_fail
 
 ; ======================================================
 ;   x25519_kpair_gen
@@ -49,8 +60,8 @@ op_x25519_kpair_gen:
 
     CALL    x25519_full_masked
 
-    CMPI    r0,  0
-    BRNZ    op_x25519_end
+    CMPI    r0,  ret_op_success
+    BRNZ    op_x25519_fail
     ST      r11, x25519_kpair_gen_output_etpub
     JMP     op_x25519_end
 
@@ -71,8 +82,8 @@ op_x25519_sc_et_eh:
 
     CALL    x25519_full_masked
 
-    CMPI    r0,  0
-    BRNZ    op_x25519_end
+    CMPI    r0,  ret_op_success
+    BRNZ    op_x25519_fail
     ST      r11, x25519_sc_et_eh_output_r1
     JMP     op_x25519_end
 
@@ -95,8 +106,8 @@ op_x25519_sc_et_sh:
 
     CALL    x25519_full_masked
 
-    CMPI    r0,  0
-    BRNZ    op_x25519_end
+    CMPI    r0,  ret_op_success
+    BRNZ    op_x25519_fail
     ST      r11, x25519_sc_et_sh_output_r2
     JMP     op_x25519_end
 
@@ -126,10 +137,12 @@ op_x25519_sc_st_eh:
 
     CALL    x25519_full_masked
 
-    CMPI    r0,  0
-    BRNZ    op_x25519_end
+    CMPI    r0,  ret_op_success
+    BRNZ    op_x25519_fail
     ST      r11, x25519_sc_st_eh_output_r3
-    MOVI    r19, 0
-    MOVI    r29, 0
-    MOVI    r28, 0
+
+    MOVI    r31, 0
+    CALL    clear_data_in
+    CALL    clear_regs_before_return
+
     JMP     op_x25519_end

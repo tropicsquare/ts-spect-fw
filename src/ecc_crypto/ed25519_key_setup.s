@@ -97,14 +97,14 @@ ed25519_key_setup_start:
     MOV         r9,  r13
     MOV         r10, r14
 
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
 
     ; Calculate A = s.G and check validity of the result
     CALL        spm_ed25519_long
-    CMPI        r0,  0
+    CMPI        r0,  pass_val
     BRNZ        ed25519_key_setup_spm_fail
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
 
     ; Transform A back to affine coordinates
@@ -188,7 +188,7 @@ ed25519_key_setup_origin_continue:
     BRE         ed25519_key_setup_kbus_fail
 
     ; Return success
-    MOVI        r3,  0
+    MOVI        r3,  ret_op_success
     RET
 
 ed25519_key_setup_spm_fail:

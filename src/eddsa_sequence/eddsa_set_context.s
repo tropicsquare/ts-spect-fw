@@ -15,13 +15,11 @@
 ; Loads keys from slot, loads Secure Chanel Hash and Nonce.
 ;
 ;   Public key A ----------------> ca_eddsa_sign_internal_A
-;   Private key part 's1' --------> ca_eddsa_sign_internal_s1
-;   Private key part 's2' --------> ca_eddsa_sign_internal_s2
+;   Private key part 's1' -------> ca_eddsa_sign_internal_s1
+;   Private key part 's2' -------> ca_eddsa_sign_internal_s2
 ;   Private key part 'prefix' ---> r20
 ;   Secure Channel Hash ---------> r16
 ;   Secure Channel Nonce --------> r17
-;
-;   Rerandomize private keys and store them back to flash slot
 ;
 ; ==============================================================================
 ;

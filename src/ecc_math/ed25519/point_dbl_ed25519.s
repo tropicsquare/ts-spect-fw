@@ -27,11 +27,11 @@
 ;   Z3 = F*G
 ;
 ; Input:
-;               X    Y    Z    T
-;   Point Q1 = (r7,  r8,  r9,  r10)
+;                X    Y    Z    T
+;   Point Q1  = (r7,  r8,  r9,  r10)
 ;
 ; Output:
-;   Q1 = 2.Q1
+;   Q1 = 2.Q1 = (r7,  r8,  r9,  r10)
 ;
 ; Expects:
 ;   Ed25519 prime in r31

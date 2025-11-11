@@ -220,11 +220,6 @@ op_ecc_key_erase:
 
 op_ecc_key_clean:
     MOVI    r31, 0
-    ; Clear Data Ram In
     CALL    clear_data_in
-    ; Clear key registers
-    MOVI    r28, 0
-    MOVI    r29, 0
-    MOVI    r2,  0
-    MOVI    r10, 0
+    CALL    clear_regs_before_return
     JMP     set_res_word
