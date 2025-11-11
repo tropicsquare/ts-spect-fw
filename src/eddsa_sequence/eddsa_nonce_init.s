@@ -28,10 +28,7 @@ op_eddsa_nonce_init:
     ST          r1,  ca_op_link
 
     GRV         r7
-    GRV         r8
-    GRV         r9
-    GRV         r10
-_eddsa_tmac_it_bp_1:
+    CALL        extend_tmac_mask
     TMAC_IT     r7
 
     TMAC_IS     r20, tmac_dst_eddsa_sign

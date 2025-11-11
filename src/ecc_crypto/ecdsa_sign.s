@@ -27,10 +27,9 @@
 ; ==============================================================================
 
 ecdsa_sign:
-    GRV         r3
-    GRV         r4
-    GRV         r5
-    GRV         r6
+    GRV         r7
+    CALL        extend_tmac_mask
+    TMAC_IT     r7
 
     TMAC_IT     r3
     TMAC_IS     r20, tmac_dst_ecdsa_sign
@@ -80,12 +79,10 @@ ecdsa_sign_tmac_padding_loop:
 
     TMAC_RD     r27
 
-; Get k2 from k1
-    ; Use SHA-512 to derive new 816 bit mask from the previous
-    HASH_IT
-    HASH        r3,  r3
-    HASH        r5,  r3
-    TMAC_IT     r3
+    ; Get k2 from k1
+    ; Update the mask using the 256 LSBs of the previous
+    CALL        extend_tmac_mask
+    TMAC_IT     r7
 
     TMAC_IS     r27, tmac_dst_ecdsa_sign
 
@@ -99,6 +96,7 @@ ecdsa_sign_tmac_padding_loop_k2:
 
     TMAC_UP     r1
     TMAC_RD     r28
+    TMAC_IT     r7      ; Destroy the TMAC state
 
     ST          r18, ca_ecdsa_sign_internal_z
 

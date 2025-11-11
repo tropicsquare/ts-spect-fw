@@ -68,12 +68,10 @@ p256_key_setup_generate_k:
 ;   Compute w = TMAC(d, "", 0xA)
 ; ==============================================================================
 p256_key_setup_start:
-    GRV     r0
-    GRV     r1
-    GRV     r2
-    GRV     r3
+    GRV     r7
+    CALL    extend_tmac_mask
+    TMAC_IT r7
 
-    TMAC_IT r0
     TMAC_IS r28, tmac_dst_ecdsa_key_setup
 
     MOVI    r2,  0x04

@@ -102,12 +102,9 @@ eddsa_nonce_finish_last_update:
 
     TMAC_RD     r27
 
-; Get r2 from r1
-_eddsa_tmac_it_bp_2:
-    ;  Use SHA-512 to derive new 816 bit mask from the previous
-    HASH_IT
-    HASH        r7,  r7
-    HASH        r9,  r7
+    ; Get r2 from r1
+    ; Update the mask using the 256 LSBs of the previous
+    CALL        extend_tmac_mask
     TMAC_IT     r7
     TMAC_IS     r27, tmac_dst_eddsa_sign
 
@@ -121,6 +118,7 @@ eddsa_nonce_finish_tmac_padding_loop_k2:
 
     TMAC_UP     r1
     TMAC_RD     r28
+    TMAC_IT     r7      ; Destroy the TMAC state
 
     LD          r31, ca_q25519
     REDP        r27, r28, r27
