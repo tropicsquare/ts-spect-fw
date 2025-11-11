@@ -1,54 +1,63 @@
-# TS SPECT Firmware
+# TS SPECT Application Firmware
 
 This repository contains the Makefile and associated scripts necessary to build firmware for a specific project.
 
 The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling,
 releasing, and managing the firmware.
 
-[**SPECT Firmware API**](doc/spect_fw_api/spect_fw_api.pdf)
+## Licensing
+
+See [LICENSE](LICENSE) file
+
+---
 
 ## Table of Contents
 
-- [TS SPECT Firmware](#ts-spect-firmware)
-  - [Table of Contents](#table-of-contents)
-  - [Licensing ](#licensing-)
-  - [Repository structure ](#repository-structure-)
-  - [Prerequisites ](#prerequisites-)
-  - [Build firmware ](#build-firmware-)
-  - [Release ](#release-)
-  - [Test/Simulate firmware ](#testsimulate-firmware-)
-    - [Test Vectors ](#test-vectors-)
+[Repository structure ](#repository-structure-)
 
+[Documentation](#doc-)
 
-## Licensing <a name="license"></a>
----
-See [LICENSE file](LICENSE),
+[Prerequisites ](#prerequisites-)
 
+[Build firmware ](#build-firmware-)
+
+[Release ](#release-)
+
+[Test/Simulate firmware ](#testsimulate-firmware-)
 
 ## Repository structure <a name="repostruct"></a>
 
-- [`data`](data/) : configuration files for constants used by the firmware (primes, curve parameters, etc.)
 - [`doc`](doc/) : firmware and algorithms documentation
-- [`fit`](fit/) : directory dedicated to evaluation done by FIT, CTU in Prague
-- [`muni`](muni/) : (_obsolete_) directory dedicated to evaluation done by MUNI in Brno
-- [`release`](release/) : compiled application and debug firmware
-- [`release_boot`](release_boot/) : compiled firmware for EdDSA signature verification needed during TROPIC01 boot phase
-- [`scripts`](scripts/) : scripts needed to generate constants, memory layouts etc. from configuration files
-- [`src`](src/) : all firmware source files
-- [`tests`](tests/) : all python tests, models and custom test vectors
+- [`modules`](modules/) : submodules used by this project:
+   - [`ts-spect-sdk`](modules/ts-spect-sdk/) : SPECT SDK for firmware development
+- [`scripts`](scripts/) : support scripts
+- [`src`](src/) : firmware source files
+- [`tests`](tests/) : python tests
 
+## Documentation <a name="doc"></a>
+
+[**SPECT Firmware API**](doc/spect_fw_api/spect_fw_api.pdf)
+
+[**Misc Doc**](doc/README.md)
 
 ## Prerequisites <a name="prereq"></a>
 ---
-1. Cloning repository and setting the environment variable `TS_REPO_ROOT` to the repository root.
+1. Cloning the repository
 
    ```bash
-   # clone the spect firmware repository
+   # clone the spect application firmware repository
    git clone https://github.com/tropicsquare/ts-spect-fw.git --recurse-submodules
-
-   # set env var TS_REPO_ROOT from root of repository
    cd ts-spect-fw
+   ```
+
+2. Setting necessary environment variables
+
+   ```bash
+   # Set repository root
    export TS_REPO_ROOT=`pwd`
+
+   # Set default revision of Const ROM
+   export DEFAULT_CONST_ROM="revA"
    ```
 
 2. Ensure you have the `spect_compiler` and `spect_iss` binaries in the environment path. These are part
@@ -70,87 +79,47 @@ repository.
 The primary [`Makefile`](Makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware. Run the desired build target using `make`.
 
-
-1. To compile application firmware to `build` directory, use:
-
-   ```bash
-   make compile
-   ```
-
-2. To release application and boot firmware to `release` directory, use:
-
-   ```bash
-   make release
-   ```
-
-3. To compile MPW1 version of the firmware to `build_mpw` and `build_mpw1_boot` directory, use:
-
-   ```bash
-   make compile_mpw1 && make compile_boot_mpw1
-   ```
-
-2. To restore the state of the repository, use:
+1. To restore the state of the repository, use:
 
    ```bash
    make clear
    ```
 
-5. For a complete list of targets, consult the Makefile or run:
+2. To compile application firmware to `build` directory, use:
+
    ```bash
-   grep : Makefile | awk -F: '/^[^.]/ {print $1;}'
+   make compile
    ```
 
-## Release <a name="release"></a>
+3. To set a Const ROM version for the build, set the `ROM_VERSION` variable:
 
-Release application and boot firmware with
+   ```bash
+   make compile ROM_VERSION=<version>
+   ```
+   See available versions in [ts-spect-sdk](modules/ts-spect-sdk/data)
+
+## Release <a name="release"></a>
+---
+Release application firmware with
 
 ```bash
 make release
 ```
 
-This creates `release` directory with following structure:
+This creates `release` directory with following structure.
+
+`version` = `git describe --dirty`
 
 | Name | Type | Description |
 | - | - | - |
-| `spect_app.hex` | File | Compiled application firmware |
-| `spect_boot.hex` | File | Compiled boot firware |
-| `spect_const_rom_code.hex` | File | Constants ROM code |
-| `dump` | Directory |  Program and symbols dump files for both firmwares |
-| `log` | Directory | Compilation log files for both firmwares |
+| `spect_app_<version>.hex32` | File | Compiled application firmware |
+| `spect_app_<version>.hex` | Soft link | Link to `spect_app_<version>.hex32` |
+| `spect_const_rom_code_<version>.hex32` | File | Constants ROM code |
+| `spect_const_rom_code_<version>.hex` | Soft link | Link to `spect_const_rom_code_<version>.hex32` |
+| `compile.log` | File | Compilation log files |
+| `spect_ops_constants.h` | File | C header file with SPECT API defines |
+| `dump` | Directory |  Program and symbols dump files |
 
 ## Test/Simulate firmware <a name="fwtestsim"></a>
 ---
-Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The scripts generates or read test vector, preload SPECTs input buffers and key slots, setup configuration files for `spect_iss` and run it.
-
-Python tests expects firmware to be build before using `make`. Besides python tests, there are 3 scripts to run certain set of tests.
-
-| Name | Description |
-| - | - |
-| [`run_tests.sh`](tests/run_tests.sh) | Compiles and tests application firmware |
-| [`run_tests_mpw1.sh`](tests/run_tests_mpw1.sh) | Compiles and tests MPW1 firmware (app + boot) |
-| [`run_tests_release.sh`](tests/run_tests_release.sh) | Tests released firmware (app + boot), previously compiled to `release` directory |
-
-### Test Vectors <a name="testvec"></a>
-
-Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models).
-
-Test vectors can be also specified using YAML file and `--testvec` option to define parameters of test (private, public key, z coordinate, randomization).
-
-See [`testvec`](tests/testvec) for test vector examples.
-
-> **_NOTE:_** Only [`test_x25519_dbg.py`](tests/test_x25519_dbg.py) and [`test_ecdsa_dbg.py`](tests/test_ecdsa_dbg.py) currently supports custom test vectors.
-
-
-   ```bash
-   cd tests
-   ```
-
-   ```bash
-   ./test_x25519_dbg.py --testvec testvec/x25519_dbg_testvec.yml
-   ```
-
-   ```bash
-   ./test_ecdsa_dbg.py --testvec testvec/ecdsa_dbg_testvec.yml
-   ```
-
-   The `test_*.py` file controls test execution, output logs generate in `tests/<test_name_directory>`
+Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The tests use `models` and `spect_tester` from `ts-spect-sdk` submodule.
