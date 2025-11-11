@@ -1,3 +1,3 @@
 [submodule "modules/ts-spect-sdk"]
 	path = modules/ts-spect-sdk
-	url = ssh://git@tropic-gitlab.corp.sldev.cz:7999/internal/sw-design/ts-spect-sdk.git
+	url = ../../sw-design/ts-spect-sdk.git
