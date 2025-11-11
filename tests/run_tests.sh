@@ -1,8 +1,8 @@
 #! /bin/bash
 
-echo "*************************************************" 
+echo "*************************************************"
 echo "*  Compile Firmware"
-echo "*************************************************" 
+echo "*************************************************"
 
 make -C .. compile
 
@@ -17,21 +17,12 @@ tests=(\
     "eddsa_full_setup" \
     "ecdsa_full_setup" \
     "x25519_dbg" \
-    "eddsa_dbg" \
-    "ecdsa_dbg" \
-    "eddsa_verify"
+    "ecdsa_sign_dbg" \
 )
 
 declare -i ret_val=0
 
-echo ${1}
-
-export TS_SPECT_FW_TEST_DONT_DUMP=""
-
 for test in ${tests[@]}; do
-    echo "*************************************************" 
-    echo "*  Running test $test"
-    echo "*************************************************" 
     ./test_$test.py
     if [ $? -ne 0 ]; then
         ret_val=$((ret_val + 1))
@@ -39,7 +30,5 @@ for test in ${tests[@]}; do
 done
 
 echo "Failed $ret_val"
-
-unset -f TS_SPECT_FW_TEST_DONT_DUMP
 
 exit $ret_val

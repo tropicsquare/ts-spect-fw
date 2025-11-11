@@ -1,91 +1,107 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import os
 
-import test_common as tc
+from import_setup import import_setup
+import_setup()
 
-if __name__ == "__main__":
+from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.key_memory import KeyMem
+from spect_tester.spect_config import (
+    SpectOpStatus,
+    L3Result,
+    KeyTypes
+)
+from spect_tester.helpers import (
+    random_bytes,
+    get_main_defines,
+    get_input_source,
+    get_output_source,
+)
+from spect_tester.spect_default_fw import (
+    SpectDefaultFW
+)
 
-    args = tc.parser.parse_args()
-    seed = tc.set_seed(args)
-    rn.seed(seed)
-    print("seed:", seed)
+TEST_FULL_SLOT = "full_slot"
+TEST_EMPTY_SLOT = "empty_slot"
 
-    defines_set = tc.get_main_defines()
+SPECT_FW = SpectDefaultFW.Application
+defines_set = get_main_defines(SPECT_FW.s_file)
 
-    ops_cfg = tc.get_ops_config()
-    test_name = "ecc_key_erase"
+def test_run(tester: SpectTester, run_name: str):
+    test_run = tester.create_test_run(run_name)
+    test_run.cmd_start()
 
-    test_dir = tc.make_test_dir(test_name)
+    test_run.set_op("ecc_key_erase")
 
-    insrc = 0x4
-    if "IN_SRC_EN" in defines_set:
-        insrc = tc.insrc_arr[rn.randint(0,1)]
+    ################################################################################################
+    #   Set Input and Output source
+    ################################################################################################
+    input_mem = get_input_source(defines_set)
+    output_mem = get_output_source(defines_set)
 
-    outsrc = 0x5
-    if "OUT_SRC_EN" in defines_set:
-        outsrc = tc.outsrc_arr[rn.randint(0,1)]
-
-# ===================================================================================
-#   Full Slot
-# ===================================================================================
-
-    cmd_file = tc.get_cmd_file(test_dir)
+    test_run.set_input_source(input_mem.src)
+    test_run.set_output_source(output_mem.src)
 
     slot = rn.randint(0, 127)
-    privkey_slot = (slot << 1)
-    pubkey_slot = (slot << 1)+1
+    priv_slot = (slot << 1)
+    pub_slot = (slot << 1)+1
 
-    run_name = test_name + "_full_slot_" + f"{slot}"
-    tc.print_run_name(run_name)
+    if run_name.endswith(TEST_FULL_SLOT):
+        test_run.set_key(
+            key     = random_bytes(32),
+            ktype   = KeyTypes.ECC,
+            slot    = priv_slot,
+            offset  = 0
+        )
 
-    tc.set_key(cmd_file, 1, ktype=0x4, slot=privkey_slot, offset = 0)
-    tc.set_key(cmd_file, 1, ktype=0x4, slot=pubkey_slot, offset = 0)
+        test_run.set_key(
+            key     = random_bytes(32),
+            ktype   = KeyTypes.ECC,
+            slot    = pub_slot,
+            offset  = 0
+        )
 
-    tc.start(cmd_file)
+    l3_input_word = (slot<<8) + test_run.op_dict['id']
+    test_run.write_word(input_mem.base, l3_input_word)
 
-    input_word = (slot << 8) + tc.find_in_list("ecc_key_erase", ops_cfg)["id"]
+    test_run.set_input_size(0)
 
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
+    test_run.run()
 
-    ctx = tc.run_op(cmd_file, "ecc_key_erase", insrc, outsrc, 2, ops_cfg, test_dir, run_name=run_name)
+    status, data_out_size = test_run.get_res_word()
+    test_run.info(f"SPECT Status: 0x{status:02x}")
+    test_run.info(f"SPECT OutSize: {data_out_size}")
 
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+    if status != SpectOpStatus.RET_OP_SUCCESS:
+        test_run.error(f"Invalid SPECT Op Status")
 
-    if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        tc.print_failed()
-        sys.exit(1)
+    l3_result_word = test_run.read_word(output_mem.base)
+    l3_result = l3_result_word & 0xFF
 
-    if (SPECT_OP_DATA_OUT_SIZE != 1):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        tc.print_failed()
-        sys.exit(1)
+    if l3_result != L3Result.L3_RESULT_OK:
+        test_run.error(f"Invalid L3 Result")
 
-    tmp = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    l3_result = tmp & 0xFF
+    if test_run.key_slot_status(KeyTypes.ECC, priv_slot) != KeyMem.SlotStatus.EMPTY:
+        test_run.error(f"Private Key Slot status is not EMPTY")
 
-    if (l3_result != 0xc3):
-        print("L3 RESULT:", hex(l3_result))
-        tc.print_failed()
-        sys.exit(1)
+    if test_run.key_slot_status(KeyTypes.ECC, pub_slot) != KeyMem.SlotStatus.EMPTY:
+        test_run.error(f"Public Key Slot status is not EMPTY")
 
-    kmem_data, kmem_slots = tc.parse_key_mem(test_dir, run_name)
+    test_run.status_summary()
 
-    if kmem_slots[0x4][privkey_slot]:
-        print("Private Key Slot is not empty.")
-        tc.print_failed()
-        sys.exit(1)
+    if test_run.err_cnt == 0:
+        SpectTester.print_passed()
+    else:
+        SpectTester.print_failed()
 
-    if kmem_slots[0x4][pubkey_slot]:
-        print("Public Key Slot is not empty.")
-        tc.print_failed()
-        sys.exit(1)
+if __name__ == "__main__":
+    test_name = "ecc_key_erase"
+    tester = SpectTester(test_name)
 
-    tc.print_passed()
+    test_run(tester, f"{test_name}_{TEST_FULL_SLOT}")
+    test_run(tester, f"{test_name}_{TEST_EMPTY_SLOT}")
 
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm {test_dir}/*")
+    err_cnt = tester.count_errors()
 
-    sys.exit(0)
+    sys.exit(err_cnt)

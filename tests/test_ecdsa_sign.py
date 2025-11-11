@@ -1,197 +1,200 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-import os
+from enum import Enum
 
-import test_common as tc
+from import_setup import import_setup
+import_setup()
+
 import models.p256 as p256
 
-defines_set = tc.get_main_defines()
+from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_memory import SpectMem
+from spect_tester.spect_config import (
+    SpectOpStatus,
+    L3Result,
+    KeyTypes,
+    CurveType,
+    EccSlot
+)
+from spect_tester.helpers import (
+    random_bytes,
+    get_main_defines,
+    create_metadata,
+    int2bytes,
+    get_input_source,
+    get_output_source,
+)
+from spect_tester.spect_default_fw import (
+    SpectDefaultFW
+)
 
-def test_proc(test_type: str):
-    run_name = f"{test_name}_{test_type}"
-    tc.print_run_name(run_name)
+SPECT_FW = SpectDefaultFW.Application
+defines_set = get_main_defines(SPECT_FW.s_file)
 
-    cmd_file = tc.get_cmd_file(test_dir)
+class TestType(Enum):
+    OK = 0
+    EMPTY_SLOT = 1
+    INVALID_CURVE = 2
+    INVALID_SLOT_NUMBER = 3
 
-    rng = [rn.randint(0, 2**256-1) for i in range(16)]
-    tc.set_rng(test_dir, rng)
+def test_run(tester: SpectTester, test_type: TestType):
 
-    insrc = 0x4
-    if "IN_SRC_EN" in defines_set:
-        insrc = tc.insrc_arr[rn.randint(0,1)]
+    run_name = f"ecdsa_sign_{test_type.name.lower()}"
 
-    outsrc = 0x5
-    if "OUT_SRC_EN" in defines_set:
-        outsrc = tc.outsrc_arr[rn.randint(0,1)]
+    test_run = tester.create_test_run(run_name)
+    test_run.cmd_start()
 
-    slot = rn.randint(0, 7)
+    test_run.set_op("ecdsa_sign")
 
-    input_word = (slot << 8) + tc.find_in_list("ecdsa_sign", ops_cfg)["id"]
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
+    test_run.set_rng()
 
-    ########################################################################################################
-    # Empty Slot
-    ########################################################################################################
-    if test_type == "empty_slot":
-        tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
-        SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-        l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-        l3_result &= 0xFF
-        if SPECT_OP_STATUS != 0xF2:
-            print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
-            return 0
+    ################################################################################################
+    #   Set Input and Output source
+    ################################################################################################
+    input_mem = get_input_source(defines_set)
+    output_mem = get_output_source(defines_set)
 
-        if SPECT_OP_DATA_OUT_SIZE != 1:
-            print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
-            return 0
+    test_run.set_input_source(input_mem.src)
+    test_run.set_output_source(output_mem.src)
 
-        if l3_result != 0x12:
-            print("l3_result", hex(l3_result))
-            return 0
+    ################################################################################################
+    #   Create test vector and populate KeySlot
+    ################################################################################################
+    slot = rn.randint(0, 31)
+    priv_slot = (slot << 1)
+    pub_slot = (slot << 1)+1
 
-        return 1
-    ########################################################################################################
-    # Generate test vector
-    ########################################################################################################
-    d, w, Ax, Ay = p256.key_gen(tc.random_bytes(32))
+    metadata_curve = CurveType.P256
+    metadata_slot = slot
 
-    sch = tc.random_bytes(32)
-    scn = tc.random_bytes(4)
+    if test_type == TestType.INVALID_CURVE:
+        metadata_curve = CurveType.ED25519
+    if test_type == TestType.INVALID_SLOT_NUMBER:
+        metadata_slot = slot+1
 
-    z = tc.random_bytes(32)
+    pub_metadata_ref, priv_metadata_ref = create_metadata(
+        curve   = metadata_curve,
+        slot    = metadata_slot,
+        origin  = 0x1
+    )
+
+    d, w, Ax, Ay = p256.key_gen(random_bytes(32))
+    sch = random_bytes(32)
+    scn = random_bytes(4)
+    z   = random_bytes(32)
 
     r_ref, s_ref = p256.sign(d, w, sch, scn, z)
-    signature_ref = r_ref.to_bytes(32, 'big') + s_ref.to_bytes(32, 'big')
+    signature_ref = int2bytes(r_ref, endianity='big') + int2bytes(s_ref, endianity='big')
+    test_run.info(f"Signature ref: {signature_ref.hex()}")
 
     wmask = rn.randint(0, 2**256 - 1)
     w = w ^ wmask
     d2 = rn.randint(0, p256.q)
     d1 = (d - d2) % p256.q
 
-    tc.set_key(cmd_file, key=d1,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
-    tc.set_key(cmd_file, key=w,          ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
-    tc.set_key(cmd_file, key=d2,         ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
-    tc.set_key(cmd_file, key=wmask,      ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
+    pub = int2bytes(Ax) + int2bytes(Ay)
 
-    if test_type == "invalid_key_type":
-        invalid_metadata = "curve"
+    if test_type != TestType.EMPTY_SLOT:
+        test_run.set_key(priv_metadata_ref, KeyTypes.ECC, priv_slot, EccSlot.METADATA_OFFSET)
+        test_run.set_key(pub_metadata_ref,  KeyTypes.ECC, pub_slot,  EccSlot.METADATA_OFFSET)
+
+        test_run.set_key(int2bytes(d1),    KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k1'])
+        test_run.set_key(int2bytes(w),     KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k2'])
+        test_run.set_key(int2bytes(d2),    KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k3'])
+        test_run.set_key(int2bytes(wmask), KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k4'])
+
+        test_run.set_key(pub, KeyTypes.ECC, pub_slot, EccSlot.PUB_OFFSET)
+
+    if test_type == TestType.EMPTY_SLOT:
+        spect_status_ref = SpectOpStatus.RET_KEY_ERR
+        l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+    elif test_type == TestType.INVALID_CURVE:
+        spect_status_ref = SpectOpStatus.RET_CURVE_TYPE_ERR
+        l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+    elif test_type == TestType.INVALID_SLOT_NUMBER:
+        spect_status_ref = SpectOpStatus.RET_SLOT_METADATA_ERR
+        l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
     else:
-        invalid_metadata = None
+        spect_status_ref = SpectOpStatus.RET_OP_SUCCESS
+        l3_result_ref = L3Result.L3_RESULT_OK
 
-    _, _ = tc.gen_and_set_metadata(
-        curve=tc.P256_ID,
-        slot=slot,
-        origin=0x01,
-        cmd_file=cmd_file,
-        invalid_metadata=invalid_metadata
-    )
+    ################################################################################################
+    #   Write data and launch
+    ################################################################################################
+    l3_input_word = (slot << 8) + test_run.op_dict['id']
+    test_run.write_word(input_mem.base, l3_input_word)
 
-    tc.set_key(cmd_file, key=Ax, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["x"])
-    tc.set_key(cmd_file, key=Ay, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["y"])
+    test_run.write_bytes(input_mem.base+0x10, z)
+    test_run.write_bytes(SpectMem.DataRamIn.base + 0xA0, sch)
+    test_run.write_bytes(SpectMem.DataRamIn.base + 0xC0, scn)
 
-    tc.write_bytes(cmd_file, z, (insrc<<12) + 0x10)
-    tc.write_bytes(cmd_file, sch, 0x00A0)
-    tc.write_bytes(cmd_file, scn, 0x00C0)
+    test_run.set_input_size(32)
 
-    # Run Op
-    tc.run_op(cmd_file, "ecdsa_sign", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name)
+    test_run.run()
 
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-    l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-    l3_result &= 0xFF
+    ################################################################################################
+    #   Chech results
+    ################################################################################################
+    # check spect and l3 status
+    status, data_out_size = test_run.get_res_word()
+    test_run.info(f"SPECT Status: 0x{status:02x}")
+    test_run.info(f"SPECT OutSize: {data_out_size}")
 
-    ########################################################################################################
-    # Invalid Key Type
-    ########################################################################################################
-    if test_type == "invalid_key_type":
-        if SPECT_OP_STATUS != 0xF4:
-            print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
-            return 0
+    if status != spect_status_ref:
+        test_run.error(
+            f"Invalid SPECT Op Status\n"+
+            f"\tExpected {spect_status_ref:02x}\n"+
+            f"\tObserved {status:02x}"
+        )
 
-        if SPECT_OP_DATA_OUT_SIZE != 1:
-            print("SPECT_OP_DATA_OUT_SIZE", hex(SPECT_OP_DATA_OUT_SIZE))
-            return 0
+    l3_result_word = test_run.read_word(output_mem.base)
+    l3_result = l3_result_word & 0xFF
 
-        if l3_result != 0x12:
-            print("l3_result", hex(l3_result))
-            return 0
-        return 1
-    ########################################################################################################
-    # Valid
-    ########################################################################################################
+    if l3_result != l3_result_ref:
+        test_run.error(
+            f"Invalid L3 Result\n"+
+            f"\tExpected {l3_result_ref:02x}\n"+
+            f"\tObserved {l3_result:02x}"
+        )
+
+    # If error run, end
+    if test_type != TestType.OK:
+        test_run.status_summary()
+        if test_run.err_cnt == 0:
+            SpectTester.print_passed()
+        else:
+            SpectTester.print_failed()
+
+        return test_run.err_cnt
+
+    # Check output
+    if data_out_size != 80:
+        test_run.error(f"Invalid output size {data_out_size}")
+
+    signature = test_run.read_bytes(output_mem.base+0x10, 64)
+    test_run.info(f"Signature: {signature.hex()}")
+
+    if signature != signature_ref:
+        test_run.error(f"Invalid signature")
+
+    test_run.status_summary()
+    if test_run.err_cnt == 0:
+        SpectTester.print_passed()
     else:
-        if SPECT_OP_STATUS != 0x00:
-            print("SPECT_OP_STATUS", hex(SPECT_OP_STATUS))
-            return 0
+        SpectTester.print_failed()
 
-        if l3_result != 0xc3:
-            print("l3_result", hex(l3_result))
-            return 0
-
-        sing_size = (SPECT_OP_DATA_OUT_SIZE - 16) // 4
-        signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, sing_size, string=True)
-
-        if "ECC_KEY_RERANDOMIZE" in defines_set:
-            kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
-
-            remasked_d1      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=0)
-            remasked_w       = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=8)
-            remasked_d2      = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=16)
-            remasked_wmask   = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=24)
-
-            b1 = ((remasked_d1 + remasked_d2) % p256.q) == ((d1 + d2) % p256.q)
-            b2 = (remasked_d1 != d1) and (remasked_d2 != d2)
-            b3 = (remasked_w ^ remasked_wmask) == (w ^ wmask)
-            b4 = (remasked_w != w) and (remasked_wmask != wmask)
-
-            if not(b1 and b2):
-                print("Remasking of d failed.")
-                return 0
-
-            if not(b3 and b4):
-                print("Remasking of w failed.")
-                return 0
-
-        if not(signature_ref == signature):
-            print("signature    ", signature.hex())
-            print("signature_ref", signature_ref.hex())
-            return 0
-
-        return 1
+    return test_run.err_cnt
 
 if __name__ == "__main__":
-
-    args = tc.parser.parse_args()
-    seed = tc.set_seed(args)
-    rn.seed(seed)
-    print("seed:", seed)
-
-    ops_cfg = tc.get_ops_config()
     test_name = "ecdsa_sign"
-    test_dir = tc.make_test_dir(test_name)
+    tester = SpectTester(test_name)
 
-    res = 0
+    test_run(tester, TestType.OK)
+    test_run(tester, TestType.EMPTY_SLOT)
+    test_run(tester, TestType.INVALID_CURVE)
+    test_run(tester, TestType.INVALID_SLOT_NUMBER)
 
-    if not test_proc("empty_slot"):
-        res |= 1
-        tc.print_failed()
-    else:
-        tc.print_passed()
+    err_cnt = tester.count_errors()
 
-    if not test_proc("invalid_key_type"):
-        res |= 2
-        tc.print_failed()
-    else:
-        tc.print_passed()
-
-    if not test_proc("valid"):
-        res |= 4
-        tc.print_failed()
-    else:
-        tc.print_passed()
-
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm -r {test_dir}")
-
-    sys.exit(res)
+    sys.exit(err_cnt)

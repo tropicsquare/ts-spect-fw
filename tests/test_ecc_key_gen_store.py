@@ -3,200 +3,273 @@ import sys
 import random as rn
 import itertools
 
-import test_common as tc
+from import_setup import import_setup
+import_setup()
 
 import models.ed25519 as ed25519
 import models.p256 as p256
 
-ecc_key_origin = {
-    "ecc_key_gen" : 0x1,
-    "ecc_key_store" : 0x2
+from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_config import (
+    SpectOpStatus,
+    L3Result,
+    KeyTypes,
+    CurveType,
+    EccSlot,
+    KeyOrigin,
+)
+from spect_tester.key_memory import KeyMem
+from spect_tester.helpers import (
+    random_bytes,
+    get_main_defines,
+    create_metadata,
+    int2bytes,
+    bytes2int,
+    get_input_source,
+    get_output_source,
+)
+from spect_tester.spect_default_fw import (
+    SpectDefaultFW
+)
+
+ECC_KEY_ORIGIN = {
+    "ecc_key_gen"   : KeyOrigin.GENERATE,
+    "ecc_key_store" : KeyOrigin.STORE
 }
 
-defines_set = tc.get_main_defines()
+SPECT_FW = SpectDefaultFW.Application
+defines_set = get_main_defines(SPECT_FW.s_file)
 
-def test_process(test_dir, run_id, insrc, outsrc, key_type, op, full_slot=False):
+TEST_GENERATE = "ecc_key_gen"
+TEST_STORE = "ecc_key_store"
 
-    cmd_file = tc.get_cmd_file(test_dir)
+TEST_FULL_SLOT = "full_slot"
+TEST_EMPTY_SLOT = "empty_slot"
 
+def __get_p256_keys(k: bytes):
+    k1, k2, k3, k4 = p256.key_gen(k)
+    return int2bytes(k1), int2bytes(k2), int2bytes(k3) + int2bytes(k4)
+
+def __get_ed25519_keys(k: bytes):
+    k1, k2, k3 = ed25519.key_gen(k)
+    k3 = int2bytes(bytes2int(k3, endianity='big'))
+    return int2bytes(k1), int2bytes(k2), k3
+
+def __unmask_privs(k1_1: bytes, k1_2: bytes, k2_1: bytes, k2_2: bytes, curve_type: CurveType):
+    if curve_type == CurveType.ED25519:
+        mod = ed25519.q
+    else:
+        mod = p256.q
+
+    k1 = int2bytes((bytes2int(k1_1) + bytes2int(k1_2)) % mod)
+    k2 = bytes(x ^ y for x, y in zip(k2_1, k2_2))
+
+    return k1, k2
+
+def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_state: str):
+
+    run_name = f"{op_name}_{curve_type.name.lower()}_{slot_state}"
+
+    test_run = tester.create_test_run(run_name)
+    test_run.cmd_start()
+
+    test_run.set_op(op_name)
+
+    ################################################################################################
+    #   Set Input and Output source
+    ################################################################################################
+    input_mem = get_input_source(defines_set)
+    output_mem = get_output_source(defines_set)
+
+    test_run.set_input_source(input_mem.src)
+    test_run.set_output_source(output_mem.src)
+
+    ################################################################################################
+    #   Set RNG
+    ################################################################################################
     rng = [rn.randint(1, 2**256-1) for _ in range(10)]
-    tc.set_rng(test_dir, rng)
+    test_run.set_rng(rng)
 
-    k = rng[0].to_bytes(32, 'little')
-
+    ################################################################################################
+    #   Create test vector
+    ################################################################################################
     slot = rn.randint(0, 31)
+    priv_slot = (slot << 1)
+    pub_slot = (slot << 1)+1
 
-    if full_slot:
-        slot_state = "full_slot"
-    else:
-        slot_state = "empty_slot"
-
-    run_name = f"{op}_{run_id}_{slot}_{slot_state}"
-
-    tc.print_run_name(run_name)
-
-    if "ram" in run_id and (
-        ("IN_SRC_EN" not in defines_set) or ("OUT_SRC_EN" not in defines_set)
-    ):
-        tc.print_test_skipped("INOUT_SRC debug feature is disabled.")
-        return 0
-
-    if key_type == tc.Ed25519_ID:
-        priv1_ref, priv2_ref, pub1_ref = ed25519.key_gen(k)
-        pub1_ref = int.from_bytes(pub1_ref, 'big')
-        pub2_ref = 0
-    else:
-        if op == "ecc_key_gen":
-            kbytes = rng[1].to_bytes(32, 'big') + rng[0].to_bytes(32, 'big')
-            kint = int.from_bytes(kbytes, 'big') % p256.q
+    if curve_type == CurveType.ED25519:
+        if op_name == TEST_GENERATE:
+            k = int2bytes(rng[0])
         else:
-            kint = rn.randint(1, p256.q - 1)
-        k = kint.to_bytes(32, 'big')
-        priv1_ref, priv2_ref, pub1_ref, pub2_ref = p256.key_gen(k)
+            k = random_bytes(32)
+        priv1_ref, priv2_ref, pub_ref = __get_ed25519_keys(k)
+        pub_size = 32
 
-    priv_metadata_ref = ((slot<<24) | (tc.SLOT_PRIVATE<<16) | (ecc_key_origin[op]<<8) | key_type)
-    pub_metadata_ref = ((slot<<24) | (tc.SLOT_PUBLIC<<16) | (ecc_key_origin[op]<<8) | key_type)
-
-    tc.start(cmd_file)
-    tc.gpr_preload(cmd_file)
-
-    input_word = (key_type << 24) + (slot << 8) + tc.find_in_list(op, ops_cfg)["id"]
-
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
-    if full_slot:
-        tc.set_key(cmd_file, 0x1234, ktype=0x4, slot=slot*2, offset=0)
-
-    if op == "ecc_key_store":
-        tc.write_bytes(cmd_file, k, (insrc<<12) + 0x10)
-
-    ctx = tc.run_op(cmd_file, op, insrc, outsrc, 3, ops_cfg, test_dir, run_name=run_name)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS and not full_slot):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 1
-
-    if (SPECT_OP_STATUS == 0 and full_slot):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 1
-
-    if (SPECT_OP_DATA_OUT_SIZE != 1):
-        print("SPECT_OP_DATA_OUT_SIZE:", hex(SPECT_OP_DATA_OUT_SIZE))
-        return 1
-
-    kmem_data, kmem_slots = tc.parse_key_mem(test_dir, run_name)
-
-    if not full_slot:
-        if not kmem_slots[0x4][slot<<1]:
-            print("Private Key Slot is empty.")
-            return 1
-
-        if not kmem_slots[0x4][(slot<<1)+1]:
-            print("Public Key Slot is empty.")
-            return 1
-
-        priv1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
-        priv2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
-        priv3 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
-        priv4 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
-        priv_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.METADATA_OFFSET)
-
-        if key_type == tc.Ed25519_ID:
-            priv1 = (priv1 + priv3) % ed25519.q
+    elif curve_type == CurveType.P256:
+        if op_name == TEST_GENERATE:
+            k = int2bytes(((rng[1]<<256) + (rng[0])) % p256.q, endianity='big')
         else:
-            priv1 = (priv1 + priv3) % p256.q
+            k = int2bytes(rn.randint(1, p256.q -1))
+        priv1_ref, priv2_ref, pub_ref = __get_p256_keys(k)
+        pub_size = 64
 
-        priv2 = priv2 ^ priv4
+    test_run.info(f"k: {k.hex()}")
 
-        pub1 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["x"])
+    test_run.info(f"Priv1 ref: {priv1_ref.hex()}")
+    test_run.info(f"Priv2 ref: {priv2_ref.hex()}")
+    test_run.info(f"Pub ref:   {pub_ref.hex()}")
 
-        pub2 = pub2_ref
-        if key_type == tc.P256_ID:
-            pub2 = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["y"])
+    pub_metadata_ref, priv_metadata_ref = create_metadata(
+        curve   = curve_type,
+        slot    = slot,
+        origin  = ECC_KEY_ORIGIN[op_name]
+    )
 
-        pub_metadata = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1)+1, offset=tc.METADATA_OFFSET)
+    test_run.info(f"Priv Metadata ref: {priv_metadata_ref.hex()}")
+    test_run.info(f"Pub Metadata ref:  {pub_metadata_ref.hex()}")
 
-        if not((
-            priv1 == priv1_ref and
-            priv2 == priv2_ref and
-            pub1 == pub1_ref and
-            pub2 == pub2_ref and
-            priv_metadata == priv_metadata_ref and
-            pub_metadata == pub_metadata_ref
-        )):
-            print("Priv metadata:   ", hex(priv_metadata))
-            print("Pub metadata:    ", hex(pub_metadata))
-            print("priv1:           ", hex(priv1))
-            print("priv1_ref:       ", hex(priv1_ref))
-            print()
-            print("priv2:           ", hex(priv2))
-            print("priv2_ref:       ", hex(priv2_ref))
-            print()
-            print("priv3:           ", hex(priv3))
-            print("priv4:           ", hex(priv4))
-            print()
-            print("pub1:            ", hex(pub1))
-            print("pub1_ref:        ", hex(pub1_ref))
-            print()
-            print("pub2:            ", hex(pub2))
-            print("pub2_ref:        ", hex(pub2_ref))
-            print()
-            return 1
+    if slot_state == TEST_FULL_SLOT:
+        spect_status_ref = SpectOpStatus.RET_KEY_ERR
+        l3_result_ref = L3Result.L3_RESULT_FAIL
+    elif curve_type == CurveType.INVALID:
+        spect_status_ref = SpectOpStatus.RET_CURVE_TYPE_ERR
+        l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+    else:
+        spect_status_ref = SpectOpStatus.RET_OP_SUCCESS
+        l3_result_ref = L3Result.L3_RESULT_OK
 
+    ################################################################################################
+    #   Write data and launch
+    ################################################################################################
+    l3_input_word = (curve_type << 24) + (slot << 8) + test_run.op_dict['id']
+    test_run.write_word(input_mem.base, l3_input_word)
 
+    if op_name == TEST_GENERATE:
+        test_run.set_input_size(0)
+    else:
+        test_run.set_input_size(32)
 
-    l3_result = tc.read_output(test_dir, run_name, (outsrc << 12), 1)
-    l3_result &= 0xFF
+    if op_name == TEST_STORE:
+        test_run.write_bytes(input_mem.base+0x10, k)
 
-    if (l3_result != 0xc3 and not full_slot):
-        print("L3 RESULT:", hex(l3_result))
-        return 1
+    if slot_state == TEST_FULL_SLOT:
+        test_run.set_key(
+            key     = random_bytes(32),
+            ktype   = KeyTypes.ECC,
+            slot    = priv_slot,
+            offset  = 0
+        )
+        test_run.set_key(
+            key     = random_bytes(32),
+            ktype   = KeyTypes.ECC,
+            slot    = pub_slot,
+            offset  = 0
+        )
 
-    if (l3_result != 0x3c and full_slot):
-        print("L3 RESULT:", hex(l3_result))
-        return 1
+    test_run.run()
 
-    return 0
+    ################################################################################################
+    #   Chech results
+    ################################################################################################
+    # check spect and l3 status
+    status, data_out_size = test_run.get_res_word()
+    test_run.info(f"SPECT Status: 0x{status:02x}")
+    test_run.info(f"SPECT OutSize: {data_out_size}")
+
+    if status != spect_status_ref:
+        test_run.error(
+            f"Invalid SPECT Op Status\n"+
+            f"\tExpected {spect_status_ref:02x}\n"+
+            f"\tObserved {status:02x}"
+        )
+
+    l3_result_word = test_run.read_word(output_mem.base)
+    l3_result = l3_result_word & 0xFF
+
+    if l3_result != l3_result_ref:
+        test_run.error(
+            f"Invalid L3 Result\n"+
+            f"\tExpected {l3_result_ref:02x}\n"+
+            f"\tObserved {l3_result:02x}"
+        )
+
+    # If full slot or invalid curve, end
+    if slot_state == TEST_FULL_SLOT or curve_type == CurveType.INVALID:
+        test_run.status_summary()
+        if test_run.err_cnt == 0:
+            SpectTester.print_passed()
+        else:
+            SpectTester.print_failed()
+
+        return test_run.err_cnt
+
+    # Check slot states
+    if test_run.key_slot_status(KeyTypes.ECC, priv_slot) != KeyMem.SlotStatus.FULL:
+        test_run.error("Private slot not populated")
+    if test_run.key_slot_status(KeyTypes.ECC, pub_slot) != KeyMem.SlotStatus.FULL:
+        test_run.error("Public slot not populated")
+
+    # Read and unmask private keys, check
+    priv1 = test_run.read_key(KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k1'])
+    priv2 = test_run.read_key(KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k2'])
+    priv3 = test_run.read_key(KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k3'])
+    priv4 = test_run.read_key(KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k4'])
+    priv_metadata = test_run.read_key(KeyTypes.ECC, priv_slot, EccSlot.METADATA_OFFSET, size=4)
+
+    priv1, priv2 = __unmask_privs(priv1, priv3, priv2, priv4, curve_type)
+
+    test_run.info(f"Priv1: {priv1.hex()}")
+    test_run.info(f"Priv2: {priv2.hex()}")
+    test_run.info(f"Priv Metadata: {priv_metadata_ref.hex()}")
+
+    if priv1 != priv1_ref:
+        test_run.error("Priv1 mismatch")
+    if priv2 != priv2_ref:
+        test_run.error("Priv2 mismatch")
+    if priv_metadata != priv_metadata_ref:
+        test_run.error("Priv metadata mismatch")
+
+    # Read public key, check
+    pub = test_run.read_key(KeyTypes.ECC, pub_slot, EccSlot.PUB_OFFSET, size=pub_size)
+    pub_metadata = test_run.read_key(KeyTypes.ECC, pub_slot, EccSlot.METADATA_OFFSET, size = 4)
+
+    test_run.info(f"Pub Metadata: {pub_metadata.hex()}")
+    test_run.info(f"Pub: {pub.hex()}")
+
+    if pub != pub_ref:
+        test_run.error("Pub mismatch")
+    if pub_metadata != pub_metadata_ref:
+        test_run.error("Pub metadata mismatch")
+
+    test_run.status_summary()
+
+    # End
+    if test_run.err_cnt == 0:
+        test_run.info("Test PASSED")
+        SpectTester.print_passed()
+    else:
+        SpectTester.print_failed()
+
+    return test_run.err_cnt
 
 if __name__ == "__main__":
-
-    ret = 0
-
-    args = tc.parser.parse_args()
-    seed = tc.set_seed(args)
-    rn.seed(seed)
-    print("seed:", seed)
-
-    ops_cfg = tc.get_ops_config()
     test_name = "ecc_key_gen_store"
-
-    test_dir = tc.make_test_dir(test_name)
+    tester = SpectTester(test_name)
 
     test_vars = [
-        ["ecc_key_gen", "ecc_key_store"],
-        [0x0, 0x4],
-        [tc.Ed25519_ID, tc.P256_ID],
-        [True, False]
+        [TEST_GENERATE,  TEST_STORE],           # op_name
+        [CurveType.P256, CurveType.ED25519],    # curve type
+        [TEST_FULL_SLOT, TEST_EMPTY_SLOT]       # slot state
     ]
 
-    all_comb = list(itertools.product(*test_vars))
-    fail_flag = 0
+    for test_comb in list(itertools.product(*test_vars)):
+        test_run(
+            tester,
+            op_name     = test_comb[0],
+            curve_type  = test_comb[1],
+            slot_state  = test_comb[2]
+        )
 
-    src = {0x0: "ram", 0x4: "cpb"}
-    curve_str = {tc.Ed25519_ID: "ed25519", tc.P256_ID: "p256"}
+    err_cnt = tester.count_errors()
 
-    for tst_comb in all_comb:
-        op = tst_comb[0]
-        insrc = tst_comb[1]
-        outsrc = tst_comb[1]+1
-        curve = tst_comb[2]
-        full_slot = tst_comb[3]
-
-        if (test_process(test_dir, f"{curve_str[curve]}_{src[insrc]}", insrc, outsrc, curve, op, full_slot)):
-            tc.print_failed()
-            fail_flag = fail_flag | 1
-        else:
-            tc.print_passed()
-
-    sys.exit(fail_flag)
+    sys.exit(err_cnt)
