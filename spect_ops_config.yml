@@ -138,26 +138,6 @@
     - name : signature
       address : 0x10
 
-- name : eddsa_verify
-  id : 0x4B
-  input :
-    - name : R
-      address : 0x20
-      base : 0x0000
-    - name : S
-      address : 0x40
-      base : 0x0000
-    - name : pubkey
-      address : 0x60
-      base : 0x0000
-    - name : message
-      address : 0x80
-      base : 0x0000
-  output :
-    - name : result
-      address : 0x00
-      base : 0x1000
-
 ############################################
 # ECDSA
 ############################################
@@ -184,42 +164,6 @@
   output :
     - name : signature
       address : 0x10
-
-############################################
-# SHA
-############################################
-- name : sha512
-  id : 0x50
-  input :
-    - name : data0
-      address : 0x10
-      base : 0x0000
-    - name : data1
-      address : 0x30
-      base : 0x0000
-    - name : data2
-      address : 0x50
-      base : 0x0000
-    - name : data3
-      address : 0x70
-      base : 0x0000
-
-- name : sha512_init
-  id : 0x51
-
-- name : sha512_update
-  id : 0x52
-  
-- name : sha512_final
-  id : 0x53
-  output :
-    - name : digest0
-      address : 0x10
-      base : 0x1000
-    - name : digest1
-      address : 0x30
-      base : 0x1000
-
 
 ############################################
 # Debug
