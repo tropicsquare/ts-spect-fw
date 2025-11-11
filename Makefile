@@ -65,7 +65,7 @@ compile: check_env const_rom ops_constants
 	rm -rf ${BUILD_DIR}
 	mkdir ${BUILD_DIR}
 
-	mv ${CONST_ROM_DATA}/spect_const_rom_code_${ROM_VERSION}.hex32 ${BUILD_DIR}/spect_const_rom_code.hex32
+	mv ${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}.hex32 ${BUILD_DIR}/spect_const_rom.hex32
 
 	${COMPILER} \
 	--isa-version=${ISA_VERSION} \
