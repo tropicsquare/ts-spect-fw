@@ -1,19 +1,18 @@
 SRC_DIR = ${TS_REPO_ROOT}/src
-FIT_DIR = ${TS_REPO_ROOT}/fit
-
-BUILD_DIR_MPW1 = ${TS_REPO_ROOT}/build_mpw1
 BUILD_DIR = ${TS_REPO_ROOT}/build
-
-BUILD_DIR_BOOT = ${TS_REPO_ROOT}/build_boot
-BUILD_DIR_MPW1_BOOT = ${TS_REPO_ROOT}/build_mpw1_boot
-
 RELEASE_DIR = ${TS_REPO_ROOT}/release
 
 COMPILER = spect_compiler
 ISS = spect_iss
 
-MEM_GEN = ${TS_REPO_ROOT}/scripts/gen_mem_files.py
-OPS_GEN = ${TS_REPO_ROOT}/scripts/gen_spect_ops_constants.py
+SDK = ${TS_REPO_ROOT}/modules/ts-spect-sdk
+
+MEM_GEN = ${SDK}/scripts/gen_mem_files.py
+OPS_GEN_S = ${SDK}/scripts/gen_spect_ops_constants_s.py
+OPS_GEN_C = ${SDK}/scripts/gen_spect_ops_constants_c.py
+
+CONST_ROM_DATA = ${SDK}/data
+ROM_VERSION = ${DEFAULT_CONST_ROM}
 
 ISA_VERSION=2
 FW_PARITY = 2 	# even
@@ -35,12 +34,7 @@ check_env:
 ############################################################################################################
 
 clear: check_env
-	rm -rf ${BUILD_DIR_MPW1}
 	rm -rf ${BUILD_DIR}
-	rm -rf ${BUILD_DIR_MPW1_BOOT}
-	rm -rf ${BUILD_DIR_BOOT}
-	rm -rf ${RELEASE_DIR}
-	rm -f ${TS_REPO_ROOT}/data/*.hex
 	rm -f ${SRC_DIR}/mem_layouts/constants_layout.s
 	rm -f ${SRC_DIR}/constants/spect_ops_constants.s
 
@@ -49,95 +43,62 @@ clear: check_env
 ############################################################################################################
 
 const_rom:
-	${MEM_GEN} ${TS_REPO_ROOT}/data/const_rom_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
-
-data_ram_in_const:
-	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_data_in_layout.s ${SRC_DIR}/mem_layouts/constants_data_in_layout.s
-
-data_ram_in_const_boot:
-	${MEM_GEN} ${TS_REPO_ROOT}/data/data_ram_in_const_boot_config.yml
-	mv ${TS_REPO_ROOT}/data/constants_data_in_boot_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
+	$(info == Building Const ROM =================================================)
+	$(info Const ROM version: $(ROM_VERSION))
+	${MEM_GEN} \
+	--cfg=${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}.yml
 
 ops_constants:
-	${OPS_GEN} ${TS_REPO_ROOT}/spect_ops_config.yml
+	$(info == Building Ops Constants =============================================)
+	${OPS_GEN_S} \
+	--cfg=${TS_REPO_ROOT}/spect_ops_config.yml \
+	--file=${SRC_DIR}/constants/spect_ops_constants.s
+	mv ${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}_layout.s ${SRC_DIR}/mem_layouts/constants_layout.s
 
 ############################################################################################################
 #		Compile APP FW to build directory
 ############################################################################################################
 
 compile: check_env const_rom ops_constants
+
+	$(info == Compile ============================================================)
 	rm -rf ${BUILD_DIR}
 	mkdir ${BUILD_DIR}
-	mv ${TS_REPO_ROOT}/data/constants.hex ${BUILD_DIR}/constants.hex
-	${COMPILER} --isa-version=${ISA_VERSION} --hex-format=1 --hex-file=${BUILD_DIR}/main.hex \
+
+	mv ${CONST_ROM_DATA}/spect_const_rom_code_${ROM_VERSION}.hex32 ${BUILD_DIR}/spect_const_rom_code.hex32
+
+	${COMPILER} \
+	--isa-version=${ISA_VERSION} \
+	--hex-format=1 \
+	--hex-file=${BUILD_DIR}/main.hex32 \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
 	--dump-program=${BUILD_DIR}/program_dump.s \
 	--dump-symbols=${BUILD_DIR}/symbols_dump.s \
-	${SRC_DIR}/${MAIN} > ${BUILD_DIR}/compile.log
+	${SRC_DIR}/${MAIN} \
+	> ${BUILD_DIR}/compile.log
 
-compile_boot: check_env const_rom ops_constants
-	rm -rf ${BUILD_DIR_BOOT}
-	mkdir ${BUILD_DIR_BOOT}
-	mv ${TS_REPO_ROOT}/data/constants.hex ${BUILD_DIR_BOOT}/constants.hex
-	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${BUILD_DIR_BOOT}/spect_boot-${FW_VERSION}.hex \
-	--first-address=${FW_BASE_ADDR} \
-	--parity=${FW_PARITY} \
-	--dump-program=${BUILD_DIR_BOOT}/program_dump_boot.s \
-	--dump-symbols=${BUILD_DIR_BOOT}/symbols_dump_boot.s \
-	${SRC_DIR}/boot_main.s
-# > ${BUILD_DIR_BOOT}/compile_boot.log
-
-############################################################################################################
-#		Final APP+BOOT FW Release
-############################################################################################################
+	${OPS_GEN_C} --cfg=${TS_REPO_ROOT}/spect_ops_config.yml --file=${BUILD_DIR}/spect_ops_constants.h
 
 release: check_env const_rom ops_constants
+
+	$(info == Compile ============================================================)
 	rm -rf ${RELEASE_DIR}
 	mkdir ${RELEASE_DIR}
-	mkdir ${RELEASE_DIR}/dump
-	mkdir ${RELEASE_DIR}/log
-	mv ${TS_REPO_ROOT}/data/constants.hex ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex
-	
-	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${RELEASE_DIR}/spect_app-${FW_VERSION}.hex \
+
+	mv ${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex32
+	ln -s ./spect_const_rom_code-${FW_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex
+	ln -s ./spect_app-${FW_VERSION}.hex32 ${RELEASE_DIR}/spect_app-${FW_VERSION}.hex
+
+	${COMPILER} \
+	--isa-version=${ISA_VERSION} \
+	--hex-format=1 \
+	--hex-file=${RELEASE_DIR}/spect_app-${FW_VERSION}.hex32 \
 	--first-address=${FW_BASE_ADDR} \
 	--parity=${FW_PARITY} \
 	--dump-program=${RELEASE_DIR}/dump/program_dump_app.s \
 	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_app.s \
-	${SRC_DIR}/${MAIN} > ${RELEASE_DIR}/log/compile_app.log
+	${SRC_DIR}/${MAIN} \
+	> ${RELEASE_DIR}/compile.log
 
-	${COMPILER} --isa-version=2 --hex-format=1 --hex-file=${RELEASE_DIR}/spect_boot-${FW_VERSION}.hex \
-	--first-address=${FW_BASE_ADDR} \
-	--parity=${FW_PARITY} \
-	--dump-program=${RELEASE_DIR}/dump/program_dump_boot.s \
-	--dump-symbols=${RELEASE_DIR}/dump/symbols_dump_boot.s \
-	${SRC_DIR}/boot_main.s > ${RELEASE_DIR}/log/compile_boot.log
-
-############################################################################################################
-#		MPW1 FW (APP+BOOT)
-############################################################################################################
-
-compile_mpw1: check_env data_ram_in_const
-	rm -rf ${BUILD_DIR_MPW1}
-	mkdir ${BUILD_DIR_MPW1}
-	mv ${TS_REPO_ROOT}/data/constants_data_in.hex ${BUILD_DIR_MPW1}/constants.hex
-	${COMPILER} --hex-format=1 --hex-file=${BUILD_DIR_MPW1}/main_mpw1.hex \
-	--isa-version=1 \
-	--first-address=${FW_BASE_ADDR} \
-	--dump-program=${BUILD_DIR_MPW1}/program_dump.s \
-	--dump-symbols=${BUILD_DIR_MPW1}/symbols_dump.s \
-	${SRC_DIR}/mpw1/main_mpw1.s > ${BUILD_DIR_MPW1}/compile.log
-
-compile_boot_mpw1: check_env data_ram_in_const_boot ops_constants
-	rm -rf ${BUILD_DIR_MPW1_BOOT}
-	mkdir ${BUILD_DIR_MPW1_BOOT}
-	mkdir ${BUILD_DIR_MPW1_BOOT}/dump
-	mv ${TS_REPO_ROOT}/data/constants_data_in_boot.hex ${BUILD_DIR_MPW1_BOOT}/constants.hex
-	${COMPILER} --isa-version=1 --hex-format=1 --hex-file=${BUILD_DIR_MPW1_BOOT}/spect_boot_mpw1.hex \
-	--first-address=${FW_BASE_ADDR} \
-	--parity=${FW_PARITY} \
-	--dump-program=${BUILD_DIR_MPW1_BOOT}/dump/program_dump.s \
-	--dump-symbols=${BUILD_DIR_MPW1_BOOT}/dump/symbols_dump.s \
-	${SRC_DIR}/boot_main.s > ${BUILD_DIR_MPW1_BOOT}/compile.log
+	${OPS_GEN_C} --cfg=${TS_REPO_ROOT}/spect_ops_config.yml --file=${RELEASE_DIR}/spect_ops_constants.h

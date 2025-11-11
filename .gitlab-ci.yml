@@ -8,8 +8,6 @@ stages:
   - test_tag
   - publish
 
-
-
 ###################################################################################################
 # Build documentation
 ###################################################################################################
@@ -51,8 +49,9 @@ run_test_tag:
   when: always
   script:
     - source ./setup_env
+    - make release
     - cd tests
-    - ./run_tests.sh
+    - ./run_tests_release.sh
 
 ###################################################################################################
 # Publish doc to pages
@@ -89,15 +88,14 @@ github_mirror:
       # Ensure we are on branch, not detached head
       - git checkout public
 
-      # Configure GIT user to match the "gitlab-runner" that runs the pipeline
-      # Match its email to "tropic-gitlab" users email that is used to connect to confluence
+      # Use Proxy Github account "tropic-gitlab" to push to the github
       - git config --global user.email "tropic-gitlab@tropicsquare.com"
-      - git config --global user.name "gitlab-runner"
+      - git config --global user.name "tropic-gitlab"
 
       # Add remote origin
       - git remote remove github || true
       - git remote add github git@github.com:tropicsquare/ts-spect-fw.git
 
       # Push - Use SSH key created for this purpose
-      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror_ts_spect_fw.id_rsa" git push github
-      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror_ts_spect_fw.id_rsa" git push github --tags
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" git push github
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" git push github --tags
