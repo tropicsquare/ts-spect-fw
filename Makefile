@@ -25,15 +25,22 @@ FW_VERSION=`git describe --dirty`
 ############################################################################################################
 #		Environment check
 ############################################################################################################
+ifndef TS_REPO_ROOT
+	$(error TS_REPO_ROOT not set!)
+endif
 
-check_env:
-	printenv TS_REPO_ROOT
+pre_release_check:
+	./scripts/check_debug_opt_off.sh
+	@if [ "$(ROM_VERSION)" = "devel" ]; then \
+		echo -e "\033[0;31mERROR: ROM_VERSION must not be 'devel' for release builds!\033[0m"; \
+		exit 1; \
+	fi
 
 ############################################################################################################
 #		Clear
 ############################################################################################################
 
-clear: check_env
+clear:
 	rm -rf ${BUILD_DIR}
 	rm -f ${SRC_DIR}/mem_layouts/constants_layout.s
 	rm -f ${SRC_DIR}/constants/spect_ops_constants.s
@@ -59,7 +66,7 @@ ops_constants:
 #		Compile APP FW to build directory
 ############################################################################################################
 
-compile: check_env const_rom ops_constants
+compile: const_rom ops_constants
 
 	$(info == Compile ============================================================)
 	rm -rf ${BUILD_DIR}
@@ -80,11 +87,12 @@ compile: check_env const_rom ops_constants
 
 	${OPS_GEN_C} --cfg=${TS_REPO_ROOT}/spect_ops_config.yml --file=${BUILD_DIR}/spect_ops_constants.h
 
-release: check_env const_rom ops_constants
+release: pre_release_check const_rom ops_constants
 
-	$(info == Compile ============================================================)
+	$(info == Release ============================================================)
 	rm -rf ${RELEASE_DIR}
 	mkdir ${RELEASE_DIR}
+	mkdir ${RELEASE_DIR}/dump
 
 	mv ${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex32
 	ln -s ./spect_const_rom_code-${FW_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex

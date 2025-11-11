@@ -10,7 +10,7 @@ opts=(
 
 for opts in "${opts[@]}"; do
     if grep -Fxq ".define ${opts}" "$file"; then
-        echo -e "\033[0;31mSome debug options are enabled. This is not allowed for release!\033[0m"
+        echo -e "\033[0;31mSome debug options are enabled. This is not allowed for release build!\033[0m"
         exit 1
     fi
 done
