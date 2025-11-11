@@ -60,3 +60,13 @@ gfp_gen_dst_ecdsa .eq 0xF1
 gfp_gen_dst_eddsa .eq 0xF2
 gfp_gen_dst_x25519 .eq 0xF3
 gfp_gen_dst_ecc_key .eq 0xF4
+
+; Call check
+call_check_level_1_id .eq 0xCC1
+call_check_level_2_id .eq 0xCC2
+call_check_level_3_id .eq 0xCC3
+call_check_level_4_id .eq 0xCC4
+
+; PASS/FAIL
+pass_val .eq 0x0F0
+fail_val .eq 0xF0F

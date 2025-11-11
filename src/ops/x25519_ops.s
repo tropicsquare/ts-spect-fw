@@ -30,6 +30,10 @@ op_x25519_key_fail:
 ;   x25519_kpair_gen
 ; ======================================================
 op_x25519_kpair_gen:
+    ; Store OP Link, nothing to check
+    MOVI    r1,  x25519_kpair_gen_id
+    ST      r1,  ca_op_link
+
     GRV     r19
     MOVI    r0,  7
     MOVI    r1,  255
@@ -54,6 +58,13 @@ op_x25519_kpair_gen:
 ;   x25519_sc_et_eh
 ; ======================================================
 op_x25519_sc_et_eh:
+    ; Check and update OP Link context
+    LD      r1,  ca_op_link
+    CMPI    r1,  x25519_kpair_gen_id
+    BRNZ    op_x25519_ctx_fail
+    MOVI    r1,  x25519_sc_et_eh_id
+    ST      r1,  ca_op_link
+
     LD      r19, x25519_context_etpriv
     LD      r16, x25519_sc_et_eh_input_ehpub
     ST      r16, x25519_context_ehpub
@@ -69,6 +80,13 @@ op_x25519_sc_et_eh:
 ;   x25519_sc_et_sh
 ; ======================================================
 op_x25519_sc_et_sh:
+    ; Check and update OP Link context
+    LD      r1,  ca_op_link
+    CMPI    r1,  x25519_sc_et_eh_id
+    BRNZ    op_x25519_ctx_fail
+    MOVI    r1,  x25519_sc_et_sh_id
+    ST      r1,  ca_op_link
+
     LD      r1, x25519_sc_et_sh_input_slot
     LDK     r16, r1, 0x200
     BRE     op_x25519_key_fail
@@ -86,6 +104,13 @@ op_x25519_sc_et_sh:
 ;   x25519_sc_st_eh
 ; ======================================================
 op_x25519_sc_st_eh:
+    ; Check and clear OP Link context
+    LD      r1,  ca_op_link
+    CMPI    r1,  x25519_sc_et_sh_id
+    BRNZ    op_x25519_ctx_fail
+    MOVI    r1,  0
+    ST      r1,  ca_op_link
+
     LD      r16, x25519_context_ehpub
     MOVI    r1, 0
     LDK     r19, r1, 0x000

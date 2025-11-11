@@ -18,6 +18,16 @@
 ; ==============================================================================
 
 op_eddsa_finish:
+    ; Check and Clear OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_e_finish_id
+    BRZ         eddsa_finish_ctx_ok
+    CMPI        r1,  eddsa_e_at_once_id
+    BRNZ        eddsa_ctx_fail
+eddsa_finish_ctx_ok:
+    MOVI        r1,  0
+    ST          r1,  ca_op_link
+
     LD          r31, ca_q25519
 
     ;MOVI        r0,  3
@@ -52,6 +62,18 @@ eddsa_finish_s_randomize:
     MOV         r28, r25
 
     CALL        spm_ed25519_short
+    ; spm invariant check
+    CMPI        r0,  pass_val
+    BRNZ        eddsa_finish_fail_verify
+    ; call check
+    LD          r4, ca_call_check_level_1
+    CMPI        r4, call_check_level_1_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_1
+    BRNZ        eddsa_finish_fail_verify
+    ; check Q1 != O
+    CALL        point_check_infinity_ed25519
+    BRZ         eddsa_finish_fail_verify
 
     ST          r7,  ca_eddsa_sign_internal_EAx
     ST          r8,  ca_eddsa_sign_internal_EAy
@@ -122,6 +144,12 @@ eddsa_finish_fail_verify:
     MOVI        r0,  ret_eddsa_err_final_verify
 
 eddsa_finish_fail:
+    ; Clear OP Link context
+    MOVI        r2,  0
+    ST          r2,  ca_op_link
+    ; Set L3 Result
+    CALL        get_output_base
+    ADDI        r30, r0,  eddsa_output_result
     MOVI        r2,  l3_result_fail
     STR         r2,  r30
 

@@ -16,6 +16,17 @@
 ; ==============================================================================
 
 op_eddsa_nonce_finish:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_nonce_init_id
+    BRZ         eddsa_nonce_finish_ctx_ok
+    CMPI        r1,  eddsa_nonce_update_id
+    BRNZ        eddsa_ctx_fail
+
+eddsa_nonce_finish_ctx_ok:
+    MOVI        r1,  eddsa_nonce_finish_id
+    ST          r1,  ca_op_link
+
     CALL        get_data_in_size
     MOV         r11, r0                         ; number of bytes in the last chunk
 

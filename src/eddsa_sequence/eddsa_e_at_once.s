@@ -14,6 +14,13 @@
 ;
 ; ==============================================================================
 op_eddsa_e_at_once:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_R_part_id
+    BRNZ        eddsa_ctx_fail
+    MOVI        r1,  eddsa_e_at_once_id
+    ST          r1,  ca_op_link
+
     ; Load all data
     CALL        get_data_in_size
     MOV         r11, r0                         ; r11 = number of bytes in message

@@ -16,6 +16,13 @@
 ; ==============================================================================
 
 op_eddsa_e_prep:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_R_part_id
+    BRNZ        eddsa_ctx_fail
+    MOVI        r1,  eddsa_e_prep_id
+    ST          r1,  ca_op_link
+
     CALL        get_input_base
     ADDI        r30, r0,  eddsa_input_message
     LDR         r19, r30

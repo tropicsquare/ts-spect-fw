@@ -15,6 +15,13 @@
 ; ==============================================================================
 
 op_eddsa_R_part:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_nonce_finish_id
+    BRNZ        eddsa_ctx_fail
+    MOVI        r1,  eddsa_R_part_id
+    ST          r1,  ca_op_link
+
     LD          r31, ca_p25519
     LD          r21, ca_ed25519_xG
     LD          r22, ca_ed25519_yG

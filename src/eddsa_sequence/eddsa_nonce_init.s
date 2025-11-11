@@ -20,6 +20,13 @@
 ; ==============================================================================
 
 op_eddsa_nonce_init:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_set_context_id
+    BRNZ        eddsa_ctx_fail
+    MOVI        r1,  eddsa_nonce_init_id
+    ST          r1,  ca_op_link
+
     GRV         r7
     GRV         r8
     GRV         r9

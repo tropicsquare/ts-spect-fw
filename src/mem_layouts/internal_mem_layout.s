@@ -65,7 +65,23 @@ ca_ecdsa_sign_internal_Ay .eq 0x0180
 ; ==============================================================================
 ;   Scalar Point Multiplication
 ; ==============================================================================
-ca_spm_internal_Px .eq 0x500
-ca_spm_internal_Py .eq 0x520
-ca_spm_internal_Pz .eq 0x540
-ca_spm_internal_Pt .eq 0x580
+ca_spm_internal_Px .eq 0x0500
+ca_spm_internal_Py .eq 0x0520
+ca_spm_internal_Pz .eq 0x0540
+ca_spm_internal_Pt .eq 0x0580
+
+; ==============================================================================
+;   Call Check
+; ==============================================================================
+ca_call_check_level_1 .eq 0x0600
+ca_call_check_level_2 .eq 0x0620
+ca_call_check_level_3 .eq 0x0640
+ca_call_check_level_4 .eq 0x0660
+
+; ==============================================================================
+;   Others
+; ==============================================================================
+ca_op_link .eq 0x0700
+ca_gfp_gen_dst .eq 0x0720
+
+ca_checkpoint .eq 0x740

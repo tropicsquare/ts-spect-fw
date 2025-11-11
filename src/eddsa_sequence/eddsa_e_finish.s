@@ -15,6 +15,16 @@
 ; ==============================================================================
 
 op_eddsa_e_finish:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_e_prep_id
+    BRZ         eddsa_e_finish_ctx_ok
+    CMPI        r1,  eddsa_e_update_id
+    BRNZ        eddsa_ctx_fail
+eddsa_e_finish_ctx_ok:
+    MOVI        r1,  eddsa_e_finish_id
+    ST          r1,  ca_op_link
+
     CALL        get_data_in_size
     MOV         r11, r0                         ; number of bytes in the last chunk of message
     ADD         r29, r29, r11

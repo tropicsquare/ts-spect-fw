@@ -38,6 +38,10 @@
 ; ==============================================================================
 
 op_eddsa_set_context:
+    ; Store OP Link, nothing to check
+    MOVI    r1,  eddsa_set_context_id
+    ST      r1,  ca_op_link
+
     CALL    get_input_base
     ADDI    r4,  r0,  eddsa_set_context_input_slot
     LDR     r2,  r4
