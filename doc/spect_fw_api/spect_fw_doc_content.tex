@@ -55,7 +55,7 @@ SPECT comes with two types of firmware:
                                      can also be updated by the bootloader.
 \end{itemize}
 
-This document explains the operations that SPECT exposes to the RISC-V CPU and the way how to inteface with SPECT
+This document explains the operations that SPECT exposes to the RISC-V CPU and the way how to interface with SPECT
 to run these operations and obtain results.
 
 \clearpage
@@ -80,6 +80,10 @@ CPU selects output data destination via \Register{SPECT_INOUT_SRC[3:0]}.
     \item \Register{SPECT_INOUT_SRC[3:0]}=0x1 -- SPECT operation stores output data to its Data RAM Out.
     \item \Register{SPECT_INOUT_SRC[3:0]}=0x5 -- SPECT operation stores output data to Result Buffer.
 \end{itemize}
+
+\TropicNote{
+    The IN/OUT source configuration is disabled for production firmware.
+}
 
 CPU indicates number of bytes in Command Buffer or Data RAM In via \linebreak
 \Register{SPECT_OP_DATA_IN_SIZE} field.
@@ -156,8 +160,7 @@ SPECT is capable of processing these \LLLCMD{}s by it self:
     \SPECTCommandMem{0x0080}{32B}{Message $M$}
 
     \SPECTCommandMemHead{Data RAM Out}
-    \SPECTCommandMem{0x0000}{4B}{Result: 0x0B5E55ED $\Rightarrow$ verified, else failed}
-    \SPECTCommandMem{0x0004}{4B}{Result: 0xBA11FADE $\Rightarrow$ verified, else failed}
+    \SPECTCommandMem{0x0000}{8B}{Result: [0x0B5E55ED, 0xBA11FADE] $\Rightarrow$ verified, else failed}
 }
 
 \subsubsection*{SHA512 Operations}
@@ -264,12 +267,12 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
         ECC Key partition in Flash memory.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
     \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
     \SPECTCommandMem{0x03}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256 - ECDSA, Ed25519 - EdDSA))}
 
-    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
+    \SPECTCommandMemHead{Result Buffer (production) / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
 }
 
@@ -281,13 +284,13 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
         ECC Key partition in Flash memory.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
     \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
     \SPECTCommandMem{0x03}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256 - ECDSA, Ed25519 - EdDSA))}
     \SPECTCommandMem{0x10}{32B}{\TsApiCmdFld{K} ($k$)}
 
-    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
+    \SPECTCommandMemHead{Result Buffer (production) / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
 }
 
@@ -300,11 +303,11 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
         Reads ECDSA/EdDSA public key $A$ from slot $i$ of ECC Public Key partition.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
     \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
 
-    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
+    \SPECTCommandMemHead{Result Buffer (production) / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
     \SPECTCommandMem{0x01}{1B}{\TsApiCmdFld{CURVE} (Curve Type (P256, Ed25519))}
     \SPECTCommandMem{0x02}{1B}{\TsApiCmdFld{ORIGIN} (Identifier weather the key was stored or generated.)}
@@ -318,11 +321,11 @@ equal to corresponding \LLLCMD{}s \TsApiCmdFld{CMD_ID}. The layout of inputs and
         Erase ECDSA/EdDSA keys from slot $i$ of ECC Public/Private Key partition.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{CMD_ID}}
     \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (Key slot $i$)}
 
-    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
+    \SPECTCommandMemHead{Result Buffer (production) / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
 }
 
@@ -407,7 +410,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Sets context for Edwards Digital Signature Algorithm such as keys ($s, prefix, A$) and Secure Channel data ($SC_H$, $SC_N$).
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x01}{2B}{Key slot $i$}
 
     \SPECTCommandMemHead{Data RAM In}
@@ -434,7 +437,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Processes next 144 bytes of decrypted message M. Updates TMAC context.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{144B}{Next 144 bytes of decrypted message M}
 
 
@@ -449,7 +452,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         $r = $TMAC($prefix$, $SC_H$ || $SC_N$ || M, 0x0C) $\pmod{q_{Ed25519}}$.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{--}{Last up to 144 bytes of decrypted message M}
 
     \SPECTCommandCtx{\{keys, TMAC ctx, part of M\}}{\{keys, $r$, M size\}}
@@ -473,7 +476,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Computes $e$ at once in case of size of the message is less 64 bytes.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{--}{First up to 63 bytes of decrypted message M}
 
     \SPECTCommandCtx{\{keys, $R$\}}{\{keys, $R$, $e$\}}
@@ -486,7 +489,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Prepares for derivation of $e$.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{64}{First 64 bytes of decrypted message M}
 
     \SPECTCommandCtx{\{keys, $R$\}}{\{keys, $R$, SHA512 ctx\}}
@@ -499,7 +502,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Processes next 128 bytes of decrypted message M. Updates SHA512 context.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{128B}{Next 128 bytes of decrypted message M}
 
     \SPECTCommandCtx{\{keys, $R$, SHA512 ctx\}}{\{keys, $R$, SHA512 ctx\}}
@@ -512,7 +515,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Finishes derivation of $e = $SHA512($R$||$A$||M).
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
     \SPECTCommandMem{0x00}{--}{Last up to 128 bytes of decrypted message M}
 
     \SPECTCommandCtx{\{keys, $R$, SHA512 ctx\}}{\{keys, $R$, $e$\}}
@@ -527,7 +530,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Computes second part $S$ of the signature -- $S = r + e \times s \pmod{q_{Ed25519}}$
     }
 
-    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
+    \SPECTCommandMemHead{Result Buffer (production) / Data RAM Out}
     \SPECTCommandMem{0x00}{1B}{\TsApiCmdFld{RESULT}}
     \SPECTCommandMem{0x10}{64B}{Signature (\TsApiCmdFld{R}, \TsApiCmdFld{S})}
 
@@ -546,7 +549,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
         Generate ECDSA signature ($r, s$) of a message digest $z$ using ECC keys from slot $i$.
     }
 
-    \SPECTCommandMemHead{Command Buffer / Data RAM In}
+    \SPECTCommandMemHead{Command Buffer (production) / Data RAM In}
 
     \SPECTCommandMem{0x01}{2B}{\TsApiCmdFld{SLOT} (ECC Key slot $i$)}
     \SPECTCommandMem{0x10}{32B}{\TsApiCmdFld{MSG_HASH} (Message digest $z$)}
@@ -555,7 +558,7 @@ All SPECT operations in this section are supported only with use of Data RAM In 
     \SPECTCommandMem{0x00A0}{32B}{Secure Channel Hash $SCh$}
     \SPECTCommandMem{0x00C0}{4B}{Secure Channel Nonce $SCn$}
 
-    \SPECTCommandMemHead{Result Buffer / Data RAM Out}
+    \SPECTCommandMemHead{Result Buffer (production) / Data RAM Out}
     \SPECTCommandMem{0x0}{1B}{\TsApiCmdFld{RESULT} (Command Result)}
     \SPECTCommandMem{0x10}{64B}{Signature (\TsApiCmdFld{R}, \TsApiCmdFld{S})}
 }
@@ -578,8 +581,9 @@ the functionality of SCB, CPB nor KBUS. EDB can be set to debug mode. They are e
 \newpage
 \TsSubSubSection{SPECT Debug Operations}
 
-\OpenIssue{
-    Decide whether we want to keep the debug operations for production SPECT Firmware.
+\TropicNote{
+    Following Ops are implemented, but disabled in production firmware! To enable them for debug
+    purposes, macro \texttt{DEBUG_OPS} must be defined in \texttt{main.s} file.
 }
 
 All SPECT operations in this section are supported only with use of Data RAM In / Out

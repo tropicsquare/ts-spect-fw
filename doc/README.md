@@ -2,7 +2,7 @@
 
 > **_NOTE:_** Current state of the documentation is incomplete and work progress.
 
-- [`spect_fw_api.pdf`](spect_fw_api/pdf/spect_fw_api.pdf) specifies API provided by the firmware
+- [`spect_fw_api.pdf`](spect_fw_api/spect_fw_api.pdf) specifies API provided by the firmware
 - [`TMAC.md`](TMAC.md) specifies TMAC function and its usage in SPECT.
 - [`deterministic_nonce_generation.md`](deterministic_nonce_generation.md) describes how nonces for ECDSA/EdDSA are generated.
 - [`ecc_key_layout.md`](#ecc_key_layout.md) describes layout of ECC keys in each flash memory slot of TROPIC01.
