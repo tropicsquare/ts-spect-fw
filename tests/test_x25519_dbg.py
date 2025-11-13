@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
 import sys
-import os
 import random as rn
-from enum import Enum
 
 from import_setup import import_setup
 import_setup()
 
-from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_memory import SpectMem
 from spect_tester.spect_config import (
     SpectOpStatus,
-    KeyTypes,
 )
-from spect_tester.key_memory import KeyMem
 from spect_tester.helpers import (
     get_main_defines,
     int2bytes,
-    bytes2int,
 )
 from spect_tester.spect_default_fw import (
     SpectDefaultFW

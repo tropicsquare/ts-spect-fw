@@ -8,7 +8,7 @@ import_setup()
 
 import models.p256 as p256
 
-from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_memory import SpectMem
 from spect_tester.spect_config import (
     SpectOpStatus,
@@ -122,7 +122,7 @@ def test_run(tester: SpectTester, test_type: TestType):
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (slot << 8) + test_run.op_dict['id']
+    l3_input_word = (slot << 8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.write_bytes(input_mem.base+0x10, z)
@@ -149,6 +149,7 @@ def test_run(tester: SpectTester, test_type: TestType):
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != l3_result_ref:

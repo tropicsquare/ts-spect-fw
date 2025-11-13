@@ -134,7 +134,7 @@ def eddsa_set_context(test_run: SpectTestRun, slot: int, scn: bytes, sch: bytes)
 
     input_mem, _ = __get_and_set_inout_src(test_run)
 
-    l3_input_word = (slot<<8) + test_run.op_dict['id']
+    l3_input_word = (slot<<8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(4)
@@ -276,6 +276,7 @@ def eddsa_finish(test_run: SpectTestRun) -> bytes:
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != L3Result.L3_RESULT_OK:
@@ -559,7 +560,7 @@ def test_err(test_type: TestType):
 
     input_mem, output_mem = __get_and_set_inout_src(test_run)
 
-    l3_input_word = (slot<<8) + test_run.op_dict['id']
+    l3_input_word = (slot<<8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(4)
@@ -576,6 +577,9 @@ def test_err(test_type: TestType):
         expected_status = SpectOpStatus.RET_CURVE_TYPE_ERR
     elif test_type == TestType.INVALID_SLOT_NUMBER:
         expected_status = SpectOpStatus.RET_SLOT_METADATA_ERR
+    else:
+        expected_status = None
+        test_run.critical("Invalid test type for error run!")
 
     if status != expected_status:
         test_run.error(
@@ -585,6 +589,8 @@ def test_err(test_type: TestType):
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
+
     l3_result = l3_result_word & 0xFF
     if l3_result != L3Result.L3_RESULT_INVALID_KEY:
         test_run.error(

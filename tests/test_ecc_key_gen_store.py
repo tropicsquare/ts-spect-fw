@@ -141,7 +141,7 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (curve_type << 24) + (slot << 8) + test_run.op_dict['id']
+    l3_input_word = (curve_type << 24) + (slot << 8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     if op_name == TEST_GENERATE:
@@ -184,6 +184,7 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != l3_result_ref:

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-from typing import Tuple
+from typing import (
+    Tuple,
+    Type,
+)
 
 from import_setup import import_setup
 import_setup()
@@ -9,7 +12,10 @@ import_setup()
 import models.ed25519 as ed25519
 
 from spect_tester.spect_tester import SpectTester, SpectTestRun
-from spect_tester.spect_memory import SpectMem
+from spect_tester.spect_memory import (
+    MemorySpace,
+    SpectMem,
+)
 from spect_tester.spect_config import (
     SpectOpStatus,
     L3Result,
@@ -33,7 +39,7 @@ from test_eddsa_sequence import eddsa_sign
 SPECT_FW = SpectDefaultFW.Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
-def __check_status_ok(test_run: SpectTestRun, output_mem: SpectMem):
+def __check_status_ok(test_run: SpectTestRun, output_mem: Type[MemorySpace]):
     status, data_out_size = test_run.get_res_word()
     test_run.info(f"SPECT Status: 0x{status:02x}")
     test_run.info(f"SPECT OutSize: {data_out_size}")
@@ -46,6 +52,7 @@ def __check_status_ok(test_run: SpectTestRun, output_mem: SpectMem):
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != L3Result.L3_RESULT_OK:
@@ -72,7 +79,7 @@ def store_eddsa_key(test_run: SpectTestRun, k: bytes, slot: int):
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (CurveType.ED25519 << 24) + (slot << 8) + test_run.op_dict['id']
+    l3_input_word = (CurveType.ED25519 << 24) + (slot << 8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(32)
@@ -108,7 +115,7 @@ def read_eddsa_key(test_run: SpectTestRun, slot: int) -> Tuple[bytes, int, int]:
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (slot << 8) + test_run.op_dict['id']
+    l3_input_word = (slot << 8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(32)
@@ -122,6 +129,7 @@ def read_eddsa_key(test_run: SpectTestRun, slot: int) -> Tuple[bytes, int, int]:
 
     _, data_out_size = test_run.get_res_word()
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
 
     pub = test_run.read_bytes(output_mem.base+0x10, data_out_size-16)
     curve = (l3_result_word >> 8) & 0xFF

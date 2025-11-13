@@ -94,6 +94,7 @@ def test_run(tester: SpectTester):
         )
 
     l3_result_word = test_run.read_word(SpectMem.DataRamOut.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != L3Result.L3_RESULT_OK:

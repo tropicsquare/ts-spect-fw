@@ -7,7 +7,7 @@ from enum import Enum
 from import_setup import import_setup
 import_setup()
 
-from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_memory import SpectMem
 from spect_tester.spect_config import (
     SpectOpStatus,
@@ -109,6 +109,7 @@ defines_set = get_main_defines(SPECT_FW.s_file)
 
 def gen_invalid_pub() -> int:
     is_square = True
+    x = 0
     while(is_square != False):
         x = rn.randint(1, x25519.p -1)
         y2 = (x*x*x + x*x*x25519.A + x) % x25519.p

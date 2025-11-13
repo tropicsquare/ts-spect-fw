@@ -113,7 +113,7 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (slot << 8) + test_run.op_dict['id']
+    l3_input_word = (slot << 8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(0)
@@ -136,6 +136,7 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != l3_result_ref:

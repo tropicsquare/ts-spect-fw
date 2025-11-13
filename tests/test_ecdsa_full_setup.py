@@ -51,7 +51,7 @@ def store_ecdsa_key(test_run: SpectTestRun, k: bytes, slot: int):
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (CurveType.P256 << 24) + (slot << 8) + test_run.op_dict['id']
+    l3_input_word = (CurveType.P256 << 24) + (slot << 8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(32)
@@ -75,6 +75,7 @@ def store_ecdsa_key(test_run: SpectTestRun, k: bytes, slot: int):
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != L3Result.L3_RESULT_OK:
@@ -110,7 +111,7 @@ def ecdsa_sign(test_run: SpectTestRun, message: bytes, scn: bytes, sch: bytes, s
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (slot<<8) + test_run.op_dict['id']
+    l3_input_word = (slot<<8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.write_bytes(input_mem.base+0x10, message)
@@ -136,6 +137,7 @@ def ecdsa_sign(test_run: SpectTestRun, message: bytes, scn: bytes, sch: bytes, s
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != L3Result.L3_RESULT_OK:
@@ -168,7 +170,7 @@ def ecc_key_read(test_run: SpectTestRun, slot: int):
     ################################################################################################
     #   Write data and launch
     ################################################################################################
-    l3_input_word = (slot<<8) + test_run.op_dict['id']
+    l3_input_word = (slot<<8) + test_run.op_dict.get('id', 0xFF)
     test_run.write_word(input_mem.base, l3_input_word)
 
     test_run.set_input_size(4)
@@ -190,6 +192,7 @@ def ecc_key_read(test_run: SpectTestRun, slot: int):
         )
 
     l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
     l3_result = l3_result_word & 0xFF
 
     if l3_result != L3Result.L3_RESULT_OK:

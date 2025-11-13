@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import os
+import numpy as np
 import random as rn
 from binascii import unhexlify
 
@@ -31,14 +32,14 @@ def test_run(tester: SpectTester, run_name: str):
     test_run.set_input_size(0)
 
     input_ctx = SpectContext(
-        gpr         = [rn.randint(1, 2**256 - 1) for _ in range(32)],
+        gpr         = np.array([rn.randint(1, 2**256 - 1) for _ in range(32)]),
         sha         = random_bytes(64),
         tmac        = random_bytes(50),
         rar_stack   = [0]*RAR_STACK_DEPTH,
         rar_pointer = 0,
         flags       = {"Z" : 0, "C" : 0, "E" : 0},
-        data_in     = [rn.randint(1, 2**32 - 1) for _ in range(SpectMem.DataRamIn.depth)],
-        data_out    = [rn.randint(1, 2**32 - 1) for _ in range(SpectMem.DataRamOut.depth)]
+        data_in     = np.array([rn.randint(1, 2**32 - 1) for _ in range(SpectMem.DataRamIn.depth)]),
+        data_out    = np.array([rn.randint(1, 2**32 - 1) for _ in range(SpectMem.DataRamOut.depth)])
     )
 
     input_ctx_file = os.path.join(test_run.run_dir, "input_context")
