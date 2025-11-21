@@ -94,8 +94,8 @@ release: pre_release_check const_rom ops_constants
 	mkdir ${RELEASE_DIR}
 	mkdir ${RELEASE_DIR}/dump
 
-	mv ${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex32
-	ln -s ./spect_const_rom_code-${FW_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${FW_VERSION}.hex
+	mv ${CONST_ROM_DATA}/spect_const_rom_${ROM_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${ROM_VERSION}.hex32
+	ln -s ./spect_const_rom_code-${ROM_VERSION}.hex32 ${RELEASE_DIR}/spect_const_rom_code-${ROM_VERSION}.hex
 	ln -s ./spect_app-${FW_VERSION}.hex32 ${RELEASE_DIR}/spect_app-${FW_VERSION}.hex
 
 	${COMPILER} \
