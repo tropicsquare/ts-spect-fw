@@ -2,6 +2,8 @@
 import sys
 import random as rn
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -24,12 +26,8 @@ from spect_tester.helpers import (
     get_input_source,
     get_output_source,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
-
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def store_ecdsa_key(test_run: SpectTestRun, k: bytes, slot: int):
@@ -211,7 +209,7 @@ def ecc_key_read(test_run: SpectTestRun, slot: int):
 
 if __name__ == "__main__":
     test_name = "ecdsa_full_setup"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     ################################################################################################
     #   Create Test Vector

@@ -4,14 +4,12 @@ import glob
 import os
 import numpy as np
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
 from spect_tester.spect_tester import SpectTester
-
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
 TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 
@@ -19,7 +17,7 @@ if __name__ == "__main__":
 
     exec_infos = glob.glob(f"{SpectTester.TESTER_DIR}/*/*/exec_info")
 
-    with open(SpectDefaultFW.Application.hex_file, 'r') as fw:
+    with open(Application.hex_file, 'r') as fw:
         fw_size = len(fw.readlines())
 
     coverage = np.zeros(shape=(fw_size), dtype=np.uint32)

@@ -3,6 +3,8 @@ import sys
 import random as rn
 import itertools
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -28,16 +30,13 @@ from spect_tester.helpers import (
     get_input_source,
     get_output_source,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
 ECC_KEY_ORIGIN = {
     "ecc_key_gen"   : KeyOrigin.GENERATE,
     "ecc_key_store" : KeyOrigin.STORE
 }
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 TEST_GENERATE = "ecc_key_gen"
@@ -255,7 +254,7 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
 
 if __name__ == "__main__":
     test_name = "ecc_key_gen_store"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     test_vars = [
         [TEST_GENERATE,  TEST_STORE],           # op_name
