@@ -6,6 +6,8 @@ from typing import (
     Type,
 )
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -30,13 +32,10 @@ from spect_tester.helpers import (
     get_input_source,
     get_output_source,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
 from test_eddsa_sequence import eddsa_sign
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def __check_status_ok(test_run: SpectTestRun, output_mem: Type[MemorySpace]):
@@ -139,7 +138,7 @@ def read_eddsa_key(test_run: SpectTestRun, slot: int) -> Tuple[bytes, int, int]:
 
 if __name__ == "__main__":
     test_name = "eddsa_full_setup"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     ################################################################################################
     #   Generate Test Vector

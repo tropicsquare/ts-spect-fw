@@ -2,6 +2,8 @@
 import sys
 import random as rn
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -18,14 +20,11 @@ from spect_tester.helpers import (
     get_input_source,
     get_output_source,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
 TEST_FULL_SLOT = "full_slot"
 TEST_EMPTY_SLOT = "empty_slot"
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def test_run(tester: SpectTester, run_name: str):
@@ -98,7 +97,7 @@ def test_run(tester: SpectTester, run_name: str):
 
 if __name__ == "__main__":
     test_name = "ecc_key_erase"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     test_run(tester, f"{test_name}_{TEST_FULL_SLOT}")
     test_run(tester, f"{test_name}_{TEST_EMPTY_SLOT}")

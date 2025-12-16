@@ -2,6 +2,8 @@
 import sys
 import random as rn
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -14,13 +16,10 @@ from spect_tester.helpers import (
     get_main_defines,
     int2bytes,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
 import models.x25519 as x25519
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def test_run(tester: SpectTester):
@@ -63,7 +62,7 @@ def test_run(tester: SpectTester):
         test_run.error("Result mismatch")
 
 if __name__ == "__main__":
-    tester = SpectTester("x25519_dbg")
+    tester = SpectTester("x25519_dbg", spect_fw=Application)
 
     if "DEBUG_OPS" not in defines_set:
         SpectTester.print_test_skipped("Debug ops are disabled")

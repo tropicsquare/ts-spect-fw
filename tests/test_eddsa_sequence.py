@@ -4,6 +4,8 @@ import os
 import random as rn
 from enum import Enum
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -30,11 +32,8 @@ from spect_tester.helpers import (
     get_output_source,
     create_metadata,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 class TestType(Enum):
@@ -466,7 +465,7 @@ def eddsa_sign(
 ####################################################################################################
 def test_ok(msg_len: int):
     test_name = f"eddsa_sign_ok_{msg_len}"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
     init_keymem_file = os.path.join(tester.test_dir, "init_keymem")
 
     ################################################################################################
@@ -529,7 +528,7 @@ def test_ok(msg_len: int):
 
 def test_err(test_type: TestType):
     test_name = f"eddsa_sign_err_{test_type.name.lower()}"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
     init_keymem_file = os.path.join(tester.test_dir, "init_keymem")
 
     ################################################################################################

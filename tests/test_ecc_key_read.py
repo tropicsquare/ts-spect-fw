@@ -2,6 +2,8 @@
 import sys
 import random as rn
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -22,14 +24,11 @@ from spect_tester.helpers import (
     get_input_source,
     get_output_source,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
 TEST_FULL_SLOT = "full_slot"
 TEST_EMPTY_SLOT = "empty_slot"
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot_state: str, invalid_metadata: SlotMetadataErrType):
@@ -191,7 +190,7 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
 
 if __name__ == "__main__":
     test_name = "ecc_key_read"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     # No Error
     test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_FULL_SLOT, SlotMetadataErrType.NO_ERR)

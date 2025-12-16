@@ -3,6 +3,8 @@ import sys
 import random as rn
 from enum import Enum
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -25,11 +27,8 @@ from spect_tester.helpers import (
     get_input_source,
     get_output_source,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 class TestType(Enum):
@@ -189,7 +188,7 @@ def test_run(tester: SpectTester, test_type: TestType):
 
 if __name__ == "__main__":
     test_name = "ecdsa_sign"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     test_run(tester, TestType.OK)
     test_run(tester, TestType.EMPTY_SLOT)

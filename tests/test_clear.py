@@ -5,6 +5,8 @@ import numpy as np
 import random as rn
 from binascii import unhexlify
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -87,7 +89,7 @@ def test_run(tester: SpectTester, run_name: str):
 
 if __name__ == "__main__":
     test_name = "clear"
-    tester = SpectTester(test_name)
+    tester = SpectTester(test_name, spect_fw=Application)
 
     test_run(tester, test_name)
 

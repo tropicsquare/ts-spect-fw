@@ -4,6 +4,8 @@ import os
 import random as rn
 from enum import Enum
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -18,9 +20,6 @@ from spect_tester.helpers import (
     get_main_defines,
     int2bytes,
     bytes2int,
-)
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
 )
 
 import models.x25519 as x25519
@@ -104,7 +103,7 @@ EXPECTED_DATA_SIZE = {
     #}
 }
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def gen_invalid_pub() -> int:
@@ -382,6 +381,6 @@ if __name__ == "__main__":
 
     for test_type in TestType:
         test_name = f"x25519_sc_{test_type.name.lower()}"
-        ret += test_run(SpectTester(test_name), test_type)
+        ret += test_run(SpectTester(test_name, spect_fw=Application), test_type)
 
     sys.exit(ret)

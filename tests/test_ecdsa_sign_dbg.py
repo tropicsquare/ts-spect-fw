@@ -3,6 +3,8 @@ import sys
 import random as rn
 from enum import Enum
 
+from default_fw import Application
+
 from import_setup import import_setup
 import_setup()
 
@@ -19,11 +21,8 @@ from spect_tester.helpers import (
     get_main_defines,
     int2bytes,
 )
-from spect_tester.spect_default_fw import (
-    SpectDefaultFW
-)
 
-SPECT_FW = SpectDefaultFW.Application
+SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 class TestType(Enum):
@@ -123,7 +122,7 @@ def test_run(tester: SpectTester):
     return test_run.err_cnt
 
 if __name__ == "__main__":
-    tester = SpectTester("ecdsa_sign_dbg")
+    tester = SpectTester("ecdsa_sign_dbg", spect_fw=Application)
 
     if "DEBUG_OPS" not in defines_set:
         SpectTester.print_test_skipped("Debug ops are disabled")
