@@ -7,7 +7,7 @@ echo "Setting TS_REPO_ROOT to: `pwd`"
 export TS_REPO_ROOT=`pwd`
 
 # Set DEFAULT_CONST_ROM
-export DEFAULT_CONST_ROM="revA"
+export DEFAULT_CONST_ROM="revB"
 echo "Setting DEFAULT_CONST_ROM to ${DEFAULT_CONST_ROM}"
 
 # Generate temporary file which will configure SW
