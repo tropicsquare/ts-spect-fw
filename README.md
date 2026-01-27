@@ -1,9 +1,9 @@
 # TS SPECT Application Firmware
 
-This repository contains the Makefile and associated scripts necessary to build firmware for a specific project.
+The primary function of the SPECT Application is to handle all Elliptic Curve Cryptography related
+functionality of the TROPIC01 chip.
 
-The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling,
-releasing, and managing the firmware.
+We have one FW for the main RISCV32 MCU and a second for the SPECT coprocessor.
 
 ## Licensing
 
@@ -15,37 +15,36 @@ See [LICENSE](LICENSE) file
 
 [Repository structure ](#repository-structure-)
 
-[Documentation](#doc-)
-
 [Prerequisites ](#prerequisites-)
 
-[Build firmware ](#build-firmware-)
+[Build ](#build-)
 
 [Release ](#release-)
 
-[Test/Simulate firmware ](#testsimulate-firmware-)
+[Tests and FWFE ](#tests-and-fwfe-)
 
-## Repository structure <a name="repostruct"></a>
+## Repository Structure <a name="repostruct"></a>
 
-- [`doc`](doc/) : firmware and algorithms documentation
-- [`modules`](modules/) : submodules used by this project:
-   - [`ts-spect-sdk`](modules/ts-spect-sdk/) : SPECT SDK for firmware development
-- [`scripts`](scripts/) : support scripts
-- [`src`](src/) : firmware source files
-- [`tests`](tests/) : python tests
-
-## Documentation <a name="doc"></a>
-
-[**SPECT Firmware API**](doc/spect_fw_api/spect_fw_api.pdf)
-
-[**Misc Doc**](doc/README.md)
+```
+├─ src               # Source files
+├─ tests             # Python scripts for verification
+├─ tests             # API documentation and support markdowns
+├─ scripts           # Support scripts
+├─ modules           # Repository submodules
+│  └─ ts-spect-sdk   # SPECT SDK (test env. + Const ROM content)
+├─ build             # Automatically created build destination
+├─ release           # Automatically created release destination
+├─ LICENSE           # LICENSE file
+├─ CHANGELOG.md      # CHANGELOG file
+└─ Makefile          # Makefile for building and release
+```
 
 ## Prerequisites <a name="prereq"></a>
 ---
 1. Cloning the repository
 
    ```bash
-   # clone the spect application firmware repository
+   # clone the SPECT FW repository
    git clone https://github.com/tropicsquare/ts-spect-fw.git --recurse-submodules
    cd ts-spect-fw
    ```
@@ -56,11 +55,14 @@ See [LICENSE](LICENSE) file
    # Set repository root
    export TS_REPO_ROOT=`pwd`
 
-   # Set default revision of Const ROM
-   export DEFAULT_CONST_ROM="revA"
+   # Set default revision of Const ROM <revA, verB, devel>
+   export DEFAULT_CONST_ROM="revB"
    ```
 
-2. Ensure you have the `spect_compiler` and `spect_iss` binaries in the environment path. These are part
+> [!TIP]
+> See available versions in [ts-spect-sdk](modules/ts-spect-sdk/data)
+
+3. Ensure you have the `spect_compiler` and `spect_iss` binaries in the environment path. These are part
 of the [`ts-spect-compiler`](https://github.com/tropicsquare/ts-spect-compiler)
 repository.
 
@@ -69,12 +71,14 @@ repository.
    spect_iss --help
    ```
 
-3. Ensure that Python and certain Python packages are installed on your system or python environment:
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. Ensure your version of `spect_compiler` and `spect_iss` is >= v0.10:
 
-## Build firmware <a name="fwbuild"></a>
+    ```bash
+    spect_compiler --version
+    spect_iss --version
+    ```
+
+## Build <a name="fwbuild"></a>
 ---
 The primary [`Makefile`](Makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware. Run the desired build target using `make`.
@@ -85,41 +89,58 @@ various targets for compiling, releasing and managing the firmware. Run the desi
    make clear
    ```
 
-2. To compile application firmware to `build` directory, use:
+2. To compile firmware to `build` directory, use:
 
    ```bash
    make compile
    ```
 
-3. To set a Const ROM version for the build, set the `ROM_VERSION` variable:
+3. To set a Const ROM version specifically for this build, set the `ROM_VERSION` variable:
 
    ```bash
    make compile ROM_VERSION=<version>
    ```
-   See available versions in [ts-spect-sdk](modules/ts-spect-sdk/data)
 
 ## Release <a name="release"></a>
 ---
 Release application firmware with
 
-```bash
-make release
-```
+   ```bash
+   make clear
+   make release
+   ```
 
-This creates `release` directory with following structure.
+This creates `release` directory with the following structure:
 
 `version` = `git describe --dirty`
 
 | Name | Type | Description |
 | - | - | - |
-| `spect_app_<version>.hex32` | File | Compiled application firmware |
+| `spect_app_<version>.hex32` | File | Compiled firmware |
 | `spect_app_<version>.hex` | Soft link | Link to `spect_app_<version>.hex32` |
 | `spect_const_rom_code_<version>.hex32` | File | Constants ROM code |
 | `spect_const_rom_code_<version>.hex` | Soft link | Link to `spect_const_rom_code_<version>.hex32` |
-| `compile.log` | File | Compilation log files |
+| `compile.log` | File | Compilation log |
 | `spect_ops_constants.h` | File | C header file with SPECT API defines |
-| `dump` | Directory |  Program and symbols dump files |
+| `dump` | Directory | Program and symbols dump files |
 
-## Test/Simulate firmware <a name="fwtestsim"></a>
+## Tests and FWFE <a name="testsfwfe"></a>
 ---
-Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The tests use `models` and `spect_tester` from `ts-spect-sdk` submodule.
+Python scripts for firmware testing and simulation are located in [`tests`](tests) directory. The tests use `models` and `spect_tester` from `ts-spect-sdk` submodule.
+
+To be able to run the tests, make sure you have the repository set up properly as described in [Prerequisites ](#prerequisites-).
+
+- Run regression:
+
+   ```bash
+   cd tests
+   ./regression.sh
+   ```
+
+- Run regression on release target:
+
+   ```bash
+   cd tests
+   make -C .. release
+   ./regression_release.sh
+   ```
