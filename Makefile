@@ -42,6 +42,7 @@ pre_release_check:
 
 clear:
 	rm -rf ${BUILD_DIR}
+	rm -rf ${RELEASE_DIR}
 	rm -f ${SRC_DIR}/mem_layouts/constants_layout.s
 	rm -f ${SRC_DIR}/constants/spect_ops_constants.s
 
