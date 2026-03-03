@@ -122,7 +122,9 @@ def test_run(tester: SpectTester, test_type: TestType):
     #   Generate Test Vector
     ################################################################################################
     # calculate etpub and etpriv
-    etpriv = rn.randint(0, 2**256-1)
+    etpriv_1 = rn.randint(0, 2**256-1)
+    etpriv_2 = rn.randint(0, 2**256-1)
+    etpriv = ((etpriv_2 << 256) | etpriv_1) % (2**256-1)
     etpriv_scalar = x25519.int2scalar(etpriv)
     etpub = x25519.x25519(etpriv_scalar, 9)
 
@@ -200,7 +202,7 @@ def test_run(tester: SpectTester, test_type: TestType):
     test_run_kpg.cmd_start()
     test_run_kpg.set_op(run_name)
 
-    rng = [etpriv] + [rn.randint(0, 2**256-1) for _ in range(8)]
+    rng = [etpriv_1] + [etpriv_2] + [rn.randint(0, 2**256-1) for _ in range(8)]
     test_run_kpg.set_rng(rng)
 
     test_run_kpg.run()

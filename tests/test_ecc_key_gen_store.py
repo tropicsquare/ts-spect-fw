@@ -98,7 +98,8 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
 
     if curve_type == CurveType.ED25519:
         if op_name == TEST_GENERATE:
-            k = int2bytes(rng[0])
+            k_int = ((rng[1] << 256) | rng[0]) % (2**256 - 1)
+            k = int2bytes(k_int)
         else:
             k = random_bytes(32)
         priv1_ref, priv2_ref, pub_ref = __get_ed25519_keys(k)

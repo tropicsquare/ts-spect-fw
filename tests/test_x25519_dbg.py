@@ -23,8 +23,10 @@ SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
 def test_run(tester: SpectTester):
+    priv_1 = rn.randint(0, 2**256-1)
+    priv_2 = rn.randint(0, 2**256-1)
+    priv = ((priv_2 << 256) | priv_1) % (2**256-1)
 
-    priv = rn.randint(0, 2**256-1)
     priv_scalar = x25519.int2scalar(priv)
     pub = x25519.x25519(priv_scalar, 9)
 
