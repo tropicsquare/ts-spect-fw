@@ -44,7 +44,13 @@ ed25519_key_setup:
     JMP         ed25519_key_setup_start
 
 ed25519_key_setup_generate_k:
+    ; We call GRV twice in case of the external TRNG provides less the 256 bits
+    ; of entropy. The final generated k is from interval [0, 2**256-2], We omit
+    ; to use simple XOR of r18 and r19 due to possible issues caused in TSV
+    GRV         r18
     GRV         r19
+    LD          r31, ca_ffff        ; r31 <- 2^256 - 1
+    REDP        r19, r19, r18       ; r19 <- r19 * 2^256 + r18 (mod 2^256 - 1)
 ed25519_key_setup_start:
     ; Add padding to k
     MOVI        r18, 1
