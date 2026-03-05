@@ -122,3 +122,4 @@
 .include    others/hash_to_field.s
 .include    others/clear_data_buffs.s
 .include    others/extend_tmac_mask.s
+.include    others/get_secure_random.s
