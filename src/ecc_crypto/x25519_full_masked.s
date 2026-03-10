@@ -50,6 +50,10 @@ x25519_full_masked:
     XOR         r0,  r0,  r16
     BRNZ        x25519_pubkey_fail
 
+    ; Check ord(P) > 8
+    CALL        point_order_check_curve25519
+    BRZ         x25519_pubkey_fail
+
     ; 1) Compute P1.y from P1.x
     CALL        get_y_curve25519
     BRNZ        x25519_pubkey_fail
