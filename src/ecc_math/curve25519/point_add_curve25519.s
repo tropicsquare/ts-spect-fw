@@ -11,8 +11,6 @@
 ; ==============================================================================
 ;
 ; General point addition on Curve25519
-; Uses Algorithm 1 from https://eprint.iacr.org/2015/1060.pdf with
-; birational mapping Curve25519 <-> W-25519
 ;
 ; Inputs:
 ;               X    Z    Y
@@ -26,66 +24,58 @@
 ;   Curve25519 prime in r31
 ;
 ; Modified registers
-;   r0-6, r20-22
+;   r0-6
+;
+; Algorithm:
+;   U1 = X1 * Z2
+;   U2 = X2 * Z1
+;   S1 = Y1 * Z2
+;   S2 = Y2 * Z1
+;   H  = U2 - U1
+;   R  = S2 - S1
+;   ZZ = Z1 * Z2
+;
+;   NX = R^2 * ZZ - H^2 * (A * ZZ + U1 + U2)
+;
+;   X3 = H * NX
+;   Y3 = R * (U1 * H^2 - NX) - S1 * H^3
+;   Z3 = H^3 * ZZ
 ;
 ; ==============================================================================
 
 point_add_curve25519:
-    LD          r20, ca_w25519_a
-    LD          r21, ca_w25519_3b
-    LD          r22, ca_curve25519_amap
+    MUL25519    r0,  r7,  r12           ; r0 <- U1
+    MUL25519    r1,  r11, r8            ; r1 <- U2
+    MUL25519    r2,  r9,  r12           ; r2 <- S1
+    MUL25519    r3,  r13, r8            ; r3 <- S2
+    MUL25519    r4,  r8,  r12           ; r4 <- ZZ
 
-    ; Map inputs to W-25519
-    MUL25519    r5,  r22, r8
-    ADDP        r5,  r5,  r7
-    MUL25519    r6,  r22, r12
-    ADDP        r6,  r6,  r11
+    SUBP        r5,  r1,  r0            ; r5 <- H
+    ADDP        r1,  r0,  r1            ; r1 <- U1 + U2             (last use of U2)
+    SUBP        r3,  r3,  r2            ; r3 <- R                   (last use of S2)
 
-    ; Add the points on W-25519
-    MUL25519    r0,  r5,  r6
-    MUL25519    r1,  r9,  r13
-    MUL25519    r2,  r8,  r12
-    ADDP        r3,  r5,  r9
-    ADDP        r4,  r6,  r13
-    MUL25519    r3,  r3,  r4
-    ADDP        r4,  r0,  r1
-    SUBP        r3,  r3,  r4
-    ADDP        r4,  r5,  r8
-    ADDP        r5,  r6,  r12
-    MUL25519    r4,  r4,  r5
-    ADDP        r5,  r0,  r2
-    SUBP        r4,  r4,  r5
-    ADDP        r5,  r9,  r8
-    ADDP        r11, r13, r12
-    MUL25519    r5,  r5,  r11
-    ADDP        r11, r1,  r2
-    SUBP        r5,  r5,  r11
-    MUL25519    r12, r20, r4
-    MUL25519    r11, r21, r2
-    ADDP        r12, r11, r12
-    SUBP        r11, r1,  r12
-    ADDP        r12, r1,  r12
-    MUL25519    r13, r11, r12
-    ADDP        r1,  r0,  r0
-    ADDP        r1,  r1,  r0
-    MUL25519    r2,  r20, r2
-    MUL25519    r4,  r21, r4
-    ADDP        r1,  r1,  r2
-    SUBP        r2,  r0,  r2
-    MUL25519    r2,  r20, r2
-    ADDP        r4,  r4,  r2
-    MUL25519    r0,  r1,  r4
-    ADDP        r13, r13, r0
-    MUL25519    r0,  r5,  r4
-    MUL25519    r11, r3,  r11
-    SUBP        r11, r11, r0
-    MUL25519    r0,  r3,  r1
-    MUL25519    r12, r5,  r12
-    ADDP        r12, r12, r0
+    MUL25519    r6,  r5,  r5            ; r6 <- H^2
+    MUL25519    r13, r6,  r5            ; r12 <- H^3
 
-    ; Map the result back to Curve25519
-    MUL25519    r22, r22, r12
-    SUBP        r11, r11, r22
+    MUL25519    r12, r13, r4            ; X3
+
+    MUL25519    r2,  r2,  r13           ; r2 < S1 * H^3             (last use of S1 and H^3)
+
+    MUL25519    r13, r3,  r3            ; r12 <- R^2
+    MUL25519    r13, r13, r4            ; r12 <- R^2 * ZZ
+    LD          r11, ca_curve25519_a
+    MUL25519    r4,  r4,  r11           ; r4 <- A * ZZ              (last use of ZZ)
+    ADDP        r4,  r4,  r1            ; r4 <- A * ZZ + U1 + U2    (last use of U1+U2)
+    MUL25519    r4,  r4,  r6            ; r4 <- H^2(A * ZZ + U1 + U2)
+    SUBP        r1,  r13, r4            ; r1 <- NX
+
+    MUL25519    r11, r1,  r5            ; X3                        (last use of H)
+
+    MUL25519    r4,  r0,  r6            ; r4 <- U1 * H^2            (last use of U1 and H^2)
+    SUBP        r4,  r4,  r1            ; r4 <- U1 * H^2 - NX       (last use of NX)
+    MUL25519    r4,  r4,  r3            ; r4 <- R * (U1 * H^2 - NX) (last use of R)
+
+    SUBP        r13, r4,  r2            ; Y3
 
     RET
 
