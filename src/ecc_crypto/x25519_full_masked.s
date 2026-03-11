@@ -27,11 +27,11 @@
 ;
 ; Full algorithm:
 ;    1) Compute P1.y from P1.x
-;    2) Randomize P1.z
-;    3) Mask the scalar s as s2 = s + r2 * #E
-;    4) Generate random point P2 (See str2point.md)
-;    5) Compute sP2.x = s2.P2
-;    6) Recover sP2.y
+;    2) Mask the scalar s as s2 = s + r2 * #E
+;    3) Generate random point P2 (See str2point.md)
+;    4) Compute sP2.x = s2.P2
+;    5) Recover sP2.y
+;    6) Randomize P1.z
 ;    7) Compute P3 = P2 + P1
 ;    8) Mask scalar s as s3 = s + r3 * #E
 ;    9) Compute sP3.x = s3.P3
@@ -54,21 +54,12 @@ x25519_full_masked:
     CALL        get_y_curve25519
     BRNZ        x25519_pubkey_fail
 
-    ; 2) Randomize P1.z
-x25519_full_masked_z_randomize:
-    GRV         r2
-    LD          r1, ca_gfp_gen_dst
-    CALL        hash_to_field
-    ORI         r18, r0,  1                     ; Ensure that Z != 0
-    MUL25519    r16, r16, r18
-    MUL25519    r17, r17, r18
-
-    ; 3) Mask the scalar s as s2 = s + r2 * #E
+    ; 2) Mask the scalar s as s2 = s + r2 * #E
     GRV         r30
     LD          r31, ca_q25519_8
     SCB         r28, r19, r30
 
-    ; 4) Generate random point P2
+    ; 3) Generate random point P2
     LD          r31, ca_p25519
     CALL        curve25519_point_generate
 
@@ -87,13 +78,21 @@ x25519_full_masked_z_randomize:
     XOR         r4,  r4,  r8
     BRZ         x25519_spm_fail
 
-    ; 6) Recover sP2.y
+    ; 5) Recover sP2.y
     CALL        y_recovery_curve25519
     MOV         r23, r7
     MOV         r24, r8
     MOV         r25, r9
     CALL        point_check_curve25519
-    BRNZ        x25519_spm_fail
+    BRNZ        x25519_point_integrity_err
+
+    ; 6) Randomize P1.z
+    GRV         r2
+    LD          r1, ca_gfp_gen_dst
+    CALL        hash_to_field
+    ORI         r18, r0,  1                     ; Ensure that Z != 0
+    MUL25519    r16, r16, r18
+    MUL25519    r17, r17, r18
 
     ; 7) Compute P3 = P2 + P1
     MOV         r7,  r16
