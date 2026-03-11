@@ -63,20 +63,25 @@ x25519_full_masked:
     LD          r31, ca_p25519
     CALL        curve25519_point_generate
 
-    ; 5) Compute sP2 = s2.P2
+    ; And check that P2 != +-P1 (P1.x * P2.z != P2x)
+    MUL25519    r0,  r16, r12
+    XOR         r0,  r0,  r11
+    BRZ         x25519_point_integrity_err          ; We fail as the probability is ~ 2^(-253)
+
+    ; 4) Compute sP2 = s2.P2
     CALL        spm_curve25519_long
     ; invariant check
     CMPI        r0,  0
-    BRNZ        x25519_spm_fail
+    BRNZ        x25519_point_integrity_err
     ; call check
     LD          r4,  ca_call_check_level_1
     CMPI        r4,  call_check_level_1_id
     MOVI        r4,  0
     ST          r4,  ca_call_check_level_1
-    BRNZ        x25519_spm_fail
-    ; sP2 != O
+    BRNZ        x25519_point_integrity_err
+    ; sP2 != O -> P2 was low order point (~ 2^(-253) probability)
     XOR         r4,  r4,  r8
-    BRZ         x25519_spm_fail
+    BRZ         x25519_point_integrity_err
 
     ; 5) Recover sP2.y
     CALL        y_recovery_curve25519
@@ -110,21 +115,21 @@ x25519_full_masked:
     CALL        spm_curve25519_long
     ; invariant check
     CMPI        r0,  0
-    BRNZ        x25519_spm_fail
+    BRNZ        x25519_point_integrity_err
     ; call check
     LD          r4, ca_call_check_level_1
     CMPI        r4, call_check_level_1_id
     MOVI        r4, 0
     ST          r4, ca_call_check_level_1
-    BRNZ        x25519_spm_fail
+    BRNZ        x25519_point_integrity_err
     ; sP3 != O
     XOR         r4,  r4,  r8
-    BRZ         x25519_spm_fail
+    BRZ         x25519_point_integrity_err
 
     ;10) Recover sP3.y
     CALL        y_recovery_curve25519
     CALL        point_check_curve25519
-    BRNZ        x25519_spm_fail
+    BRNZ        x25519_point_integrity_err
 
     ; 11) Compute sP1 = sP2 - sP3
     MOVI        r0,  0
@@ -142,7 +147,7 @@ x25519_full_masked:
     MOVI        r12, 1
 
     CALL        point_check_curve25519
-    BRNZ        x25519_spm_fail
+    BRNZ        x25519_point_integrity_err
 
     MOVI        r0,  ret_op_success
 
@@ -151,7 +156,7 @@ x25519_pubkey_fail:
     MOVI        r0,  ret_x25519_err_inv_pub_key
     RET
 
-x25519_spm_fail:
+x25519_point_integrity_err:
     MOVI        r0,  ret_point_integrity_err
     RET
 
