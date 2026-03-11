@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - TMAC mask requires only one GRV call and is extended using SHA-512
+- Ed25519 and X25519 uses `get_secure_random` routine in case of GRV provides less then 256 bit of entropy
 
 ### Added
 
