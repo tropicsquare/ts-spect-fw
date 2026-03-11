@@ -53,14 +53,10 @@ map_to_curve_elligator2_curve25519:
     MOVI        r30, 0x001
     ADDP        r7,  r6,  r30       ; xd = tv1 + 1 % p
                                     ; Nonzero: -1 is square (mod p), tv1 is not
-.ifdef SPECT_ISA_VERSION_1
-    CMPA        r7,  0
-.endif
-.ifdef SPECT_ISA_VERSION_2
     XORI        r30, r7,  0
-.endif
     ; If xd == 0, the resulting point is point at infinity ->
-    BRZ         curve25519_point_generate_y_final
+    BRZ         curve25519_point_generate_fail  ; We rater fail, the probability is ~ 2^(-253)
+
     LD          r8,  ca_curve25519_a
     MOVI        r30, 0x000
     SUBP        r9,  r30, r8        ; x1n = -A  % p             x1 = x1n / xd = -A / (1 + 2 * u^2)
@@ -90,13 +86,7 @@ map_to_curve_elligator2_curve25519:
 
     ; e1 = tv2 == gx1
     ; y1 = cmov(y12, y11, e1)   If g(x1) is square, this is its sqrt
-.ifdef SPECT_ISA_VERSION_1
-    SUBP        r4,  r10, r8
-    CMPA        r4,  0
-.endif
-.ifdef SPECT_ISA_VERSION_2
     XOR         r4, r10, r8
-.endif
     BRNZ        curve25519_point_generate_y1_y12
 
 curve25519_point_generate_y1_y11:
@@ -121,12 +111,7 @@ curve25519_point_generate_y1_next:
 
     SUBP        r30, r10, r6        ; e2 = tv2 == gx2
                                     ; y2 = cmov(y22, y21, e2)   If g(x2) is square, this is its sqrt
-.ifdef SPECT_ISA_VERSION_1
-    CMPA        r30, 0
-.endif
-.ifdef SPECT_ISA_VERSION_2
     XORI        r30, r30, 0
-.endif
     BRNZ        curve25519_point_generate_y2_y22
 curve25519_point_generate_y2_y21:
     MOV         r0, r3
@@ -141,12 +126,7 @@ curve25519_point_generate_y2_next:
 
     SUBP        r30, r10, r8,       ; e3 = tv2 == gx1
                                     ; xn = cmov(x2n, x1n, e3)   If e3, x = x1, else x = x2
-.ifdef SPECT_ISA_VERSION_1
-    CMPA        r30, 0
-.endif
-.ifdef SPECT_ISA_VERSION_2
     XORI        r30, r30, 0
-.endif
     BRNZ        curve25519_point_generate_xn_x2n
 
 curve25519_point_generate_xn_x1n:
@@ -178,15 +158,17 @@ curve25519_point_generate_y_next:
     AND         r6,  r2,  r8        ; e4 = sgn0(y) == 1      Fix sign of y
     XOR         r30, r30, r6
                                     ; y = cmov(y, -y, e3 ^ e4)
+    MOVI        r0,  pass_val
     BRZ         curve25519_point_generate_y_plus
 
 curve25519_point_generate_y_minus:
     MOV         r11, r1
-    JMP         curve25519_point_generate_y_final
+    RET
 
 curve25519_point_generate_y_plus:
     MOV         r11, r2
-    JMP         curve25519_point_generate_y_final
+    RET
 
-curve25519_point_generate_y_final:
+curve25519_point_generate_fail:
+    MOVI        r0,  fail_val
     RET
