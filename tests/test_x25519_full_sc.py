@@ -29,8 +29,8 @@ class TestType(Enum):
     EMPTY_SLOT = 1
     INVALID_PUB_FIELD = 2
     INVALID_PUB_SQRR = 3
-    # Not Implemented in FW
-    #INVALID_PUB_INF = 4
+    INVALID_PUB_INF = 4
+    INVALID_PUB_ORDER = 5
 
 OP_KPAIR_GEN = "x25519_kpair_gen"
 OP_ET_EH = "x25519_sc_et_eh"
@@ -62,12 +62,18 @@ EXPECTED_STATUS = {
         OP_ET_SH: SpectOpStatus.RET_CTX_ERR,
         OP_ST_EH: SpectOpStatus.RET_CTX_ERR,
     },
-    #TestType.INVALID_PUB_INF : {
-    #    OP_KPAIR_GEN: SpectOpStatus.RET_OP_SUCCESS,
-    #    OP_ET_EH: SpectOpStatus.RET_X25519_ERR_INV_PUB_KEY,
-    #    OP_ET_SH: SpectOpStatus.RET_CTX_ERR,
-    #    OP_ST_EH: SpectOpStatus.RET_CTX_ERR,
-    #}
+    TestType.INVALID_PUB_INF : {
+        OP_KPAIR_GEN: SpectOpStatus.RET_OP_SUCCESS,
+        OP_ET_EH: SpectOpStatus.RET_X25519_ERR_INV_PUB_KEY,
+        OP_ET_SH: SpectOpStatus.RET_CTX_ERR,
+        OP_ST_EH: SpectOpStatus.RET_CTX_ERR,
+    },
+    TestType.INVALID_PUB_ORDER : {
+        OP_KPAIR_GEN: SpectOpStatus.RET_OP_SUCCESS,
+        OP_ET_EH: SpectOpStatus.RET_X25519_ERR_INV_PUB_KEY,
+        OP_ET_SH: SpectOpStatus.RET_CTX_ERR,
+        OP_ST_EH: SpectOpStatus.RET_CTX_ERR,
+    }
 }
 
 EXPECTED_DATA_SIZE = {
@@ -95,16 +101,24 @@ EXPECTED_DATA_SIZE = {
         OP_ET_SH: 0,
         OP_ST_EH: 0,
     },
-    #TestType.INVALID_PUB_INF : {
-    #    OP_KPAIR_GEN: 32,
-    #    OP_ET_EH: 32,
-    #    OP_ET_SH: 32,
-    #    OP_ST_EH: 32,
-    #}
+    TestType.INVALID_PUB_INF : {
+        OP_KPAIR_GEN: 32,
+        OP_ET_EH: 0,
+        OP_ET_SH: 0,
+        OP_ST_EH: 0,
+    },
+    TestType.INVALID_PUB_ORDER : {
+        OP_KPAIR_GEN: 32,
+        OP_ET_EH: 0,
+        OP_ET_SH: 0,
+        OP_ST_EH: 0,
+    }
 }
 
 SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
+
+LOW_ORDER_PUB = 0x57119fd0dd4e22d8868e1c58c45c44045bef839c55b1d0b1248c50a3bc959c5f
 
 def gen_invalid_pub() -> int:
     is_square = True
@@ -152,8 +166,10 @@ def test_run(tester: SpectTester, test_type: TestType):
         ehpub = rn.randint(x25519.p, 2**256-1)
     elif test_type == TestType.INVALID_PUB_SQRR:
         ehpub = gen_invalid_pub()
-    #elif test_type == TestType.INVALID_PUB_INF:
-    #    ehpub = 0
+    elif test_type == TestType.INVALID_PUB_INF:
+        ehpub = 0
+    elif test_type == TestType.INVALID_PUB_ORDER:
+        ehpub = LOW_ORDER_PUB
 
     tester.info(
         f"Ephemeral Host:\n"+
