@@ -10,7 +10,7 @@
 ;
 ; ==============================================================================
 ;
-; Check if point P in x-only coordinates is not of order h=8
+; Check if point P in x-only coordinates is not of low-order (<= 8)
 ;
 ;   [8].P != O
 ;
@@ -25,6 +25,9 @@
 ;
 ; Modified registers:
 ;   r1,2,3,6,7,8
+;
+; Subroutines:
+;   point_xdbl_curve25519
 ;
 ; ==============================================================================
 
