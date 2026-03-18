@@ -10,3 +10,4 @@ spect_ops_constants.h
 spect_ops_constants.s
 constants_*layout.s
 .*
+tests/program_dump_coverage.s
