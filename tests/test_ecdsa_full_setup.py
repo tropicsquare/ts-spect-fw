@@ -7,7 +7,9 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
-import models.p256 as p256
+from spect_models.ECDSA import ECDSA_SECP256R1 as ECDSA
+from spect_models.Curves.secp256r1 import secp256r1
+from spect_models.Fields.Field_secp256r1 import Field
 
 from spect_tester.spect_tester import SpectTester, SpectTestRun
 from spect_tester.spect_memory import SpectMem
@@ -217,20 +219,18 @@ if __name__ == "__main__":
     k = random_bytes(32)
     slot = rn.randint(0,31)
 
-    d, w, Ax, Ay = p256.key_gen(k)
-    pub_ref = Ax.to_bytes(32, 'big') + Ay.to_bytes(32, 'big')
+    key = ECDSA.KeyGen(k)
 
     sch = random_bytes(32)
     scn = random_bytes(4)
     msg = random_bytes(32)
 
-    r_ref, s_ref = p256.sign(d, w, sch, scn, msg)
-    signature_ref = int2bytes(r_ref, endianity='big') + int2bytes(s_ref, endianity='big')
+    signature_ref = ECDSA.Sign(M=msg, Key=key, sch=sch, scn=scn)
 
     tester.info(f"K: {k.hex()}")
-    tester.info(f"Pub ref: {pub_ref.hex()}")
+    tester.info(f"Pub ref: {key.PublicBytes().hex()}")
     tester.info(f"Slot: {slot}")
-    tester.info(f"Signature ref: {signature_ref.hex()}")
+    tester.info(f"Signature ref: {signature_ref.to_bytes().hex()}")
 
     ################################################################################################
     #   Store Key
@@ -248,7 +248,7 @@ if __name__ == "__main__":
 
     tester.info(f"Signature: {signature.hex()}")
 
-    if signature != signature_ref:
+    if signature != signature_ref.to_bytes():
         tester.error("Signature Mismatch")
 
     ################################################################################################
@@ -262,7 +262,7 @@ if __name__ == "__main__":
 
     tester.info(f"Pub: {pub.hex()}")
 
-    if pub != pub_ref:
+    if pub != key.PublicBytes():
         tester.error("Public Key Mismatch")
 
     if curve != CurveType.P256:

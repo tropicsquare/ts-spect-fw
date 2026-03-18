@@ -9,7 +9,9 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
-import models.ed25519 as ed25519
+from spect_models.EdDSA import EdDSA, KeyPair, Signature
+from spect_models.Curves.Ed25519 import Ed25519
+from spect_models.Fields.Field255 import Field
 
 from spect_tester.spect_tester import SpectTester, SpectTestRun
 from spect_tester.spect_memory import SpectMem
@@ -47,7 +49,7 @@ class TestType(Enum):
 #   Key Memory Generator
 ####################################################################################################
 ####################################################################################################
-def create_key_mem(test_type: TestType, s, prefix, A, slot) -> KeyMem:
+def create_key_mem(test_type: TestType, Key: KeyPair, slot: int) -> KeyMem:
     keymem = KeyMem()
     if test_type == TestType.EMPTY_SLOT:
         return keymem
@@ -55,19 +57,20 @@ def create_key_mem(test_type: TestType, s, prefix, A, slot) -> KeyMem:
     priv_slot = slot<<1
     pub_slot = priv_slot+1
 
-    s1 = rn.randint(1, ed25519.q-1)
-    s2 = (s - s1) % ed25519.q
+    s2 = rn.randint(1, Ed25519.Q-1)
+    s1 = (Key.s - s2) % Ed25519.Q
 
     prefix_mask = rn.randint(0, 2**256 - 1)
-    prefix_masked = prefix ^ prefix_mask
+    prefix_masked = Key.prefix ^ prefix_mask
+
+    pub_bytes = Key.PublicBytes(encoding="spect")
 
     keymem.write(int2bytes(s1),            KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k1'])
     keymem.write(int2bytes(prefix_masked), KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k2'])
     keymem.write(int2bytes(s2),            KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k3'])
     keymem.write(int2bytes(prefix_mask),   KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k4'])
 
-    A_switch = int2bytes(bytes2int(A, endianity='big'))
-    keymem.write(A_switch, KeyTypes.ECC, pub_slot, EccSlot.PUB_OFFSET)
+    keymem.write(pub_bytes,                KeyTypes.ECC, pub_slot,  EccSlot.PUB_OFFSET)
 
     if test_type == TestType.INVALID_CURVE:
         curve = CurveType.P256
@@ -474,9 +477,9 @@ def test_ok(msg_len: int):
     slot = rn.randint(0,31)
 
     k = random_bytes(32)
-    s, prefix, pub = ed25519.key_gen(k)
+    Key = EdDSA.KeyGen(k)
 
-    create_key_mem(TestType.OK, s, prefix, pub, slot).dump(init_keymem_file)
+    create_key_mem(TestType.OK, Key, slot).dump(init_keymem_file)
 
     message = random_bytes(msg_len)
     sch = random_bytes(32)
@@ -492,7 +495,7 @@ def test_ok(msg_len: int):
         f"    scn:      {scn}\n"
     )
 
-    signature_ref = ed25519.sign(s, prefix, pub, sch, scn, message)
+    signature_ref = EdDSA.Sign(message, Key, sch, scn).to_bytes()
     tester.info(f"Signature ref: {signature_ref.hex()}")
 
     ################################################################################################
@@ -537,9 +540,9 @@ def test_err(test_type: TestType):
     slot = rn.randint(0,31)
 
     k = random_bytes(32)
-    s, prefix, pub = ed25519.key_gen(k)
+    Key = EdDSA.KeyGen(k)
 
-    create_key_mem(test_type, s, prefix, pub, slot).dump(init_keymem_file)
+    create_key_mem(test_type, Key, slot).dump(init_keymem_file)
 
     sch = random_bytes(32)
     scn = random_bytes(4)

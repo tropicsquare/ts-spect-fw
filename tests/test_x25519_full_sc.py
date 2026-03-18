@@ -9,6 +9,9 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
+from spect_models.Curves.Curve25519 import Curve25519, CURVE25519_BASE, int2scalar
+from spect_models.Fields.Field255 import Field
+
 from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_memory import SpectMem
 from spect_tester.spect_config import (
@@ -21,8 +24,6 @@ from spect_tester.helpers import (
     int2bytes,
     bytes2int,
 )
-
-import models.x25519 as x25519
 
 class TestType(Enum):
     OK = 0
@@ -118,18 +119,16 @@ EXPECTED_DATA_SIZE = {
 SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
-LOW_ORDER_PUB = 0x57119fd0dd4e22d8868e1c58c45c44045bef839c55b1d0b1248c50a3bc959c5f
+LOW_ORDER_PUB = Curve25519(Field(0x57119fd0dd4e22d8868e1c58c45c44045bef839c55b1d0b1248c50a3bc959c5f))
 
-def gen_invalid_pub() -> int:
-    is_square = True
-    x = 0
-    while(is_square != False):
-        x = rn.randint(1, x25519.p -1)
-        y2 = (x*x*x + x*x*x25519.A + x) % x25519.p
+def gen_invalid_pub() -> Curve25519:
+    x = Field(rn.randint(1, Field.P))
+    P = Curve25519(x)
+    while(P.is_valid()):
+        x = Field(rn.randint(1, Field.P))
+        P = Curve25519(x)
 
-        is_square = (pow(y2, (x25519.p-1)//2, x25519.p)) in [0,1]
-
-    return x
+    return P
 
 def test_run(tester: SpectTester, test_type: TestType):
     ################################################################################################
@@ -137,64 +136,67 @@ def test_run(tester: SpectTester, test_type: TestType):
     ################################################################################################
     # calculate etpub and etpriv
     etpriv = rn.randint(0, 2**256-1)
-    etpriv_scalar = x25519.int2scalar(etpriv)
-    etpub = x25519.x25519(etpriv_scalar, 9)
+    etpriv_scalar = int2scalar(etpriv)
+    etpub = CURVE25519_BASE.spm(etpriv_scalar)
 
     tester.info(
         f"Ephemeral Tropic:\n"+
         f"\tPriv: 0x{etpriv_scalar:064x}\n"+
-        f"\tPub:  0x{etpub:064x}\n"
+        f"\tPub:  {etpub.to_bytes().hex()}\n"
     )
 
     # calculate stpub a stpriv
     stpriv = rn.randint(0, 2**256-1)
-    stpriv_scalar = x25519.int2scalar(stpriv)
-    stpub = x25519.x25519(stpriv_scalar, 9)
+    stpriv_scalar = int2scalar(stpriv)
+    stpub = CURVE25519_BASE.spm(stpriv_scalar)
 
     tester.info(
         f"Static Tropic:\n"+
         f"\tPriv: 0x{stpriv_scalar:064x}\n"+
-        f"\tPub:  0x{stpub:064x}\n"
+        f"\tPub:  {stpub.to_bytes().hex()}\n"
     )
 
     # calculate ehpub and ehpriv
     ehpriv = rn.randint(0, 2**256-1)
-    ehpriv_scalar = x25519.int2scalar(ehpriv)
-    ehpub = x25519.x25519(ehpriv_scalar, 9)
+    ehpriv_scalar = int2scalar(ehpriv)
+    ehpub = CURVE25519_BASE.spm(ehpriv_scalar)
 
+    # We need to use int instead of Curve25519 to be able to represent also invalid pubkeys
     if test_type == TestType.INVALID_PUB_FIELD:
-        ehpub = rn.randint(x25519.p, 2**256-1)
+        ehpub_int = rn.randint(Field.P, 2**256-1)
     elif test_type == TestType.INVALID_PUB_SQRR:
-        ehpub = gen_invalid_pub()
+        ehpub_int = int(gen_invalid_pub())
     elif test_type == TestType.INVALID_PUB_INF:
-        ehpub = 0
+        ehpub_int = 0
     elif test_type == TestType.INVALID_PUB_ORDER:
-        ehpub = LOW_ORDER_PUB
+        ehpub_int = int(LOW_ORDER_PUB)
+    else:
+        ehpub_int = int(ehpub)
 
     tester.info(
         f"Ephemeral Host:\n"+
         f"\tPriv: 0x{ehpriv_scalar:064x}\n"+
-        f"\tPub:  0x{ehpub:064x}\n"
+        f"\tPub:  {int2bytes(ehpub_int).hex()}\n"
     )
 
     # calculate shpub and shpriv
     shpriv = rn.randint(0, 2**256-1)
-    shpriv_scalar = x25519.int2scalar(ehpriv)
-    shpub = x25519.x25519(shpriv_scalar, 9)
+    shpriv_scalar = int2scalar(shpriv)
+    shpub = CURVE25519_BASE.spm(shpriv_scalar)
 
     tester.info(
         f"Static Host:\n"+
         f"\tPriv: 0x{shpriv_scalar:064x}\n"+
-        f"\tPub:  0x{shpub:064x}\n"
+        f"\tPub:  {shpub.to_bytes().hex()}\n"
     )
 
-    X1_int = x25519.x25519(etpriv_scalar, ehpub)
-    R2_int = x25519.x25519(etpriv_scalar, shpub)
-    R3_int = x25519.x25519(stpriv_scalar, ehpub)
+    X1 = ehpub.spm(etpriv_scalar).to_bytes()
+    R2 = shpub.spm(etpriv_scalar).to_bytes()
+    R3 = ehpub.spm(stpriv_scalar).to_bytes()
 
-    tester.info(f"X1: 0x{X1_int:064x}")
-    tester.info(f"R2: 0x{R2_int:064x}")
-    tester.info(f"R3: 0x{R3_int:064x}")
+    tester.info(f"X1: {X1.hex()}")
+    tester.info(f"R2: {R2.hex()}")
+    tester.info(f"R3: {R3.hex()}")
 
     slot = rn.randint(0,3)
     tester.info(f"Slot: {slot}")
@@ -202,7 +204,7 @@ def test_run(tester: SpectTester, test_type: TestType):
     init_keymem_file = os.path.join(tester.test_dir, "init_keymem")
     keymem = KeyMem()
     if test_type != TestType.EMPTY_SLOT:
-        keymem.write(int2bytes(shpub), KeyTypes.SHPUB, slot, offset=0)
+        keymem.write(shpub.to_bytes(), KeyTypes.SHPUB, slot, offset=0)
 
     keymem.write(int2bytes(stpriv), KeyTypes.STPRIV, slot=0, offset=0)
     keymem.dump(init_keymem_file)
@@ -240,10 +242,9 @@ def test_run(tester: SpectTester, test_type: TestType):
 
     if expected_status == SpectOpStatus.RET_OP_SUCCESS:
         r_etpub = test_run_kpg.read_bytes(SpectMem.DataRamOut.base + 0x20, data_out_size)
-        r_etpub_int = bytes2int(r_etpub)
-        test_run_kpg.info(f"ETPUB result: 0x{r_etpub_int:064x}")
+        test_run_kpg.info(f"ETPUB result: {r_etpub}")
 
-        if r_etpub_int != etpub:
+        if r_etpub != etpub.to_bytes():
             test_run_kpg.error("ETPUB Mismatch")
 
     test_run_kpg.status_summary()
@@ -260,7 +261,7 @@ def test_run(tester: SpectTester, test_type: TestType):
 
     test_run_et_eh.set_rng()
 
-    test_run_et_eh.write_bytes(SpectMem.DataRamIn.base+0x20, int2bytes(ehpub))
+    test_run_et_eh.write_bytes(SpectMem.DataRamIn.base+0x20, int2bytes(ehpub_int))
     test_run_et_eh.set_input_size(32)
 
     test_run_et_eh.run()
@@ -284,10 +285,9 @@ def test_run(tester: SpectTester, test_type: TestType):
 
     if expected_status == SpectOpStatus.RET_OP_SUCCESS:
         r_X1 = test_run_et_eh.read_bytes(SpectMem.DataRamOut.base + 0x20, data_out_size)
-        r_X1_int = bytes2int(r_X1)
-        test_run_et_eh.info(f"X1 result: 0x{r_X1_int:064x}")
+        test_run_et_eh.info(f"X1 result: {r_X1}")
 
-        if r_X1_int != X1_int:
+        if r_X1 != X1:
             test_run_et_eh.error("X1 Mismatch")
 
     test_run_et_eh.status_summary()
@@ -328,10 +328,9 @@ def test_run(tester: SpectTester, test_type: TestType):
 
     if expected_status == SpectOpStatus.RET_OP_SUCCESS:
         r_R2 = test_run_et_sh.read_bytes(SpectMem.DataRamOut.base + 0x20, data_out_size)
-        r_R2_int = bytes2int(r_R2)
-        test_run_et_sh.info(f"R2 result: 0x{r_R2_int:064x}")
+        test_run_et_sh.info(f"R2 result: {r_R2}")
 
-        if r_R2_int != R2_int:
+        if r_R2 != R2:
             test_run_et_sh.error("R2 Mismatch")
 
     test_run_et_sh.status_summary()
@@ -348,7 +347,7 @@ def test_run(tester: SpectTester, test_type: TestType):
 
     test_run_st_eh.set_rng()
 
-    test_run_st_eh.write_bytes(SpectMem.DataRamIn.base+0x20, int2bytes(ehpub))
+    test_run_st_eh.write_bytes(SpectMem.DataRamIn.base+0x20, ehpub.to_bytes())
     test_run_st_eh.set_input_size(1)
 
     test_run_st_eh.run()
@@ -372,10 +371,9 @@ def test_run(tester: SpectTester, test_type: TestType):
 
     if expected_status == SpectOpStatus.RET_OP_SUCCESS:
         r_R3 = test_run_st_eh.read_bytes(SpectMem.DataRamOut.base + 0x20, data_out_size)
-        r_R3_int = bytes2int(r_R3)
-        test_run_st_eh.info(f"R3 result: 0x{r_R3_int:064x}")
+        test_run_st_eh.info(f"R3 result: {r_R3}")
 
-        if r_R3_int != R3_int:
+        if r_R3 != R3:
             test_run_st_eh.error("R3 Mismatch")
 
     test_run_st_eh.status_summary()
