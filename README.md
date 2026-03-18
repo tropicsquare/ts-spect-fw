@@ -28,7 +28,7 @@ See [LICENSE](LICENSE) file
 ```
 ├─ src               # Source files
 ├─ tests             # Python scripts for verification
-├─ tests             # API documentation and support markdowns
+├─ doc               # API documentation and support markdowns
 ├─ scripts           # Support scripts
 ├─ modules           # Repository submodules
 │  └─ ts-spect-sdk   # SPECT SDK (test env. + Const ROM content)
@@ -128,19 +128,34 @@ This creates `release` directory with the following structure:
 ---
 Python scripts for firmware testing and simulation are located in [`tests`](tests) directory. The tests use `models` and `spect_tester` from `ts-spect-sdk` submodule.
 
-To be able to run the tests, make sure you have the repository set up properly as described in [Prerequisites ](#prerequisites-).
+To be able to run the tests, make sure you have the repository set up properly as described in [Prerequisites ](#prerequisites-). To run a single test, ensure you have the FW you want to test build in the `build` directory.
 
-- Run regression:
+### Run regression
 
-   ```bash
-   cd tests
-   ./regression.sh
-   ```
+```bash
+cd tests
+./regression.sh
+```
 
-- Run regression on release target:
+### Run regression on release target
 
-   ```bash
-   cd tests
-   make -C .. release
-   ./regression_release.sh
-   ```
+```bash
+cd tests
+make -C .. release
+./regression_release.sh
+```
+
+### Test Code Coverage
+
+After you run the tests, you can collect the test code coverage:
+
+```bash
+./collect_code_coverage.py
+```
+
+This outputs the coverage in percent and number of not executed instructions. It also creates a `program_dump_coverage.s` file, with the not executed instructions marked with `>>>`.
+
+### FWFE
+
+> [!NOTE]
+> Currently, there is no Firmware Fault Emulation test.
