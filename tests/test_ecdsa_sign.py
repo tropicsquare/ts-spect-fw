@@ -8,7 +8,8 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
-import models.p256 as p256
+from spect_models.ECDSA import ECDSA_SECP256R1 as ECDSA
+from spect_models.Fields.Field_secp256r1 import Field
 
 from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_memory import SpectMem
@@ -78,21 +79,21 @@ def test_run(tester: SpectTester, test_type: TestType):
         origin  = 0x1
     )
 
-    d, w, Ax, Ay = p256.key_gen(random_bytes(32))
+    key = ECDSA.KeyGen(seed=random_bytes(32))
+
     sch = random_bytes(32)
     scn = random_bytes(4)
     z   = random_bytes(32)
 
-    r_ref, s_ref = p256.sign(d, w, sch, scn, z)
-    signature_ref = int2bytes(r_ref, endianity='big') + int2bytes(s_ref, endianity='big')
-    test_run.info(f"Signature ref: {signature_ref.hex()}")
+    signature_ref = ECDSA.Sign(M=z, Key=key, sch=sch, scn=scn)
+    test_run.info(f"Signature ref: {signature_ref.to_bytes().hex()}")
 
     wmask = rn.randint(0, 2**256 - 1)
-    w = w ^ wmask
-    d2 = rn.randint(0, p256.q)
-    d1 = (d - d2) % p256.q
+    w = key.w ^ wmask
+    d2 = rn.randint(0, ECDSA.Curve.Q)
+    d1 = (key.d - d2) % ECDSA.Curve.Q
 
-    pub = int2bytes(Ax) + int2bytes(Ay)
+    pub_bytes = key.PublicBytes(encoding="spect")
 
     if test_type != TestType.EMPTY_SLOT:
         test_run.set_key(priv_metadata_ref, KeyTypes.ECC, priv_slot, EccSlot.METADATA_OFFSET)
@@ -103,17 +104,20 @@ def test_run(tester: SpectTester, test_type: TestType):
         test_run.set_key(int2bytes(d2),    KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k3'])
         test_run.set_key(int2bytes(wmask), KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k4'])
 
-        test_run.set_key(pub, KeyTypes.ECC, pub_slot, EccSlot.PUB_OFFSET)
+        test_run.set_key(pub_bytes,        KeyTypes.ECC, pub_slot,  EccSlot.PUB_OFFSET)
 
     if test_type == TestType.EMPTY_SLOT:
         spect_status_ref = SpectOpStatus.RET_KEY_ERR
         l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+
     elif test_type == TestType.INVALID_CURVE:
         spect_status_ref = SpectOpStatus.RET_CURVE_TYPE_ERR
         l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+
     elif test_type == TestType.INVALID_SLOT_NUMBER:
         spect_status_ref = SpectOpStatus.RET_SLOT_METADATA_ERR
         l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+
     else:
         spect_status_ref = SpectOpStatus.RET_OP_SUCCESS
         l3_result_ref = L3Result.L3_RESULT_OK
@@ -175,7 +179,7 @@ def test_run(tester: SpectTester, test_type: TestType):
     signature = test_run.read_bytes(output_mem.base+0x10, 64)
     test_run.info(f"Signature: {signature.hex()}")
 
-    if signature != signature_ref:
+    if signature != signature_ref.to_bytes():
         test_run.error(f"Invalid signature")
 
     test_run.status_summary()

@@ -11,7 +11,9 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
-import models.ed25519 as ed25519
+from spect_models.EdDSA import EdDSA, KeyPair, Signature
+from spect_models.Curves.Ed25519 import Ed25519
+from spect_models.Fields.Field255 import Field
 
 from spect_tester.spect_tester import SpectTester, SpectTestRun
 from spect_tester.spect_memory import (
@@ -146,13 +148,14 @@ if __name__ == "__main__":
     slot = rn.randint(0,31)
 
     k = random_bytes(32)
-    s, prefix, pub_ref = ed25519.key_gen(k)
+    key = EdDSA.KeyGen(k)
 
     message = random_bytes(rn.randint(128, 256))
     sch = random_bytes(32)
     scn = random_bytes(4)
 
-    signature_ref = ed25519.sign(s, prefix, pub_ref, sch, scn, message)
+    signature_ref = EdDSA.Sign(message, key, sch, scn).to_bytes()
+    tester.info(f"Signature ref: {signature_ref.hex()}")
 
     ################################################################################################
     #   Store EdDSA Key
@@ -190,10 +193,10 @@ if __name__ == "__main__":
 
     pub, curve, origin = read_eddsa_key(read_key_run, slot)
 
-    tester.info(f"Pub ref: {pub_ref.hex()}")
+    tester.info(f"Pub ref: {key.PublicBytes().hex()}")
     tester.info(f"Pub:     {pub.hex()}")
 
-    if pub != pub_ref:
+    if pub != key.PublicBytes():
         tester.error("Public key mismatch")
 
     if curve != CurveType.ED25519:
