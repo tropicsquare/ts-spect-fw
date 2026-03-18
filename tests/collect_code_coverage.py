@@ -15,7 +15,7 @@ TS_REPO_ROOT = os.environ["TS_REPO_ROOT"]
 
 if __name__ == "__main__":
 
-    exec_infos = glob.glob(f"{SpectTester.TESTER_DIR}/*/*/exec_info")
+    exec_infos = glob.glob(f"{SpectTester.TESTER_DIR}/*/*/exec_info.csv")
 
     with open(Application.hex_file, 'r') as fw:
         fw_size = len(fw.readlines())
@@ -45,8 +45,7 @@ if __name__ == "__main__":
 
         for i in range(fw_size):
             if coverage[i] == 0:
-                nl = pg_lines[i].strip()
-                nl += " <<<<<<<<<<<<<<<<<<<<<\n"
+                nl = ">>> " + pg_lines[i]
                 pg_lines[i] = nl
 
     with open(f"{TS_REPO_ROOT}/tests/program_dump_coverage.s", 'w') as pg:
