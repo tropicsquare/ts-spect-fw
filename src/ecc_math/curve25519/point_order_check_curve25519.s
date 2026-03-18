@@ -2,7 +2,7 @@
 ;  file    ecc_math/curve25519/point_order_check_curve25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
 ;  This work is subject to the license terms of the LICENSE.txt file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
