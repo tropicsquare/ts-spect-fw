@@ -56,9 +56,10 @@ ca_p256_key_setup_internal_d .eq 0x0120
 ; ==============================================================================
 ca_p256_key_setup_internal_w .eq 0x0140
 ca_ecdsa_sign_internal_z .eq 0x0120
-ca_ecdsa_sign_internal_s .eq 0x0140
 ca_ecdsa_sign_internal_Ax .eq 0x0160
 ca_ecdsa_sign_internal_Ay .eq 0x0180
+ca_ecdsa_sign_internal_r .eq 0x01A0
+ca_ecdsa_sign_internal_s .eq 0x01C0
 
 ; ==============================================================================
 ;   Scalar Point Multiplication
