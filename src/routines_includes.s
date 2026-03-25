@@ -43,8 +43,9 @@
 
 .include   ecc_math/p256/point_add_p256.s
 .include   ecc_math/p256/point_dbl_p256.s
-.include   ecc_math/p256/spm_p256_short.s
+;.include   ecc_math/p256/spm_p256_short.s
 .include   ecc_math/p256/spm_p256_long.s
+.include   ecc_math/p256/spm_p256_double.s
 .include   ecc_math/p256/spm_p256_full_masked.s
 .include   ecc_math/p256/point_check_p256.s
 
@@ -97,6 +98,7 @@
 .include    ecc_crypto/p256_key_setup.s
 .include    ecc_crypto/ed25519_key_setup.s
 .include    ecc_crypto/ecdsa_sign.s
+.include    ecc_crypto/ecdsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
 
 ; ====================================================
