@@ -45,94 +45,13 @@ eddsa_finish_s_randomize:
 ; ==============================================================================
 ;   Verify the signature
 ; ==============================================================================
-    ; decompress public key to extended coordinates
-    LD          r31, ca_p25519
-    LD          r6,  ca_ed25519_d
-    LD          r12, ca_eddsa_sign_internal_A
-    SWE         r12, r12
-    CALL        point_decompress_ed25519
-
-    ; Check decompress success
-    CMPI        r31, 0      ; CLEAR zero flag
-    CMPI        r1,  pass_val
-    BRNZ        eddsa_finish_fail_invalid_pubkey
-    MOVI        r13, 1
-    MUL25519    r14, r11, r12
-
-    ; Compute e.A
-    MOV         r28, r25
-
-    CALL        spm_ed25519_short
-    ; spm invariant check
-    CMPI        r0,  pass_val
-    BRNZ        eddsa_finish_fail_verify
-    ; call check
-    LD          r4, ca_call_check_level_1
-    CMPI        r4, call_check_level_1_id
-    MOVI        r4, 0
-    ST          r4, ca_call_check_level_1
-    BRNZ        eddsa_finish_fail_verify
-    ; check Q1 != O
-    CALL        point_check_infinity_ed25519
-    BRZ         eddsa_finish_fail_verify
-
-    ST          r7,  ca_eddsa_sign_internal_EAx
-    ST          r8,  ca_eddsa_sign_internal_EAy
-    ST          r9,  ca_eddsa_sign_internal_EAz
-    ST          r10, ca_eddsa_sign_internal_EAt
-
-    ; Compute S.G
-    LD          r28, ca_eddsa_sign_internal_S
-    LD          r11, ca_ed25519_xG
-    LD          r12, ca_ed25519_yG
-    MOVI        r13, 1
-    MUL25519    r14, r11, r12
-
-    CALL        spm_ed25519_short
-    ; spm invariant check
-    CMPI        r0,  pass_val
-    BRNZ        eddsa_finish_fail_verify
-    ; call check
-    LD          r4, ca_call_check_level_1
-    CMPI        r4, call_check_level_1_id
-    MOVI        r4, 0
-    ST          r4, ca_call_check_level_1
-    BRNZ        eddsa_finish_fail_verify
-    ; check Q1 != O
-    CALL        point_check_infinity_ed25519
-    BRZ         eddsa_finish_fail_verify
-
-    LD          r11, ca_eddsa_sign_internal_EAx
-    LD          r12, ca_eddsa_sign_internal_EAy
-    LD          r13, ca_eddsa_sign_internal_EAz
-    LD          r14, ca_eddsa_sign_internal_EAt
-
-    MOVI        r0,  0
-    SUBP        r11, r0,  r11
-    SUBP        r14, r0,  r14
-
-    CALL        point_add_ed25519
-    MOV         r7,  r11
-    MOV         r8,  r12
-    MOV         r9,  r13
-
-    ; ENC(Q)
-    CALL        point_compress_ed25519
-
-    LD          r4,  ca_eddsa_sign_internal_R
-
-    ; ENC(Q) == ENC(R)
-    MOVI        r31,  0xFFF
-    ; Compare twice to prevent FI attempts
-    CMPI        r31, 0     ; Clear zero flag
-    XOR         r2,  r8,  r4
+    CALL        eddsa_verify_e
+    CMPI        r30, pass_val
     BRNZ        eddsa_finish_fail_verify
 
-    CMPI        r31,  0     ; Clear zero flag
-    XOR         r2,  r4,  r8
-    BRNZ        eddsa_finish_fail_verify
-    ;
-
+; ==============================================================================
+;   Finish
+; ==============================================================================
     CALL        get_output_base
     ADDI        r30, r0,  eddsa_output_result
 

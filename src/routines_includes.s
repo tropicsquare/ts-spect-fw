@@ -32,8 +32,9 @@
 .include   ecc_math/ed25519/point_decompress_ed25519.s
 .include   ecc_math/ed25519/point_add_ed25519.s
 .include   ecc_math/ed25519/point_dbl_ed25519.s
-.include   ecc_math/ed25519/spm_ed25519_short.s
+;.include   ecc_math/ed25519/spm_ed25519_short.s
 .include   ecc_math/ed25519/spm_ed25519_long.s
+.include   ecc_math/ed25519/spm_ed25519_double.s
 .include   ecc_math/ed25519/spm_ed25519_full_masked.s
 .include   ecc_math/ed25519/point_valid_check_ed25519.s
 ;.include   ecc_math/ed25519/point_order_check_ed25519.s
@@ -78,6 +79,7 @@
 .include    eddsa_sequence/eddsa_e_update.s
 .include    eddsa_sequence/eddsa_e_finish.s
 .include    eddsa_sequence/eddsa_finish.s
+.include    eddsa_sequence/eddsa_verify_e.s
 
 ; ====================================================
 ; ECC Point Generation
