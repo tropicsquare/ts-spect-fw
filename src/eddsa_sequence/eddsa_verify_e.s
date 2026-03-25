@@ -27,6 +27,10 @@ eddsa_verify_e_pass:
     MOVI        r30,  pass_val
     RET
 
+eddsa_verify_e_call_check:
+    ; Store call check
+    MOVI        r0,  call_check_level_1_id
+    ST          r0,  ca_call_check_level_1
 eddsa_verify_e:
     ; Check E != 0
     MOVI        r0, 0
@@ -96,11 +100,11 @@ eddsa_verify_e:
     CALL        point_compress_ed25519
 
     ; r4 <- ENC(R)
-    LD          r4,  ca_eddsa_sign_internal_R
+    LD          r5,  ca_eddsa_sign_internal_R
 
     ; Check ENC(Q) == ENC(R)
     CMPI        r31, 0     ; Clear zero flag
-    XOR         r2,  r8,  r4
+    XOR         r2,  r8,  r5
     BRZ         eddsa_verify_e_pass
 
 eddsa_verify_e_fail:

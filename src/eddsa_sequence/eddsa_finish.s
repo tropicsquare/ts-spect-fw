@@ -45,7 +45,14 @@ eddsa_finish_s_randomize:
 ; ==============================================================================
 ;   Verify the signature
 ; ==============================================================================
-    CALL        eddsa_verify_e
+    CALL        eddsa_verify_e_call_check
+    ; Call check
+    LD          r4, ca_call_check_level_1
+    CMPI        r4, call_check_level_1_id
+    MOVI        r4, 0
+    ST          r4, ca_call_check_level_1
+    BRNZ        ecdsa_fail_verify
+    ; Check retval
     CMPI        r30, pass_val
     BRNZ        eddsa_finish_fail_verify
 
@@ -58,9 +65,9 @@ eddsa_finish_s_randomize:
     MOVI        r2,  l3_result_ok
     STR         r2,  r30
     ADDI        r30, r0,  eddsa_finish_output_signature
+    SWE         r5,  r5
+    STR         r5,  r30
     LD          r5,  ca_eddsa_sign_internal_S
-    SWE         r4,  r4
-    STR         r4,  r30
     ADDI        r30, r30,  0x20
     STR         r5,  r30
 
