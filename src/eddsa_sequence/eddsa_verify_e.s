@@ -85,6 +85,8 @@ eddsa_verify_e:
 
     ; (r7, r8, r9, r10) <- Q = [-E].A + [S].G
     CALL        spm_ed25519_double
+    CMPI        r0,  pass_val
+    BRNZ        eddsa_verify_e_fail
 
     ; check Q != O
     CALL        point_check_infinity_ed25519
