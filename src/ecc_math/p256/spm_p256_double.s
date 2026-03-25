@@ -36,13 +36,6 @@
 ; ==============================================================================
 
 spm_p256_double:
-    MOVI    r0,  0
-    MOVI    r1,  1
-
-    ST      r0,  ca_dspm_point_Ox
-    ST      r1,  ca_dspm_point_Oy
-    ST      r0,  ca_dspm_point_Oz
-
     ST      r12, ca_dspm_point_P1x
     ST      r13, ca_dspm_point_P1y
     ST      r14, ca_dspm_point_P1z
@@ -64,6 +57,10 @@ spm_p256_double:
     MOVI    r9,  0
     MOVI    r10, 1
     MOVI    r11, 0
+
+    ST      r9,  ca_dspm_point_Ox
+    ST      r10, ca_dspm_point_Oy
+    ST      r11, ca_dspm_point_Oz
 
     ROL8    r28, r28
     ROL8    r29, r29

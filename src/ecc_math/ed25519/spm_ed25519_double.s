@@ -34,14 +34,6 @@
 ; ==============================================================================
 
 spm_ed25519_double:
-    MOVI    r0,  0
-    MOVI    r1,  1
-
-    ST      r0,  ca_dspm_point_Ox
-    ST      r1,  ca_dspm_point_Oy
-    ST      r1,  ca_dspm_point_Oz
-    ST      r0,  ca_dspm_point_Ot
-
     ST      r11, ca_dspm_point_P1x
     ST      r12, ca_dspm_point_P1y
     ST      r13, ca_dspm_point_P1z
@@ -68,6 +60,11 @@ spm_ed25519_double:
     MOVI    r8,  1
     MOVI    r9,  1
     MOVI    r10, 0
+
+    ST      r7,  ca_dspm_point_Ox
+    ST      r8,  ca_dspm_point_Oy
+    ST      r9,  ca_dspm_point_Oz
+    ST      r10, ca_dspm_point_Ot
 
     ROL8    r28, r28
     ROL8    r29, r29
