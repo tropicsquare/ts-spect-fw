@@ -76,11 +76,14 @@ ecdsa_verify:
     MOVI        r17, 1
 
     CALL        spm_p256_double
+    CMPI        r0,  pass_val
+    BRNZ        ecdsa_verify_fail
 
     MOV         r1,  r11
     CALL        inv_p256
 
-    MULP        r0,  r12, r1
+    ; r0 <- Qx
+    MUL256      r0,  r9,  r1
 
 ; ==============================================================================
 ;   Check: [u1.G + u2.A]x == r
