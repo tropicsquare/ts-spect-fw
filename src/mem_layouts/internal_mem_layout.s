@@ -70,6 +70,34 @@ ca_spm_internal_Pz .eq 0x0540
 ca_spm_internal_Pt .eq 0x0580
 
 ; ==============================================================================
+;   Double Scalar Point Multiplication
+; ==============================================================================
+;
+;   Bits 9:8 of these address constants are derived from the scalars bits.
+;
+;           (  X        Y        Z )
+;       O : 0x0120 - 0x0140 - 0x0160
+ca_dspm_point_Ox .eq 0x0120
+ca_dspm_point_Oy .eq 0x0140
+ca_dspm_point_Oz .eq 0x0160
+
+;      P1 : 0x0220 - 0x0240 - 0x0260
+ca_dspm_point_P1x .eq 0x0220
+ca_dspm_point_P1y .eq 0x0240
+ca_dspm_point_P1z .eq 0x0260
+
+;      P2 : 0x0320 - 0x0340 - 0x0360
+ca_dspm_point_P2x .eq 0x0320
+ca_dspm_point_P2y .eq 0x0340
+ca_dspm_point_P2z .eq 0x0360
+
+; P1 + P2 : 0x0420 - 0x0440 - 0x0460
+ca_dspm_point_P1P2x .eq 0x0420
+ca_dspm_point_P1P2y .eq 0x0440
+ca_dspm_point_P1P2z .eq 0x0460
+
+
+; ==============================================================================
 ;   Call Check
 ; ==============================================================================
 ca_call_check_level_1 .eq 0x0600
