@@ -26,23 +26,11 @@ ca_ed25519_smp_P2t .eq 0x0260
 ; ==============================================================================
 ;   EdDSA
 ; ==============================================================================
-ca_eddsa_sign_internal_A .eq 0x0300
-ca_eddsa_sign_internal_R .eq 0x0320
-ca_eddsa_sign_internal_S .eq 0x0340
-ca_eddsa_sign_internal_EAx .eq 0x0360
-ca_eddsa_sign_internal_EAy .eq 0x0380
-ca_eddsa_sign_internal_EAz .eq 0x03A0
-ca_eddsa_sign_internal_EAt .eq 0x03C0
-ca_eddsa_sign_internal_s1 .eq 0x03E0
-ca_eddsa_sign_internal_s2 .eq 0x0400
-
-; ==============================================================================
-;   EdDSA Verify
-; ==============================================================================
-ca_eddsa_verify_internal_SBx .eq 0x0120
-ca_eddsa_verify_internal_SBy .eq 0x0140
-ca_eddsa_verify_internal_SBz .eq 0x0160
-ca_eddsa_verify_internal_SBt .eq 0x0180
+ca_eddsa_sign_internal_A .eq 0x0500
+ca_eddsa_sign_internal_R .eq 0x0520
+ca_eddsa_sign_internal_S .eq 0x0540
+ca_eddsa_sign_internal_s1 .eq 0x0560
+ca_eddsa_sign_internal_s2 .eq 0x0580
 
 ; ==============================================================================
 ;   Ed25519 Key Setup
@@ -64,10 +52,10 @@ ca_ecdsa_sign_internal_s .eq 0x01C0
 ; ==============================================================================
 ;   Scalar Point Multiplication
 ; ==============================================================================
-ca_spm_internal_Px .eq 0x0500
-ca_spm_internal_Py .eq 0x0520
-ca_spm_internal_Pz .eq 0x0540
-ca_spm_internal_Pt .eq 0x0580
+ca_spm_internal_Px .eq 0x0300
+ca_spm_internal_Py .eq 0x0320
+ca_spm_internal_Pz .eq 0x0340
+ca_spm_internal_Pt .eq 0x0380
 
 ; ==============================================================================
 ;   Double Scalar Point Multiplication
@@ -75,27 +63,30 @@ ca_spm_internal_Pt .eq 0x0580
 ;
 ;   Bits 9:8 of these address constants are derived from the scalars bits.
 ;
-;           (  X        Y        Z )
-;       O : 0x0120 - 0x0140 - 0x0160
+;           (  X        Y        Z        T )
+;       O : 0x0120 - 0x0140 - 0x0160 - 0x0180
 ca_dspm_point_Ox .eq 0x0120
 ca_dspm_point_Oy .eq 0x0140
 ca_dspm_point_Oz .eq 0x0160
+ca_dspm_point_Ot .eq 0x0180
 
-;      P1 : 0x0220 - 0x0240 - 0x0260
+;      P1 : 0x0220 - 0x0240 - 0x0260 - 0x0280
 ca_dspm_point_P1x .eq 0x0220
 ca_dspm_point_P1y .eq 0x0240
 ca_dspm_point_P1z .eq 0x0260
+ca_dspm_point_P1t .eq 0x0280
 
-;      P2 : 0x0320 - 0x0340 - 0x0360
+;      P2 : 0x0320 - 0x0340 - 0x0360 - 0x0380
 ca_dspm_point_P2x .eq 0x0320
 ca_dspm_point_P2y .eq 0x0340
 ca_dspm_point_P2z .eq 0x0360
+ca_dspm_point_P2t .eq 0x0380
 
-; P1 + P2 : 0x0420 - 0x0440 - 0x0460
+; P1 + P2 : 0x0420 - 0x0440 - 0x0460 - 0x0480
 ca_dspm_point_P1P2x .eq 0x0420
 ca_dspm_point_P1P2y .eq 0x0440
 ca_dspm_point_P1P2z .eq 0x0460
-
+ca_dspm_point_P1P2t .eq 0x0480
 
 ; ==============================================================================
 ;   Call Check
