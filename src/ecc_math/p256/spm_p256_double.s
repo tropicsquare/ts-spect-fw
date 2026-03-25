@@ -36,14 +36,18 @@
 ; ==============================================================================
 
 spm_p256_double:
+    ; Store the points to their locations
+    ; === P1 ===
     ST          r12, ca_dspm_point_P1x
     ST          r13, ca_dspm_point_P1y
     ST          r14, ca_dspm_point_P1z
 
+    ; === P2 ===
     ST          r15, ca_dspm_point_P2x
     ST          r16, ca_dspm_point_P2y
     ST          r17, ca_dspm_point_P2z
 
+    ; === P1 + P2 ===
     MOV         r9,  r15
     MOV         r10, r16
     MOV         r11, r17
@@ -54,6 +58,7 @@ spm_p256_double:
     ST          r13, ca_dspm_point_P1P2y
     ST          r14, ca_dspm_point_P1P2z
 
+    ; === Accumulator Q = O ===
     MOVI        r9,  0
     MOVI        r10, 1
     MOVI        r11, 0
@@ -62,7 +67,7 @@ spm_p256_double:
     ST          r10, ca_dspm_point_Oy
     ST          r11, ca_dspm_point_Oz
 
-    ; Mask the scalars
+    ; Mask the scalars to prevent profiling
     LD          r31, ca_q256
     GRV         r1
     SCB         r26, r28, r1
@@ -70,42 +75,53 @@ spm_p256_double:
     SCB         r28, r29, r1
     LD          r31, ca_p256
 
+    ; ROL the scalars, so we can use the bits directly as pointers
     ROL8        r27, r27                                ; Move k1_high to position
     ROL8        r29, r29                                ; Move k2_high to position
     ROL         r29, r29
 
+    ; Prepare for loop
     MOVI        r15, 2                                  ; Main loop counter
 
     MOVI        r20, 0x100
     MOVI        r21, 0x200
 
+; ==============================================================================
+;   DSPM Main Loop
+; ==============================================================================
 spm_p256_double_main_loop:
     MOVI        r30, 256    ; i
     MOVI        r16, 0      ; j
 
 spm_p256_double_loop:
-    CALL        point_dbl_p256
+; ------------------------------------------------------------------------------
+;   Inner Loop Body
+    CALL        point_dbl_p256                          ; Q <- 2.Q
 
     ROL         r27, r27
     ROL         r29, r29
 
+    ; We get the address of the point (O, P1, P2, P1+P2) directly from the scalar bits
     AND         r0,  r27, r20
     AND         r1,  r29, r21
     OR          r0,  r0,  r1
 
-    ADDI        r0,  r0,  0x120
+    ADDI        r0,  r0,  ca_dspm_point_Ox              ; Offset the address to the points
 
-    LDR         r12, r0
+    LDR         r12, r0                                 ; X
     ADDI        r0,  r0,  0x20
-    LDR         r13, r0
+    LDR         r13, r0                                 ; Y
     ADDI        r0,  r0,  0x20
-    LDR         r14, r0
+    LDR         r14, r0                                 ; Z
 
-    CALL        point_add_p256
+                                                        ;           00  01  10  11
+    CALL        point_add_p256                          ; Q <- Q + <O,  P1, P2, P1+P2>
 
+    ; Move the result of the addition to the accumulator
     MOV         r9,  r12
     MOV         r10, r13
     MOV         r11, r14
+; ------------------------------------------------------------------------------
 
     ; Inner loop counter update/check
     ADDI        r16, r16, 1                             ; j++
@@ -122,6 +138,7 @@ spm_p256_double_loop:
     ; Outer loop counter update/check
     SUBI        r15, r15, 1
     BRNZ        spm_p256_double_main_loop
+; ==============================================================================
 
     MOVI        r0,  pass_val
     RET
