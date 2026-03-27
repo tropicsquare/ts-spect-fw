@@ -7,6 +7,9 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
+from spect_models.Curves.Curve25519 import Curve25519, CURVE25519_BASE, int2scalar
+from spect_models.Fields.Field255 import Field
+
 from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_memory import SpectMem
 from spect_tester.spect_config import (
@@ -17,8 +20,6 @@ from spect_tester.helpers import (
     int2bytes,
 )
 
-import models.x25519 as x25519
-
 SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
@@ -27,10 +28,11 @@ def test_run(tester: SpectTester):
     priv_2 = rn.randint(0, 2**256-1)
     priv = ((priv_2 << 256) | priv_1) % (2**256-1)
 
-    priv_scalar = x25519.int2scalar(priv)
-    pub = x25519.x25519(priv_scalar, 9)
+    priv = rn.randint(0, 2**256-1)
+    priv_scalar = int2scalar(priv)
+    pub = CURVE25519_BASE.spm(priv_scalar)
 
-    R_ref = int2bytes(x25519.x25519(priv_scalar, pub))
+    R_ref = pub.spm(priv_scalar)
 
     run_name = "x25519_dbg"
     test_run = tester.create_test_run(run_name)
@@ -40,7 +42,7 @@ def test_run(tester: SpectTester):
     test_run.set_rng()
 
     test_run.write_bytes(SpectMem.DataRamIn.base+0x20, int2bytes(priv_scalar))
-    test_run.write_bytes(SpectMem.DataRamIn.base+0x40, int2bytes(pub))
+    test_run.write_bytes(SpectMem.DataRamIn.base+0x40, pub.to_bytes())
 
     test_run.run()
 
@@ -60,7 +62,7 @@ def test_run(tester: SpectTester):
 
     R = test_run.read_bytes(SpectMem.DataRamOut.base+0x20, data_out_size)
 
-    if R != R_ref:
+    if R != R_ref.to_bytes():
         test_run.error("Result mismatch")
 
 if __name__ == "__main__":

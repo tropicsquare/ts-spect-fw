@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_point_generation/point_generate_p256.s
+;  file    ecc_math/curve25519/point_order_check_curve25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
@@ -10,33 +10,38 @@
 ;
 ; ==============================================================================
 ;
-; Point Generate on NIST curve P-256.
-; See spect_fw/str2point.md for detailed description.
+; Check if point P in x-only coordinates is not of low-order (<= 8)
 ;
-; Input:
-;   DST in ca_gfp_gen_dst
+;   [8].P != O
 ;
-; Output:
-;   Random point (x, y, z) on curve P-256 -- (r17, r18, r19)
+; Inputs:
+;   Point P.x = (r16)
+;
+; Outputs:
+;   Sets Z flag if [8].P == O
 ;
 ; Expects:
-;   P-256 prime in r31
+;   Curve25519 prime in r31
 ;
 ; Modified registers:
-;   r1, r2, r30
+;   r1,2,3,6,7,8
 ;
 ; Subroutines:
-;   hash_to_field
-;   map_to_curve_simple_swu
+;   point_xdbl_curve25519
 ;
 ; ==============================================================================
-p256_point_generate:
-    LD      r1, ca_gfp_gen_dst
-    GRV     r2
-    CALL    hash_to_field
 
-    CALL    map_to_curve_simple_swu
-    XORI    r30, r19, 0
-    BRZ     p256_point_generate
+point_order_check_curve25519:
+    LD      r6,  ca_curve25519_a2d4
+
+    MOV     r7,  r16
+    MOVI    r8,  1
+
+    CALL    point_xdbl_curve25519       ; [2].P
+    CALL    point_xdbl_curve25519       ; [4].P
+    CALL    point_xdbl_curve25519       ; [8].P
+
+    XOR     r2,  r2,  r2                ; SET Zero Flag and r2 <- 0
+    XOR     r8,  r8,  r2                ; Check r8 != 0
 
     RET

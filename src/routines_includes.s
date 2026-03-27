@@ -2,8 +2,8 @@
 ;  file    routines_includes.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -55,6 +55,7 @@
 .include    ecc_math/curve25519/point_check_curve25519.s
 .include    ecc_math/curve25519/point_xadd_curve25519.s
 .include    ecc_math/curve25519/point_xdbl_curve25519.s
+.include    ecc_math/curve25519/point_order_check_curve25519.s
 .include    ecc_math/curve25519/spm_curve25519_long.s
 .include    ecc_math/curve25519/y_recovery_curve25519.s
 

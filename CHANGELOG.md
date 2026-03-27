@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Op links
 - Call checks
 - Reset of TMAC state after use
+- X25519 routine now checks for low-order pub keys
 
 ## [v1.0.0] 2025-07-15
 

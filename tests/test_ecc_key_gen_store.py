@@ -10,8 +10,13 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
-import models.ed25519 as ed25519
-import models.p256 as p256
+from spect_models.ECDSA import ECDSA_SECP256R1 as ECDSA
+from spect_models.Curves.secp256r1 import secp256r1
+from spect_models.Fields.Field_secp256r1 import Field
+
+from spect_models.EdDSA import EdDSA
+from spect_models.Curves.Ed25519 import Ed25519
+from spect_models.Fields.Field255 import Field
 
 from spect_tester.spect_tester import SpectTester, SpectTestRun
 from spect_tester.spect_config import (
@@ -48,19 +53,24 @@ TEST_FULL_SLOT = "full_slot"
 TEST_EMPTY_SLOT = "empty_slot"
 
 def __get_p256_keys(k: bytes):
-    k1, k2, k3, k4 = p256.key_gen(k)
-    return int2bytes(k1), int2bytes(k2), int2bytes(k3) + int2bytes(k4)
+    Key = ECDSA.KeyGen(k)
+    k1 = int2bytes(Key.d)
+    k2 = int2bytes(Key.w)
+    pub = Key.PublicBytes(encoding="spect")
+    return k1, k2, pub
 
 def __get_ed25519_keys(k: bytes):
-    k1, k2, k3 = ed25519.key_gen(k)
-    k3 = int2bytes(bytes2int(k3, endianity='big'))
-    return int2bytes(k1), int2bytes(k2), k3
+    Key = EdDSA.KeyGen(k)
+    k1 = int2bytes(Key.s)
+    k2 = int2bytes(Key.prefix)
+    pub = Key.PublicBytes(encoding="spect")
+    return k1, k2, pub
 
 def __unmask_privs(k1_1: bytes, k1_2: bytes, k2_1: bytes, k2_2: bytes, curve_type: CurveType):
     if curve_type == CurveType.ED25519:
-        mod = ed25519.q
+        mod = Ed25519.Q
     else:
-        mod = p256.q
+        mod = secp256r1.Q
 
     k1 = int2bytes((bytes2int(k1_1) + bytes2int(k1_2)) % mod)
     k2 = bytes(x ^ y for x, y in zip(k2_1, k2_2))
@@ -111,9 +121,9 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
 
     elif curve_type == CurveType.P256:
         if op_name == TEST_GENERATE:
-            k = int2bytes(((rng[1]<<256) + (rng[0])) % p256.q, endianity='big')
+            k = int2bytes(((rng[1]<<256) + (rng[0])) % secp256r1.Q, endianity='big')
         else:
-            k = int2bytes(rn.randint(1, p256.q -1))
+            k = int2bytes(rn.randint(1, secp256r1.Q -1))
         priv1_ref, priv2_ref, pub_ref = __get_p256_keys(k)
         pub_size = 64
 
