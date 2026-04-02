@@ -138,7 +138,7 @@ ecdsa_sign_tmac_padding_loop_k2:
 ;   Masked with t as (z*t + t*r*d1 + t*r*d2) * (k*t)^(-1)
 ; ==============================================================================
 
-ecdsa_sign_mask_k:
+ecdsa_sign_compute_s:
     GRV         r2
     LD          r1, ca_gfp_gen_dst
     CALL        hash_to_field
@@ -168,76 +168,20 @@ ecdsa_sign_mask_k:
 ; ==============================================================================
 ;   Verify the signature
 ; ==============================================================================
-
+ecdsa_sign_final_verify:
     ST          r13, ca_ecdsa_sign_internal_s
-    MOV         r1,  r13
-    CALL        inv_q256                        ; r1 = s^(-1)
+    ST          r22, ca_ecdsa_sign_internal_r
 
-    MULP        r28, r18, r1                    ; r28 = z s^(-1) = u1
-    MULP        r27, r22, r1                    ; r27 = r s^(-1) = u2
-
-    LD          r31, ca_p256
-    ; P1 = u1.G to (r19, r20, r21)
-    LD          r12, ca_p256_xG
-    LD          r13, ca_p256_yG
-    MOVI        r14, 1
-
-    CALL        spm_p256_short
-    ; call check
+    CALL        ecdsa_verify
+    ; Call check
     LD          r4, ca_call_check_level_1
     CMPI        r4, call_check_level_1_id
     MOVI        r4, 0
     ST          r4, ca_call_check_level_1
     BRNZ        ecdsa_fail_verify
-    ; spm invariant check
-    CMPI        r0,  pass_val
+    ; check retval
+    CMPI        r30, pass_val
     BRNZ        ecdsa_fail_verify
-
-    MOV         r19, r9
-    MOV         r20, r10
-    MOV         r21, r11
-
-    ; P2 = u2.A to (r9, r10, r11)
-    LD          r12, ca_ecdsa_sign_internal_Ax
-    LD          r13, ca_ecdsa_sign_internal_Ay
-    MOVI        r14, 1
-
-    MOV         r28, r27
-    CALL        spm_p256_short
-    ; call check
-    LD          r4,  ca_call_check_level_1
-    CMPI        r4,  call_check_level_1_id
-    MOVI        r4,  0
-    ST          r4,  ca_call_check_level_1
-    BRNZ        ecdsa_fail_verify
-    ; spm invariant check
-    CMPI        r0,  pass_val
-    BRNZ        ecdsa_fail_verify
-
-    ; P1 + P2
-    MOV         r12, r19
-    MOV         r13, r20
-    MOV         r14, r21
-
-    CALL        point_add_p256
-
-    MOV         r1,  r14
-    CALL        inv_p256
-    MUL256      r12, r12, r1
-
-    LD          r31, ca_q256
-    MOVI        r0,  0
-    REDP        r12, r0,  r12
-
-    ; Final compare
-    CMPI        r31, 0          ; CLEAR zero flag
-    XOR         r1,  r12, r22
-    BRNZ        ecdsa_fail_verify
-    ; (FI redundancy)
-    CMPI        r31, 0          ; CLEAR zero flag
-    XOR         r1,  r12, r22
-    BRNZ        ecdsa_fail_verify
-    ;
 
     MOVI        r3,  ret_op_success
     MOVI        r2,  l3_result_ok

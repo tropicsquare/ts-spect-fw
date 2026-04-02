@@ -13,6 +13,18 @@
 ; Computes e = SHA512(R, A, M) mod q at once in case of len(M) < 64 bytes
 ;
 ; ==============================================================================
+;
+; Overall EdDSA sequence context
+;   Public key 'A' --------------> ca_eddsa_sign_internal_A
+;   Private key part 's' --------> r26
+;   Private key part 'prefix' ---> r20
+;   Secure Channel Hash ---------> r16
+;   Secure Channel Nonce --------> r17
+;   Nonce 'r' -------------------> r27
+;   Signature part 'R' ----------> ca_eddsa_sign_internal_R
+;   E = SHA512(R, A, M) ---------> r25
+;
+; ==============================================================================
 op_eddsa_e_at_once:
     ; Check and update OP Link context
     LD          r1,  ca_op_link
