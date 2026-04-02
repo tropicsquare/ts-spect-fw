@@ -34,11 +34,11 @@ ecdsa_verify_pass:
     MOVI        r30, pass_val
     RET
 
-ecdsa_verify_call_check:
+ecdsa_verify:
     ; Store call check
     MOVI        r0,  call_check_level_1_id
     ST          r0,  ca_call_check_level_1
-ecdsa_verify:
+
     ; r1 <- s
     LD          r1,  ca_ecdsa_sign_internal_s
     ; r19 <- r

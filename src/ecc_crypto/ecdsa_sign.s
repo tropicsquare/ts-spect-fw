@@ -172,7 +172,7 @@ ecdsa_sign_final_verify:
     ST          r13, ca_ecdsa_sign_internal_s
     ST          r22, ca_ecdsa_sign_internal_r
 
-    CALL        ecdsa_verify_call_check
+    CALL        ecdsa_verify
     ; Call check
     LD          r4, ca_call_check_level_1
     CMPI        r4, call_check_level_1_id

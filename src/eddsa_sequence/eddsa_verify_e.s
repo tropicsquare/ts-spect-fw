@@ -27,11 +27,10 @@ eddsa_verify_e_pass:
     MOVI        r30,  pass_val
     RET
 
-eddsa_verify_e_call_check:
+eddsa_verify_e:
     ; Store call check
     MOVI        r0,  call_check_level_1_id
     ST          r0,  ca_call_check_level_1
-eddsa_verify_e:
     ; Check E != 0
     MOVI        r0, 0
     XOR         r1, r0, r25

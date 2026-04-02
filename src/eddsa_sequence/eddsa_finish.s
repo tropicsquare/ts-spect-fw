@@ -45,7 +45,7 @@ eddsa_finish_s_randomize:
 ; ==============================================================================
 ;   Verify the signature
 ; ==============================================================================
-    CALL        eddsa_verify_e_call_check
+    CALL        eddsa_verify_e
     ; Call check
     LD          r4, ca_call_check_level_1
     CMPI        r4, call_check_level_1_id
