@@ -95,15 +95,23 @@ x25519_full_masked:
     GRV         r2
     LD          r1, ca_gfp_gen_dst
     CALL        hash_to_field
-    ORI         r18, r0,  1                     ; Ensure that Z != 0
-    MUL25519    r16, r16, r18
-    MUL25519    r17, r17, r18
+    ORI         r8, r0,  1                     ; Ensure that Z != 0
+    MUL25519    r7, r16, r8
+    MUL25519    r9, r17, r8
 
     ; 7) Compute P3 = P2 + P1
-    MOV         r7,  r16
-    MOV         r8,  r18
-    MOV         r9,  r17
+    ; We need to swap the P2 and P1, so we preserve the P2 in (r7, r8, r9)
+    XOR         r0,  r0,  r0
+    ZSWAP       r7,  r11
+    ZSWAP       r8,  r12
+    ZSWAP       r9,  r13
     CALL        point_add_curve25519
+
+    ; And check that P3 != +-P2 (P2.x * P3.z != P3.x * P2.z)
+    MUL25519    r0,  r7,  r12
+    MUL25519    r1,  r11, r8
+    XOR         r0,  r0,  r1
+    BRZ         x25519_point_integrity_err          ; We fail as the probability is ~ 2^(-253)
 
     ; 8) Mask scalar s as s3 = s + r3 * #E
     GRV         r30
