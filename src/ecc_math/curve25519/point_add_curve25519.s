@@ -10,7 +10,12 @@
 ;
 ; ==============================================================================
 ;
-; General point addition on Curve25519
+; Point addition on Curve25519. Computes Q3 = Q1 + Q2, where:
+;   Q1 != Q2
+;   Q1 != O
+;   Q2 != O
+;
+; Code using this routine shall ensure these constraints are satisfied.
 ;
 ; Inputs:
 ;               X    Z    Y
