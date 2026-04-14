@@ -37,8 +37,8 @@ curve25519_point_generate:
 
     CALL        map_to_curve_elligator2_curve25519
     ; (r3, r7, r11, r8) = (xn, xd, y, 1)
-    XORI        r30, r7, 0
-    BRZ         curve25519_point_generate
+    CMPI        r0, pass_val
+    BRNZ        curve25519_point_generate
 
     MUL25519    r13, r11, r7
     MOV         r11, r3

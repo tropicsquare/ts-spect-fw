@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - TMAC mask requires only one GRV call and is extended using SHA-512
+- Generic addition on Curve25519 uses Montgomery group law instead of W-25519 birational map
 
 ### Added
 
