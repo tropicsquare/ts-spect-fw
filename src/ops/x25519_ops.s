@@ -45,7 +45,8 @@ op_x25519_kpair_gen:
     MOVI    r1,  x25519_kpair_gen_id
     ST      r1,  ca_op_link
 
-    GRV     r19
+    CALL    get_secure_random
+
     MOVI    r0,  7
     MOVI    r1,  255
     SBIT    r0,  r0, r1

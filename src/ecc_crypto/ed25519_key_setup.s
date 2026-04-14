@@ -44,7 +44,8 @@ ed25519_key_setup:
     JMP         ed25519_key_setup_start
 
 ed25519_key_setup_generate_k:
-    GRV         r19
+    CALL        get_secure_random
+
 ed25519_key_setup_start:
     ; Add padding to k
     MOVI        r18, 1

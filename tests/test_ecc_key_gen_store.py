@@ -3,6 +3,8 @@ import sys
 import random as rn
 import itertools
 
+import hashlib
+
 from default_fw import Application
 
 from import_setup import import_setup
@@ -108,7 +110,10 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
 
     if curve_type == CurveType.ED25519:
         if op_name == TEST_GENERATE:
-            k = int2bytes(rng[0])
+            rng0 = rng[0].to_bytes(32, byteorder='big')
+            rng1 = rng[1].to_bytes(32, byteorder='big')
+            k_wide = hashlib.sha512(rng0 + rng1).digest()
+            k = bytes([a ^ b for a, b in zip(k_wide[:32], k_wide[32:])])[::-1]
         else:
             k = random_bytes(32)
         priv1_ref, priv2_ref, pub_ref = __get_ed25519_keys(k)

@@ -4,6 +4,8 @@ import os
 import random as rn
 from enum import Enum
 
+import hashlib
+
 from default_fw import Application
 
 from import_setup import import_setup
@@ -135,7 +137,12 @@ def test_run(tester: SpectTester, test_type: TestType):
     #   Generate Test Vector
     ################################################################################################
     # calculate etpub and etpriv
-    etpriv = rn.randint(0, 2**256-1)
+    rng0 = rn.randint(0, 2**256-1).to_bytes(32, 'big')
+    rng1 = rn.randint(0, 2**256-1).to_bytes(32, 'big')
+    k_wide = hashlib.sha512(rng0 + rng1).digest()
+    k = bytes([a ^ b for a, b in zip(k_wide[:32], k_wide[32:])])
+    etpriv = int.from_bytes(k, 'big')
+
     etpriv_scalar = int2scalar(etpriv)
     etpub = CURVE25519_BASE.spm(etpriv_scalar)
 
@@ -218,7 +225,7 @@ def test_run(tester: SpectTester, test_type: TestType):
     test_run_kpg.cmd_start()
     test_run_kpg.set_op(run_name)
 
-    rng = [etpriv] + [rn.randint(0, 2**256-1) for _ in range(8)]
+    rng = [int.from_bytes(rng0, 'big')] + [int.from_bytes(rng1, 'big')] + [rn.randint(0, 2**256-1) for _ in range(8)]
     test_run_kpg.set_rng(rng)
 
     test_run_kpg.run()
