@@ -31,20 +31,19 @@
 ;   point_add_ed25519
 ;
 ; Masking methods:
-;   1) Randomized Coordinates       -- (x, y, z, t) == (rx, ry, rz, rt)
-;   2) Group Scalar Randomization   -- k' = k + r * #E
-;   3) Point Splitting              -- k.P1 = k.P2 + k.P3 for P = P1 + P2
+;   1) Random Projective Coordinates -- (x, y, z) == (rx, ry, rz)
+;   2) Group Scalar Randomization -- k' = k + r * #E
+;   3) Additive Scalar Splitting -- k.P = k1.P + k2.P
 ;
 ; Full algorithm:
-;   1) Convert P to randomized extended coordinates
-;   2) Generate random point P2 (See str2point.md)
-;   3) Mask scalar k as k2 = k + rng2 * #E
-;   4) Compute k2.P2
-;   5) Compute P3 = P1 - P2
-;   6) Mask scalar k as k3 = k + rng3 * #E
-;   7) Compute k3.P3
-;   8) Compute k.P = k2.P2 + k3.P3
-;   9) Convert k.P to affine coordinates
+;   1) Convert P to randomized projective coordinates
+;   2) Split scalar k as k2 = k1 + k2 for random k1
+;   3) Mask scalar k1 as k1' = k1 + rng * #E
+;   4) Compute P1 = k1'.P
+;   5) Mask scalar k2 as k2' = k2 + rng * #E
+;   6) Compute P2 = k2'.P
+;   7) Compute k.P = P1 + P2
+;   8) Convert k.P to affine coordinates
 ;
 ; ==============================================================================
 
@@ -55,8 +54,6 @@ spm_ed25519_full_masked:
 
     ; 1) Convert P to randomized extended coordinates
     LD          r31, ca_p25519
-
-spm_ed25519_full_masked_z_randomize:
     GRV         r2
     LD          r1, ca_gfp_gen_dst
     CALL        hash_to_field
@@ -65,78 +62,70 @@ spm_ed25519_full_masked_z_randomize:
     MUL25519    r24, r21, r22                   ; T = x * y * Z = X * y
     MUL25519    r22, r22, r23                   ; Y = y * Z
 
-    ; 2) Generate randpom point P2 (See str2point.md)
-    CALL        ed25519_point_generate
+    ; Store the randomized point
+    ST          r21, ca_spm_internal_Px
+    ST          r22, ca_spm_internal_Py
+    ST          r23, ca_spm_internal_Pz
+    ST          r24, ca_spm_internal_Pt
 
-    ; 3) Mask scalar k as k2 = k + rng2 * #E
+    ; 2) Split scalar k = k1 + k2 -> k1 <- rng, k2 = k - k1
+    LD          r31, ca_q25519
+    GRV         r2
+    LD          r1,  ca_gfp_gen_dst
+    CALL        hash_to_field
+    MOV         r28, r0                         ; r28 <- k1
+    SUBP        r25, r27, r28                   ; r25 <- k2
+
+    ; 3) Mask scalar k1 as k1' = k1 + rng * #E
     LD          r31, ca_q25519_8
     GRV         r30
-    SCB         r28, r27, r30
+    SCB         r28, r28, r30                   ; (r28, r29) <- k1'
 
-    ; 4) Compute k2.P2
-    LD          r31, ca_p25519
-    LD          r6,  ca_ed25519_d
+    ; 4) Compute P1 = k1'.P
+    CALL        spm_ed25519_long                ; (r7,  r8,  r9,  r10) <- (r28, r29).P = P1
 
-    ST          r11, ca_ed25519_smp_P2x
-    ST          r12, ca_ed25519_smp_P2y
-    ST          r13, ca_ed25519_smp_P2z
-    ST          r14, ca_ed25519_smp_P2t
-
-    CALL        spm_ed25519_long
     CMPI        r0,  pass_val
-    BRNZ        ed25519_spm_fail
+    BRNZ        spm_ed25519_integrity_fail
     CALL        point_valid_check_ed25519
-    BRNZ        ed25519_spm_fail
+    BRNZ        spm_ed25519_integrity_fail
 
-    ; 5) Compute P3 = P1 - P2
-    LD          r11, ca_ed25519_smp_P2x
-    LD          r12, ca_ed25519_smp_P2y
-    LD          r13, ca_ed25519_smp_P2z
-    LD          r14, ca_ed25519_smp_P2t
-    ST          r7,  ca_ed25519_smp_P2x
-    ST          r8,  ca_ed25519_smp_P2y
-    ST          r9,  ca_ed25519_smp_P2z
-    ST          r10, ca_ed25519_smp_P2t
-    MOV         r7,  r21
-    MOV         r8,  r22
-    MOV         r9,  r23
-    MOV         r10, r24
+    ; (r21, r22, r23, r24) <- P1
+    MOV         r21, r7
+    MOV         r22, r8
+    MOV         r23, r9
+    MOV         r24, r10
 
-    MOVI        r0,  0
-    SUBP        r11, r0,  r11
-    SUBP        r14, r0,  r14
-
-    CALL        point_add_ed25519
-
-    ; 6) Mask scalar k as k3 = k + rng3 * #E
+    ; 5) Mask scalar k2 as k2' = k2 + rng * #E
     LD          r31, ca_q25519_8
     GRV         r30
-    SCB         r28, r27, r30
+    SCB         r28, r25, r30                   ; (r28, r29) <- k2'
 
-    ; 7) Compute k3.P3
-    LD          r31, ca_p25519
-    LD          r6,  ca_ed25519_d
+    ; 6) Compute k2'.P
+    CALL        spm_ed25519_long                ; (r7,  r8,  r9,  r10) <- (r28, r29).P = P2
 
-    CALL        spm_ed25519_long
     CMPI        r0,  pass_val
-    BRNZ        ed25519_spm_fail
+    BRNZ        spm_ed25519_integrity_fail
     CALL        point_valid_check_ed25519
-    BRNZ        ed25519_spm_fail
+    BRNZ        spm_ed25519_integrity_fail
 
-    ; 8) Compute k.P = k2.P2 + k3.P3
-    LD          r11, ca_ed25519_smp_P2x
-    LD          r12, ca_ed25519_smp_P2y
-    LD          r13, ca_ed25519_smp_P2z
-    LD          r14, ca_ed25519_smp_P2t
+    ; 7) Compute k.P = k1'.P + k2'.P
+    ; (r11, r12, r13, r14) <- P1
+    MOV         r11, r21
+    MOV         r12, r22
+    MOV         r13, r23
+    MOV         r14, r24
 
-    CALL        point_add_ed25519
+    LD          r6,  ca_ed25519_d
+    CALL        point_add_ed25519               ; (r11, r12, r13, r14) <- P1 + P2 = k.P
 
+    ; Check if k.P is valid point on Ed25519
     MOV         r7,  r11
     MOV         r8,  r12
     MOV         r9,  r13
     MOV         r10, r14
+
     CALL        point_valid_check_ed25519
-    BRNZ        ed25519_spm_fail
+    BRNZ        spm_ed25519_integrity_fail
 
     ; 9) Convert k.P to affine coordinates
     MOV         r1,  r13
@@ -144,22 +133,9 @@ spm_ed25519_full_masked_z_randomize:
     MUL25519    r21, r11, r1
     MUL25519    r22, r12, r1
 
-    MUL25519    r1,  r21, r21
-    MUL25519    r2,  r22, r22
-    SUBP        r3,  r2,  r1                    ; (y^2 - x^2)
-
-    MUL25519    r4,  r1,  r2
-    MUL25519    r4,  r4,  r6
-    MOVI        r0,  1
-    ADDP        r4,  r4,  r0                    ; 1 + d x^2 y^2
-
-    XOR         r0,  r3,  r4
-    BRNZ        ed25519_spm_fail
-
     MOVI        r0,  ret_op_success
-
     RET
 
-ed25519_spm_fail:
+spm_ed25519_integrity_fail:
     MOVI        r0,  ret_point_integrity_err
     RET
