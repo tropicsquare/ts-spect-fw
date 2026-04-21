@@ -103,29 +103,25 @@ p256_key_setup_tmac_padding_loop:
     LD      r31, ca_p256
 
     ; Load the ECDSA base point
-    LD      r12, ca_p256_xG
-    LD      r13, ca_p256_yG
-
-    MOVI    r14, 1
+    LD      r9,  ca_p256_xG
+    LD      r10, ca_p256_yG
 
     ; Randomize the base points Z-coordinate
     GRV     r2
     LD      r1, ca_gfp_gen_dst
     CALL    hash_to_field
 
-    ORI     r14, r0,  1         ; Ensure that Z != 0
-    MUL256  r12, r12, r14
-    MUL256  r13, r13, r14
-
-    MOV     r9,  r12
-    MOV     r10, r13
-    MOV     r11, r14
+    ORI     r11, r0,  1         ; Ensure that Z != 0
+    MUL256  r9,  r9,  r11
+    MUL256  r10, r10, r11
 
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail
 
-    ; Compute the scalar point multiple
-    LD      r8,  ca_p256_b
+    ; Store the randomized point G
+    ST      r9,  ca_spm_internal_Px
+    ST      r10, ca_spm_internal_Py
+    ST      r11, ca_spm_internal_Pz
 
     CALL    spm_p256_long
     CMPI    r0,  pass_val
