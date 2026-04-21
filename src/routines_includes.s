@@ -85,10 +85,6 @@
 .include    ecc_point_generation/map_to_curve_elligator2_curve25519.s
 .include    ecc_point_generation/point_generate_curve25519.s
 .include    ecc_point_generation/point_generate_ed25519.s
-.include    ecc_point_generation/sqrt_ratio_3mod4.s
-.include    ecc_point_generation/map_to_curve_simple_swu.s
-.include    ecc_point_generation/point_generate_p256.s
-
 
 ; ====================================================
 ; ECC Crypto
