@@ -52,7 +52,6 @@
 .include    ecc_math/curve25519/get_y_curve25519.s
 .include    ecc_math/curve25519/point_add_curve25519.s
 .include    ecc_math/curve25519/point_check_curve25519.s
-.include    ecc_math/curve25519/point_xadd_curve25519.s
 .include    ecc_math/curve25519/point_xdbl_curve25519.s
 .include    ecc_math/curve25519/point_order_check_curve25519.s
 .include    ecc_math/curve25519/spm_curve25519.s
@@ -77,14 +76,6 @@
 .include    eddsa_sequence/eddsa_e_finish.s
 .include    eddsa_sequence/eddsa_finish.s
 .include    eddsa_sequence/eddsa_verify_e.s
-
-; ====================================================
-; ECC Point Generation
-; ====================================================
-
-.include    ecc_point_generation/map_to_curve_elligator2_curve25519.s
-.include    ecc_point_generation/point_generate_curve25519.s
-.include    ecc_point_generation/point_generate_ed25519.s
 
 ; ====================================================
 ; ECC Crypto
