@@ -67,8 +67,7 @@ x25519_full_masked:
     ; ==========================================================================
     ; 2) Split scalar k = k1 + k2 ... k1 <- rng, k2 = k - k1
     ; ==========================================================================
-    ; We use q*8 here, because k might be greater then q,
-    ; but is it always less then q*8
+    ; We must use q*8 here as the modulus, since k is from [2^254, 2^255 - 8]
     LD          r31, ca_q25519_8
 x25519_full_masked_scalar_split:
     GRV         r2

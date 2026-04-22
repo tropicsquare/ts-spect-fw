@@ -57,12 +57,15 @@ spm_p256_long:
     MOVI    r10, 1
     MOVI    r11, 0
 
+; === MAIN LOOP ================================================================
     MOVI    r15, 2
 
 spm_p256_long_main_loop:
     MOVI    r30, 256                                ; i = 256
     MOVI    r16, 0                                  ; j = 0
+; --- INNER LOOP ---------------------------------------------------------------
 spm_p256_long_loop:
+; --- INNER LOOP BODY -------
     ROL     r29, r29
 
     CSWAP   r9,  r12
@@ -75,16 +78,19 @@ spm_p256_long_loop:
     CSWAP   r9,  r12
     CSWAP   r10, r13
     CSWAP   r11, r14
+; ---------------------------
 
     ADDI    r16, r16, 1                             ; j++
     SUBI    r30, r30, 1                             ; i--
     BRNZ    spm_p256_long_loop                      ; i == 0 ?
     CMPI    r16, 256                                ; j == 256 ?
     BRNZ    spm_p256_long_invariant_failed
+; ------------------------------------------------------------------------------
 
     MOV     r29, r28
     SUBI    r15, r15, 1
     BRNZ    spm_p256_long_main_loop
+; ==============================================================================
 
     ; === Check Montgomery ladder invariant ===
     ; r30 is 0 from the loop
