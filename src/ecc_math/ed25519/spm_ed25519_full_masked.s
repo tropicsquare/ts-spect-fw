@@ -69,7 +69,8 @@ spm_ed25519_full_masked:
     ST          r24, ca_spm_internal_Pt
 
     ; 2) Split scalar k = k1 + k2 -> k1 <- rng, k2 = k - k1
-    LD          r31, ca_q25519
+    ; We use q*8 here, because k might be greater then q, but is always less then q*8
+    LD          r31, ca_q25519_8
     GRV         r2
     LD          r1,  ca_gfp_gen_dst
     CALL        hash_to_field
@@ -77,7 +78,6 @@ spm_ed25519_full_masked:
     SUBP        r25, r27, r28                   ; r25 <- k2
 
     ; 3) Mask scalar k1 as k1' = k1 + rng * #E
-    LD          r31, ca_q25519_8
     GRV         r30
     SCB         r28, r28, r30                   ; (r28, r29) <- k1'
 
