@@ -81,15 +81,15 @@ x25519_full_masked_scalar_split:
 
     ; Split
     MOV         r28, r0                         ; r28 <- k1
-    SUBP        r19, r19, r28                   ; r19 <- k2
+    SUBP        r20, r19, r28                   ; r20 <- k2
 
     ; check k2 != 0 (i.e. k1 == k)
     MOVI        r0,  0
-    XOR         r1,  r19, r0
+    XOR         r1,  r20, r0
     BRZ         x25519_full_masked_scalar_split ; Try again (prob. ~2^(-225))
 
     ; check k1 != k2
-    XOR         r2,  r19, r28
+    XOR         r2,  r20, r28
     BRZ         x25519_full_masked_scalar_split ; Try again (prob. ~2^(-225))
 
     ; ... Now we know that k1.P != k2.P, k1.P != O and k2.P != O ...
@@ -102,7 +102,7 @@ x25519_full_masked_scalar_split:
     SCB         r28, r28, r30                   ; (r28, r29) <- k1'
 
     ; ==========================================================================
-    ; 4) Compute P1 = k1'.P -> (r20, r21, r22)
+    ; 4) Compute P1 = k1'.P -> (r21, r22, r23)
     ; ==========================================================================
     CALL        spm_curve25519                  ; (r7, r8, r9) <- (r28, r29).P = P1
 
@@ -122,16 +122,16 @@ x25519_full_masked_scalar_split:
     BRNZ        x25519_point_integrity_err
 
     ; (r20, r21, r22) <- P1
-    MOV         r20, r7
-    MOV         r21, r8
-    MOV         r22, r9
+    MOV         r21, r7
+    MOV         r22, r8
+    MOV         r23, r9
 
     ; ==========================================================================
     ; 5) Mask scalar k2 as k2' = k2 + rng * #E
     ; ==========================================================================
     LD          r31, ca_q25519_8
     GRV         r30
-    SCB         r28, r19, r30                   ; (r28, r29) <- k2'
+    SCB         r28, r20, r30                   ; (r28, r29) <- k2'
 
     ; ==========================================================================
     ; 6) Re-randomize P
@@ -169,9 +169,9 @@ x25519_full_masked_scalar_split:
     ; 8) Compute k.P = k1'.P + k2'.P
     ; ==========================================================================
     ; (r11, r12, r13) <- P1
-    MOV         r11, r20
-    MOV         r12, r21
-    MOV         r13, r22
+    MOV         r11, r21
+    MOV         r12, r22
+    MOV         r13, r23
 
     ; The addition routine will always work thanks to the checks during
     ; the scalar splitting
