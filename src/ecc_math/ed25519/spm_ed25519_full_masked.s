@@ -172,9 +172,10 @@ spm_ed25519_full_masked:
     MUL25519    r21, r7,  r1
     MUL25519    r22, r8,  r1
 
-    MOVI        r0,  ret_op_success
+; = RETURN =====================================================================
+    MOVI        r0,  pass_val
     RET
 
 spm_ed25519_integrity_fail:
-    MOVI        r0,  ret_point_integrity_err
+    MOVI        r0,  fail_val
     RET
