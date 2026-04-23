@@ -41,9 +41,10 @@
 ;   3) Mask scalar k1 as k1' = k1 + rng * #E
 ;   4) Compute P1 = k1'.P
 ;   5) Mask scalar k2 as k2' = k2 + rng * #E
-;   6) Compute P2 = k2'.P
-;   7) Compute k.P = P1 + P2
-;   8) Convert k.P to affine coordinates
+;   6) Re-randomize P
+;   7) Compute P2 = k2'.P
+;   8) Compute k.P = P1 + P2
+;   9) Convert k.P to affine coordinates
 
 ; ==============================================================================
 
@@ -118,7 +119,30 @@ spm_p256_full_masked:
     SCB     r28, r25, r30                   ; (r28, r29) <- k2'
 
     ; ==========================================================================
-    ; 6) Compute k2'.P
+    ; 6) Re-randomize P
+    ; ==========================================================================
+    ; Load point P
+    LD      r9,  ca_spm_internal_Px
+    LD      r10, ca_spm_internal_Py
+    LD      r11, ca_spm_internal_Pz
+
+    ; Re-randomize
+    LD      r31, ca_p256
+    GRV     r2
+    LD      r1,  ca_gfp_gen_dst
+    CALL    hash_to_field
+    ORI     r0, r0,  1                      ; Ensure that Z != 0
+    MUL256  r9,  r9,  r0
+    MUL256  r10, r10, r0
+    MUL256  r11, r11, r0
+
+    ; Store the re-randomized point back
+    ST      r9,  ca_spm_internal_Px
+    ST      r10, ca_spm_internal_Py
+    ST      r11, ca_spm_internal_Pz
+
+    ; ==========================================================================
+    ; 7) Compute P2 = k2'.P
     ; ==========================================================================
     CALL    spm_p256_long                   ; (r9, r10, r11) <- (r28, r29).P = P2
 
@@ -138,7 +162,7 @@ spm_p256_full_masked:
     BRNZ    spm_p256_integrity_fail
 
     ; ==========================================================================
-    ; 7) Compute k.P = k1'.P + k2'.P
+    ; 8) Compute k.P = k1'.P + k2'.P
     ; ==========================================================================
     ; (r12, r13, r14) <- P1
     MOV     r12, r22
@@ -157,7 +181,7 @@ spm_p256_full_masked:
     BRNZ    spm_p256_integrity_fail
 
     ; ==========================================================================
-    ; 8) Convert k.P to affine coordinates
+    ; 9) Convert k.P to affine coordinates
     ; ==========================================================================
     ; We convert it from registers (r9, r10, r11) since these are the registers
     ; checked for point validity

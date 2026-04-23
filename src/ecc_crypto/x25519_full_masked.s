@@ -31,9 +31,10 @@
 ;   3) Mask scalar k1 as k1' = k1 + rng * #E
 ;   4) Compute P1 = k1'.P
 ;   5) Mask scalar k2 as k2' = k2 + rng * #E
-;   6) Compute P2 = k2'.P
-;   7) Compute k.P = P1 + P2
-;   8) Convert k.P to affine coordinates
+;   6) Re-randomize P
+;   7) Compute P2 = k2'.P
+;   8) Compute k.P = P1 + P2
+;   9) Convert k.P to affine coordinates
 ;
 ; ==============================================================================
 
@@ -133,7 +134,19 @@ x25519_full_masked_scalar_split:
     SCB         r28, r19, r30                   ; (r28, r29) <- k2'
 
     ; ==========================================================================
-    ; 6) Compute P2 = k2'.P -> (r7, r8, r9)
+    ; 6) Re-randomize P
+    ; ==========================================================================
+    LD          r31, ca_p25519
+    GRV         r2
+    LD          r1,  ca_gfp_gen_dst
+    CALL        hash_to_field
+    ORI         r0,  r0,  1                     ; Ensure that Z != 0
+    MUL25519    r11, r11, r0
+    MUL25519    r12, r12, r0
+    MUL25519    r13, r13, r0
+
+    ; ==========================================================================
+    ; 7) Compute P2 = k2'.P -> (r7, r8, r9)
     ; ==========================================================================
     CALL        spm_curve25519                  ; (r7, r8, r9) <- (r28, r29).P = P2
 
@@ -153,7 +166,7 @@ x25519_full_masked_scalar_split:
     BRNZ        x25519_point_integrity_err
 
     ; ==========================================================================
-    ; 7) Compute k.P = k1'.P + k2'.P
+    ; 8) Compute k.P = k1'.P + k2'.P
     ; ==========================================================================
     ; (r11, r12, r13) <- P1
     MOV         r11, r20
@@ -166,7 +179,7 @@ x25519_full_masked_scalar_split:
     CALL        point_add_curve25519            ; (r11, r12, r13) <- P1 + P2 = k.P
 
     ; ==========================================================================
-    ; 8) Transform sP1.x to affine coordinate system
+    ; 9) Transform sP1.x to affine coordinate system
     ; ==========================================================================
     MOV         r1, r12
     CALL        inv_p25519                      ; r1 <- (k.P).z ^ (-1)
