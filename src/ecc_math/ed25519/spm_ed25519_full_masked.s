@@ -92,8 +92,18 @@ spm_ed25519_full_masked:
     ; ==========================================================================
     CALL        spm_ed25519_long                ; (r7,  r8,  r9,  r10) <- (r28, r29).P = P1
 
+    ; call check
+    LD          r4,  ca_call_check_level_1
+    CMPI        r4,  call_check_level_1_id
+    MOVI        r4,  0
+    ST          r4,  ca_call_check_level_1
+    BRNZ        x25519_point_integrity_err
+
+    ; spm retval check
     CMPI        r0,  pass_val
     BRNZ        spm_ed25519_integrity_fail
+
+    ; point check
     CALL        point_valid_check_ed25519
     BRNZ        spm_ed25519_integrity_fail
 
@@ -115,8 +125,18 @@ spm_ed25519_full_masked:
     ; ==========================================================================
     CALL        spm_ed25519_long                ; (r7,  r8,  r9,  r10) <- (r28, r29).P = P2
 
+    ; call check
+    LD          r4,  ca_call_check_level_1
+    CMPI        r4,  call_check_level_1_id
+    MOVI        r4,  0
+    ST          r4,  ca_call_check_level_1
+    BRNZ        x25519_point_integrity_err
+
+    ; spm retval check
     CMPI        r0,  pass_val
     BRNZ        spm_ed25519_integrity_fail
+
+    ; point check
     CALL        point_valid_check_ed25519
     BRNZ        spm_ed25519_integrity_fail
 
