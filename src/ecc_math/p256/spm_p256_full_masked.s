@@ -90,8 +90,18 @@ spm_p256_full_masked:
     ; ==========================================================================
     CALL    spm_p256_long                   ; (r9, r10, r11) <- (r28, r29).P = P1
 
+    ; call check
+    LD      r4,  ca_call_check_level_1
+    CMPI    r4,  call_check_level_1_id
+    MOVI    r4,  0
+    ST      r4,  ca_call_check_level_1
+    BRNZ    x25519_point_integrity_err
+
+    ; spm retval check
     CMPI    r0,  pass_val
     BRNZ    spm_p256_integrity_fail
+
+    ; point check
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
 
@@ -112,8 +122,18 @@ spm_p256_full_masked:
     ; ==========================================================================
     CALL    spm_p256_long                   ; (r9, r10, r11) <- (r28, r29).P = P2
 
+    ; call check
+    LD      r4,  ca_call_check_level_1
+    CMPI    r4,  call_check_level_1_id
+    MOVI    r4,  0
+    ST      r4,  ca_call_check_level_1
+    BRNZ    x25519_point_integrity_err
+
+    ; spm retval check
     CMPI    r0,  pass_val
     BRNZ    spm_p256_integrity_fail
+
+    ; point check
     CALL    point_check_p256
     BRNZ    spm_p256_integrity_fail
 
