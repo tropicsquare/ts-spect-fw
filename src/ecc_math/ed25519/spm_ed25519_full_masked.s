@@ -25,19 +25,19 @@
 ;
 ; Subroutines:
 ;   hash_to_field
-;   ed25519_point_generate
 ;   spm_ed25519_long
 ;   point_valid_check_ed25519
 ;   point_add_ed25519
+;   inv_p25519
 ;
 ; Masking methods:
 ;   1) Random Projective Coordinates -- (x, y, z) == (rx, ry, rz)
 ;   2) Group Scalar Randomization -- k' = k + r * #E
-;   3) Additive Scalar Splitting -- k.P = k1.P + k2.P
+;   3) Additive Scalar Splitting -- k = k1 + k2 for random k1
 ;
 ; Full algorithm:
 ;   1) Convert P to randomized projective coordinates
-;   2) Split scalar k as k2 = k1 + k2 for random k1
+;   2) Split scalar k as k2 = k - k1 for random k1
 ;   3) Mask scalar k1 as k1' = k1 + rng * #E
 ;   4) Compute P1 = k1'.P
 ;   5) Mask scalar k2 as k2' = k2 + rng * #E
@@ -72,7 +72,7 @@ spm_ed25519_full_masked:
     ST          r24, ca_spm_internal_Pt
 
     ; ==========================================================================
-    ; 2) Split scalar k = k1 + k2 -> k1 <- rng, k2 = k - k1
+    ; 2) Split scalar k = k1 + k2 ... k1 <- rng, k2 = k - k1
     ; ==========================================================================
     ; We must use q*8 here as the modulus, since k is from [2^254, 2^255 - 8]
     LD          r31, ca_q25519_8
@@ -177,6 +177,7 @@ spm_ed25519_full_masked:
     MOV         r13, r23
     MOV         r14, r24
 
+    ; Load Ed25519 parameter d
     LD          r6,  ca_ed25519_d
     CALL        point_add_ed25519               ; (r11, r12, r13, r14) <- P1 + P2 = k.P
 

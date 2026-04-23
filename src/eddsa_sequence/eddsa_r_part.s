@@ -34,9 +34,10 @@ op_eddsa_R_part:
     MOVI        r1,  eddsa_R_part_id
     ST          r1,  ca_op_link
 
-    LD          r31, ca_p25519
-    LD          r21, ca_ed25519_xG
-    LD          r22, ca_ed25519_yG
+    ; Load inputs for spm_ed25519_full_masked
+    LD          r21, ca_ed25519_xG              ; r21 <- Gx
+    LD          r22, ca_ed25519_yG              ; r22 <- Gy
+    ; Nonce r is already in r27 from EdDSA context
 
     CALL        spm_ed25519_full_masked
 

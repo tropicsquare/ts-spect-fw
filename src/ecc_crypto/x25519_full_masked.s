@@ -14,20 +14,28 @@
 ;
 ; Inputs:
 ;   X25519 Public Key u in r16  (P)
-;   X25519 Private Key k in r19
+;   X25519 Private Key k in r19 (expected already clamped)
 ;   DST in ca_gfp_gen_dst
 ;
 ; Outputs:
 ;   X25519(k, u) in r11
 ;
+; Subroutines:
+;   point_order_check_curve25519
+;   point_check_curve25519
+;   get_y_curve25519
+;   hash_to_field
+;   spm_curve25519
+;   inv_p25519
+;
 ; Masking methods:
-;   1) Random Projective Coordinates -- (x, 1) == (r * x, r)
-;   2) Group Scalar Randomization -- k = k + r * #E (mod p)
-;   3) Additive Scalar Splitting -- k.P = k1.P + k2.P
+;   1) Random Projective Coordinates -- (x, z) == (rx, rz)
+;   2) Group Scalar Randomization -- k' = k + r * #E (mod p)
+;   3) Additive Scalar Splitting -- k = k1 + k2 for random k1
 ;
 ; Full algorithm:
 ;   1) Recover P.y for P.x and randomize P
-;   2) Split scalar k = k1 + k2 ... k1 <- rng, k2 = k - k1
+;   2) Split scalar k as k2 = k - k1 for random k1
 ;   3) Mask scalar k1 as k1' = k1 + rng * #E
 ;   4) Compute P1 = k1'.P
 ;   5) Mask scalar k2 as k2' = k2 + rng * #E
@@ -191,6 +199,7 @@ x25519_full_masked_scalar_split:
     CALL        point_check_curve25519
     BRNZ        x25519_point_integrity_err
 
+; = RETURN =====================================================================
     MOVI        r0,  ret_op_success
     RET
 x25519_pubkey_fail:

@@ -33,11 +33,11 @@
 ; Masking methods:
 ;   1) Random Projective Coordinates -- (x, y, z) == (rx, ry, rz)
 ;   2) Group Scalar Randomization -- k' = k + r * #E
-;   3) Additive Scalar Splitting -- k.P = k1.P + k2.P
+;   3) Additive Scalar Splitting -- k = k1 + k2 for random k1
 ;
 ; Full algorithm:
 ;   1) Convert P to randomized projective coordinates
-;   2) Split scalar k as k2 = k1 + k2 for random k1
+;   2) Split scalar k as k2 = k - k1 for random k1
 ;   3) Mask scalar k1 as k1' = k1 + rng * #E
 ;   4) Compute P1 = k1'.P
 ;   5) Mask scalar k2 as k2' = k2 + rng * #E
@@ -60,7 +60,7 @@ spm_p256_full_masked:
     GRV     r2
     LD      r1,  ca_gfp_gen_dst
     CALL    hash_to_field
-    ORI     r24, r0,  1             ; Ensure that Z != 0
+    ORI     r24, r0,  1                     ; Ensure that Z != 0
     MUL256  r22, r22, r24
     MUL256  r23, r23, r24
 
@@ -70,7 +70,7 @@ spm_p256_full_masked:
     ST      r24, ca_spm_internal_Pz
 
     ; ==========================================================================
-    ; 2) Split scalar k = k1 + k2 -> k1 <- rng, k2 = k - k1
+    ; 2) Split scalar k = k1 + k2 ... k1 <- rng, k2 = k - k1
     ; ==========================================================================
     LD      r31, ca_q256
     GRV     r2
@@ -190,6 +190,7 @@ spm_p256_full_masked:
     MUL256  r22, r9,  r1
     MUL256  r23, r10, r1
 
+; = RETURN =====================================================================
     MOVI    r0,  pass_val
     RET
 
