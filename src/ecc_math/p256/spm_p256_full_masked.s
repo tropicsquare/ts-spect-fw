@@ -125,8 +125,8 @@ spm_p256_full_masked:
     MOV     r13, r23
     MOV     r14, r24
 
-    ; Load parameter b
-    LD      r6,  ca_p256_b
+    ; Load P-256 parameter b
+    LD      r8,  ca_p256_b
     CALL    point_add_p256                  ; (r12, r13, r14) <- P1 + P2 = k.P
 
     ; Check if k.P is valid point on P-256
