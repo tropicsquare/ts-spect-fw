@@ -77,12 +77,12 @@ op_ecdsa_sign:
     SUBP    r26, r26, r0
     ADDP    r21, r21, r0
 
+.ifdef ECC_KEY_RERANDOMIZE
     ; Rerandomize w part
     GRV     r10
     XOR     r22, r22, r10
     XOR     r23, r23, r10
 
-.ifdef ECC_KEY_RERANDOMIZE
     ; Store the rerandomized priv keys back to flash slot
     KBO     r25, ecc_kbus_erase             ; Erase the slot before writing remasked keys
     BRE     eddsa_set_context_kbus_fail
