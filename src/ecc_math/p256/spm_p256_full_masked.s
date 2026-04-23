@@ -159,10 +159,12 @@ spm_p256_full_masked:
     ; ==========================================================================
     ; 8) Convert k.P to affine coordinates
     ; ==========================================================================
-    MOV     r1,  r14
+    ; We convert it from registers (r9, r10, r11) since these are the registers
+    ; checked for point validity
+    MOV     r1,  r11
     CALL    inv_p256
-    MUL256  r22, r12, r1
-    MUL256  r23, r13, r1
+    MUL256  r22, r9,  r1
+    MUL256  r23, r10, r1
 
     MOVI    r0,  pass_val
     RET
