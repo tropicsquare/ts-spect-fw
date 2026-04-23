@@ -165,10 +165,12 @@ spm_ed25519_full_masked:
     ; ==========================================================================
     ; 8) Convert k.P to affine coordinates
     ; ==========================================================================
-    MOV         r1,  r13
+    ; We convert it from registers (r7, r8, r9) since these are the registers
+    ; checked for point validity
+    MOV         r1,  r9
     CALL        inv_p25519                      ; r1 <- (k.P).z ^ (-1)
-    MUL25519    r21, r11, r1
-    MUL25519    r22, r12, r1
+    MUL25519    r21, r7,  r1
+    MUL25519    r22, r8,  r1
 
     MOVI        r0,  ret_op_success
     RET
