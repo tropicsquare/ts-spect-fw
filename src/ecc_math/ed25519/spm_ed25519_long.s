@@ -56,9 +56,6 @@ spm_ed25519_long:
     MOVI        r9,  1
     MOVI        r10, 0
 
-    MOVI        r30, 256    ; i
-    MOVI        r16, 0      ; j
-
     MOVI        r15, 2
 ; === MAIN LOOP ================================================================
 spm_ed25519_long_main_loop:
