@@ -16,15 +16,6 @@
 ca_addr_base .eq 0x0100
 
 ; ==============================================================================
-;   EdDSA
-; ==============================================================================
-ca_eddsa_sign_internal_A .eq 0x0500
-ca_eddsa_sign_internal_R .eq 0x0520
-ca_eddsa_sign_internal_S .eq 0x0540
-ca_eddsa_sign_internal_s1 .eq 0x0560
-ca_eddsa_sign_internal_s2 .eq 0x0580
-
-; ==============================================================================
 ;   Ed25519 Key Setup
 ; ==============================================================================
 ca_ed25519_key_setup_internal_s .eq 0x0120
@@ -42,12 +33,13 @@ ca_ecdsa_sign_internal_r .eq 0x01A0
 ca_ecdsa_sign_internal_s .eq 0x01C0
 
 ; ==============================================================================
-;   Scalar Point Multiplication
+;   EdDSA
 ; ==============================================================================
-ca_spm_internal_Px .eq 0x0300
-ca_spm_internal_Py .eq 0x0320
-ca_spm_internal_Pz .eq 0x0340
-ca_spm_internal_Pt .eq 0x0380
+ca_eddsa_sign_internal_s1 .eq 0x0120
+ca_eddsa_sign_internal_s2 .eq 0x0140
+ca_eddsa_sign_internal_A .eq 0x0160
+ca_eddsa_sign_internal_R .eq 0x01A0
+ca_eddsa_sign_internal_S .eq 0x01C0
 
 ; ==============================================================================
 ;   Double Scalar Point Multiplication
@@ -79,6 +71,16 @@ ca_dspm_point_P1P2x .eq 0x0420
 ca_dspm_point_P1P2y .eq 0x0440
 ca_dspm_point_P1P2z .eq 0x0460
 ca_dspm_point_P1P2t .eq 0x0480
+
+; ==============================================================================
+;   Scalar Point Multiplication
+; ==============================================================================
+ca_spm_internal_Q0 .eq 0x0220 ; - 0x0280
+ca_spm_internal_Q1 .eq 0x0320 ; - 0x0380
+ca_spm_internal_Px .eq 0x0420
+ca_spm_internal_Py .eq 0x0440
+ca_spm_internal_Pz .eq 0x0460
+ca_spm_internal_Pt .eq 0x0480
 
 ; ==============================================================================
 ;   Call Check
