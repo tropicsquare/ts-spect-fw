@@ -54,6 +54,7 @@ ecc_kbus_verify_erase .eq 0x404
 tmac_dst_ecdsa_key_setup .eq 0xA
 tmac_dst_ecdsa_sign .eq 0xB
 tmac_dst_eddsa_sign .eq 0xC
+tmac_dst_drng .eq 0xF
 
 ; GF(p) gen DSTs
 gfp_gen_dst_ecdsa .eq 0xF1

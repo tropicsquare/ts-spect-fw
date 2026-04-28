@@ -103,3 +103,5 @@ ca_op_link .eq 0x0700
 ca_gfp_gen_dst .eq 0x0720
 
 ca_checkpoint .eq 0x740
+
+ca_tmac_drng_seed .eq 0x780
