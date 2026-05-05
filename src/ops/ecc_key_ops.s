@@ -147,7 +147,8 @@ ecc_key_read_p256:
     MOVI    r11, 1
     LD      r31, ca_p256
     CALL    point_check_p256
-    BRNZ    op_key_fail
+    MOVI    r3,  ret_key_err
+    BRNZ    op_key_read_invalid
 
     MOVI    r1,  80     ; No compression
     JMP     ecc_key_read_continue
@@ -158,7 +159,8 @@ ecc_key_read_ed25519:
     MOVI        r9,  1  ; Z
     MUL25519    r10, r7,  r8
     CALL        point_valid_check_ed25519
-    BRNZ        op_key_fail
+    MOVI        r3,  ret_key_err
+    BRNZ        op_key_read_invalid
 
     ; Compress to r7 for output
     CALL    point_compress_ed25519_from_affine
