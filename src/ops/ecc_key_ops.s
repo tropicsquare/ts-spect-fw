@@ -101,13 +101,13 @@ op_ecc_key_read:
     BRNE    op_key_read_invalid
 
     ; load kpair metadata
-    LDK     r2,  r26, ecc_key_metadata
+    LDK     r16,  r26, ecc_key_metadata
     BRE     op_key_fail
 
     ; check metadata
     MOVI    r3,  ret_slot_metadata_err
     MOVI    r30, 0xFF
-    MOV     r5,  r2
+    MOV     r5,  r16
 
     ; 'Origin'
     ROR8    r5,  r5
@@ -132,7 +132,7 @@ ecc_key_read_check_slot_type:
 
     ; mask curve
     MOVI    r3,  ret_curve_type_err
-    AND     r30, r30, r2
+    AND     r30, r30, r16
 
     CMPI    r30, ecc_type_ed25519
     BRZ     ecc_key_read_ed25519
@@ -141,17 +141,31 @@ ecc_key_read_check_slot_type:
     BRNZ    op_key_read_invalid
 
 ecc_key_read_p256:
-    MOVI    r1,  80     ; add another 32 byte to data out size for P-256
-    LDK     r16, r26, ecc_pub_key_Ax
-    BRE     op_key_fail
-    LDK     r17, r26, ecc_pub_key_Ay
-    BRE     op_key_fail
+    ; Check that the ECC pub is valid P-256 Pub
+    MOV     r9,  r7
+    MOV     r10, r8
+    MOVI    r11, 1
+    LD      r31, ca_p256
+    CALL    point_check_p256
+    BRNZ    op_key_fail
+
+    MOVI    r1,  80     ; No compression
     JMP     ecc_key_read_continue
 ecc_key_read_ed25519:
-    ; load ed25519 pubkey
-    MOVI    r1,  48     ; data out size 16 + 32
-    LDK     r16, r26, ecc_pub_key_Ax
-    BRE     op_key_fail
+    ; Check that the ECC pub is valid Ed25519 Pub
+    LD          r31, ca_p25519
+    LD          r6,  ca_ed25519_d
+    MOVI        r9,  1  ; Z
+    MUL25519    r10, r7,  r8
+    CALL        point_valid_check_ed25519
+    BRNZ        op_key_fail
+
+    ; Compress to r7 for output
+    CALL    point_compress_ed25519_from_affine
+    MOV     r7,  r8
+    MOVI    r8,  0
+
+    MOVI    r1,  48
 
 ecc_key_read_continue:
     KBO     r26, ecc_kbus_flush
@@ -159,7 +173,7 @@ ecc_key_read_continue:
 
     ; compose return value
     MOVI    r5,  0xFFF
-    AND     r2,  r2,  r5
+    AND     r2,  r16, r5
     ROL8    r2,  r2
     ORI     r2,  r2,  l3_result_ok
     MOVI    r0,  0
