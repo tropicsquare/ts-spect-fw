@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
+from enum import Enum
+from dataclasses import dataclass
 
 from default_fw import Application
 
@@ -25,24 +27,63 @@ from spect_tester.helpers import (
     get_output_source,
 )
 
-TEST_FULL_SLOT = "full_slot"
-TEST_EMPTY_SLOT = "empty_slot"
-
 SPECT_FW = Application
 defines_set = get_main_defines(SPECT_FW.s_file)
 
-def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot_state: str, invalid_metadata: SlotMetadataErrType):
+@dataclass
+class ECC_KEY_READ_TEST_VEC:
+    curve_type          : CurveType
+    origin              : KeyOrigin
+    metadata_error      : SlotMetadataErrType
+    slot_is_populated   : bool
+    pub_is_valid        : bool
 
-    if slot_state == TEST_EMPTY_SLOT:
-        suffix = TEST_EMPTY_SLOT
-    elif invalid_metadata != SlotMetadataErrType.NO_ERR:
-        suffix = invalid_metadata.name.lower()
-    elif curve_type == CurveType.INVALID:
-        suffix = "invalid_curve"
+# TEST VECTORS
+class TEST_VEC:
+#       Curve Type         Key Origin          Metadata corruption              populated  valid pub
+# OK tests
+    Ed25519_OK = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.NO_ERR,      True,      True
+    )
+    P256_OK = ECC_KEY_READ_TEST_VEC(
+        CurveType.P256,    KeyOrigin.STORE,    SlotMetadataErrType.NO_ERR,      True,      True
+    )
+# Err tests
+    EmptySlot = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.NO_ERR,      False,     True
+    )
+    Ed25519_InvalidPub = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.NO_ERR,      True,      False
+    )
+    P256_InvalidPub = ECC_KEY_READ_TEST_VEC(
+        CurveType.P256,    KeyOrigin.GENERATE, SlotMetadataErrType.NO_ERR,      True,      False
+    )
+    MetadataErr_CurveType = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.CURVE_ERR,   True,      True
+    )
+    MetadataErr_SlotType = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.TYPE_ERR,    True,      True
+    )
+    MetadataErr_SlotNumber = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.NUMBER_ERR,  True,      True
+    )
+    MetadataErr_KeyOrigin = ECC_KEY_READ_TEST_VEC(
+        CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.ORIGIN_ERR,  True,      True
+    )
+
+def test_run(
+    tester: SpectTester, test_vec: ECC_KEY_READ_TEST_VEC):
+
+    if test_vec.slot_is_populated == False:
+        suffix = "empty_slot"
+    elif test_vec.pub_is_valid == False:
+        suffix = "invalid_pub"
+    elif test_vec.metadata_error != SlotMetadataErrType.NO_ERR:
+        suffix = test_vec.metadata_error.name.lower()
     else:
         suffix = "ok"
 
-    run_name = f"ecc_key_read_{curve_type.name.lower()}_{suffix}"
+    run_name = f"ecc_key_read_{test_vec.curve_type.name.lower()}_{suffix}"
 
     test_run = tester.create_test_run(run_name)
     test_run.cmd_start()
@@ -65,27 +106,33 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
     priv_slot = (slot << 1)
     pub_slot = (slot << 1)+1
 
-    if curve_type == CurveType.ED25519:
+    if test_vec.curve_type == CurveType.ED25519:
         pub_size = 32
-        pub_ref = random_bytes(pub_size)
-        # Ed25519 Public is stored with swapped endianity for easier SPECT FW implementation
-        pub_ref_in_slot = pub_ref[::-1]
-    else:
+        pub_ref = EdDSA.KeyGen(random_bytes(32))
+    elif test_vec.curve_type == CurveType.P256:
         pub_size = 64
-        pub_ref = random_bytes(pub_size)
-        # P256 Public is stored with swapped endianity and coords for easier SPECT FW implementation
-        pub_ref_in_slot = (pub_ref[:32])[::-1] + (pub_ref[32:])[::-1]
+        pub_ref = ECDSA.KeyGen(random_bytes(32))
+    else:
+        test_run.critical(f"Invalid CurveType value: {test_vec.curve_type}")
+        # critical exits
+
+    pub_ref_in_slot = pub_ref.PublicBytes(encoding="spect")
+    pub_ref = pub_ref.PublicBytes() # Get the pub in default encoding
 
     privs = random_bytes(4*32)
 
     pub_metadata_ref, priv_metadata_ref = create_metadata(
-        curve            = curve_type,
+        curve            = test_vec.curve_type,
         slot             = slot,
-        origin           = origin,
-        invalid_metadata = invalid_metadata
+        origin           = test_vec.origin,
+        invalid_metadata = test_vec.metadata_error
     )
 
-    if slot_state != TEST_EMPTY_SLOT:
+    if test_vec.pub_is_valid == False:
+        pub_ref_in_slot = random_bytes(64)
+
+    # Populate slot
+    if test_vec.slot_is_populated == True:
         test_run.info(f"Pubkey Ref: {pub_ref.hex()}")
         test_run.set_key(privs, KeyTypes.ECC, priv_slot, 0)
         test_run.set_key(priv_metadata_ref, KeyTypes.ECC, priv_slot, EccSlot.METADATA_OFFSET)
@@ -93,19 +140,24 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
         test_run.set_key(pub_ref_in_slot, KeyTypes.ECC, pub_slot, EccSlot.PUB_OFFSET)
         test_run.set_key(pub_metadata_ref, KeyTypes.ECC, pub_slot, EccSlot.METADATA_OFFSET)
 
-    if slot_state == TEST_EMPTY_SLOT:
+    # Predict SPECT response
+    if test_vec.slot_is_populated == False:                         # Empty slot
         spect_status_ref = SpectOpStatus.RET_KEY_ERR
         l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
-    elif curve_type == CurveType.INVALID:
+
+    elif test_vec.pub_is_valid == False:                            # Invalid Pub
+        spect_status_ref = SpectOpStatus.RET_KEY_ERR
+        l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
+
+    elif test_vec.metadata_error == SlotMetadataErrType.CURVE_ERR:  # Invalid Curve Type
         spect_status_ref = SpectOpStatus.RET_CURVE_TYPE_ERR
         l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
-    elif invalid_metadata == SlotMetadataErrType.CURVE_ERR:
-        spect_status_ref = SpectOpStatus.RET_CURVE_TYPE_ERR
-        l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
-    elif invalid_metadata != SlotMetadataErrType.NO_ERR:
+
+    elif test_vec.metadata_error != SlotMetadataErrType.NO_ERR:     # Other error in metadata
         spect_status_ref = SpectOpStatus.RET_SLOT_METADATA_ERR
         l3_result_ref = L3Result.L3_RESULT_INVALID_KEY
-    else:
+
+    else:                                                           # Everithing OK
         spect_status_ref = SpectOpStatus.RET_OP_SUCCESS
         l3_result_ref = L3Result.L3_RESULT_OK
 
@@ -146,9 +198,9 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
         )
 
     # If some error, end
-    if ((slot_state == TEST_EMPTY_SLOT) or
-        (invalid_metadata != SlotMetadataErrType.NO_ERR) or
-        (curve_type == CurveType.INVALID)
+    if ((test_vec.slot_is_populated == False) or
+        (test_vec.pub_is_valid == False) or
+        (test_vec.metadata_error != SlotMetadataErrType.NO_ERR)
     ):
         test_run.status_summary()
         if test_run.err_cnt == 0:
@@ -165,10 +217,10 @@ def test_run(tester: SpectTester, curve_type: CurveType, origin: KeyOrigin, slot
     r_curve = (l3_result_word >> 8) & 0xFF
     r_origin = (l3_result_word >> 16) & 0xFF
 
-    if r_curve != curve_type:
+    if r_curve != test_vec.curve_type:
         test_run.error(f"Invalid curve type")
 
-    if r_origin != origin:
+    if r_origin != test_vec.origin:
         test_run.error(f"Invalid key origin")
 
     test_run.info(f"Pub Size: {pub_size}")
@@ -193,16 +245,18 @@ if __name__ == "__main__":
     tester = SpectTester(test_name, spect_fw=Application)
 
     # No Error
-    test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_FULL_SLOT, SlotMetadataErrType.NO_ERR)
-    test_run(tester, CurveType.P256,    KeyOrigin.STORE,    TEST_FULL_SLOT, SlotMetadataErrType.NO_ERR)
-
-    # Errors
-    test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_EMPTY_SLOT, SlotMetadataErrType.NO_ERR)
-    test_run(tester, CurveType.INVALID, KeyOrigin.GENERATE, TEST_FULL_SLOT,  SlotMetadataErrType.NO_ERR)
-    test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_FULL_SLOT,  SlotMetadataErrType.CURVE_ERR)
-    test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_FULL_SLOT,  SlotMetadataErrType.TYPE_ERR)
-    test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_FULL_SLOT,  SlotMetadataErrType.NUMBER_ERR)
-    test_run(tester, CurveType.ED25519, KeyOrigin.GENERATE, TEST_FULL_SLOT,  SlotMetadataErrType.ORIGIN_ERR)
+    test_run(tester, TEST_VEC.Ed25519_OK                )
+    test_run(tester, TEST_VEC.P256_OK                   )
+    # Empty Slot
+    test_run(tester, TEST_VEC.EmptySlot                 )
+    # Invalid ECC Pub key
+    test_run(tester, TEST_VEC.Ed25519_InvalidPub        )
+    test_run(tester, TEST_VEC.P256_InvalidPub           )
+    # Invalid Slot metadata
+    test_run(tester, TEST_VEC.MetadataErr_CurveType     )
+    test_run(tester, TEST_VEC.MetadataErr_SlotType      )
+    test_run(tester, TEST_VEC.MetadataErr_SlotNumber    )
+    test_run(tester, TEST_VEC.MetadataErr_KeyOrigin     )
 
     err_cnt = tester.count_errors()
 
