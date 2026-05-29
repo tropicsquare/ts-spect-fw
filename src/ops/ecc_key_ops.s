@@ -107,14 +107,14 @@ op_ecc_key_read:
     BRNE        op_key_read_invalid
 
     ; Load SLOT Metadata
-    LDK         r16,  r26, ecc_key_metadata
+    LDK         r15,  r26, ecc_key_metadata
     BRE         op_key_fail
 
 ; === Parse and check SLOT Metadata ============================================
-; We keep the metadata word in r16 because it is part of the response data
+; We keep the metadata word in r15 because it is part of the response data
     MOVI        r3,  ret_slot_metadata_err
     MOVI        r30, 0xFF
-    MOV         r5,  r16
+    MOV         r5,  r15
 
     ; Check Origin
     ROR8        r5,  r5
@@ -137,16 +137,10 @@ ecc_key_read_check_slot_type:
     CMP         r4,  r25
     BRNZ        op_key_read_invalid
 
-; === Read the public key A (raw pint coordinates) =============================
-    ; (r7, r8) <- A
-    LDK         r7,  r26, ecc_pub_key_Ax
-    BRE         op_key_fail
-    LDK         r8,  r26, ecc_pub_key_Ay
-    BRE         op_key_fail
-
+; === Read the public key ======================== =============================
     ; Get Curve Type from Slot Metadata
     MOVI        r3,  ret_curve_type_err
-    AND         r30, r30, r16
+    AND         r30, r30, r15
 
     ; Branch based on the Curve Type
     CMPI        r30, ecc_type_ed25519
@@ -157,6 +151,11 @@ ecc_key_read_check_slot_type:
 
 ; === Check and prepare P-256 Public key =======================================
 ecc_key_read_p256:
+    ; (r7, r8) <- A
+    LDK         r7,  r26, ecc_pub_key_Ax
+    BRE         op_key_fail
+    LDK         r8,  r26, ecc_pub_key_Ay
+    BRE         op_key_fail
     ; Check that A is valid P-256 Pub
     LD          r31, ca_p256
     MOV         r9,  r7                             ; r9  <- Ax
@@ -171,21 +170,27 @@ ecc_key_read_p256:
 
 ; === Check and prepare Ed25519 Public key =====================================
 ecc_key_read_ed25519:
-    ; Check that A is valid Ed25519 Pub
-    LD          r31, ca_p25519
-    LD          r6,  ca_ed25519_d
-    MOVI        r9,  1                              ; r9  <- Az = 1
-    MUL25519    r10, r7,  r8                        ; r10 <- At = Ax * Ay
-    CALL        point_valid_check_ed25519
+    ; Ed25519 Public key is stored compressed
+    ; Compressed public key pass the point validity check in ~50 % cases
+    ; Therefore we read the compressed value twice and compare
+    LDK         r7,  r26, ecc_pub_key_Ax
+    BRE         op_key_fail
+    LDK         r12, r26, ecc_pub_key_Ax
+    BRE         op_key_fail
+
     MOVI        r3,  ret_key_err
+    XOR         r8,  r12,  r7
     BRNZ        op_key_read_invalid
 
-    ; Ed25519 Public key is returned in compressed format (32B)
-    ; r7 <- ENC(A)
-    CALL        point_compress_ed25519_from_affine
-    MOV         r7,  r8
-    MOVI        r8,  0
+    LD          r31, ca_p25519
+    LD          r6,  ca_ed25519_d
+    SWE         r12, r12
+    CALL        point_decompress_ed25519
+    MOVI        r3,  ret_key_err
+    CMPI        r1,  pass_val
+    BRNZ        op_key_read_invalid
 
+    MOVI        r8,  0
     MOVI        r1,  48                             ; r1 <- response data size (16+32 B)
 
 ; === Finalize ECC_Key_Read ====================================================
@@ -195,7 +200,7 @@ ecc_key_read_continue:
 
     ; Compose return value (ORIGIN | CURVE | L3 Result)
     MOVI        r5,  0xFFF
-    AND         r2,  r16, r5
+    AND         r2,  r15, r5
     ROL8        r2,  r2
     ORI         r2,  r2,  l3_result_ok
     MOVI        r0,  0

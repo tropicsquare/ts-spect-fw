@@ -9,6 +9,14 @@ from default_fw import Application
 from import_setup import import_setup
 import_setup()
 
+from spect_models.ECDSA import ECDSA_SECP256R1 as ECDSA
+from spect_models.Curves.secp256r1 import secp256r1
+from spect_models.Fields.Field_secp256r1 import Field
+
+from spect_models.EdDSA import EdDSA
+from spect_models.Curves.Ed25519 import Ed25519
+from spect_models.Fields.Field255 import Field
+
 from spect_tester.spect_tester import SpectTester, SpectTestRun
 from spect_tester.spect_config import (
     SpectOpStatus,
@@ -71,6 +79,27 @@ class TEST_VEC:
         CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.ORIGIN_ERR,  True,      True
     )
 
+def _get_invalid_pub(curve: CurveType) -> bytes:
+    valid = True
+    if curve == CurveType.ED25519:
+        while valid:
+            pub = EdDSA.KeyGen()
+            # Randomly alter the y ccordinate
+            pub.P.y += rn.randint(0, 2**256)
+            valid = Ed25519.from_bytes(pub.PublicBytes()).is_valid()
+    elif curve == CurveType.P256:
+        while valid:
+            pub = ECDSA.KeyGen()
+            # Randomly alter the y and x ccordinates
+            pub.P.x += rn.randint(0, 2**256)
+            pub.P.y += rn.randint(0, 2**256)
+            valid = secp256r1.from_bytes(pub.PublicBytes()).is_valid()
+    else:
+        test_run.critical(f"Invalid CurveType value: {curve}")
+        # critical exits
+
+    return pub
+
 def test_run(
     tester: SpectTester, test_vec: ECC_KEY_READ_TEST_VEC):
 
@@ -116,6 +145,9 @@ def test_run(
         test_run.critical(f"Invalid CurveType value: {test_vec.curve_type}")
         # critical exits
 
+    if test_vec.pub_is_valid == False:
+        pub_ref = _get_invalid_pub(test_vec.curve_type)
+
     pub_ref_in_slot = pub_ref.PublicBytes(encoding="spect")
     pub_ref = pub_ref.PublicBytes() # Get the pub in default encoding
 
@@ -127,9 +159,6 @@ def test_run(
         origin           = test_vec.origin,
         invalid_metadata = test_vec.metadata_error
     )
-
-    if test_vec.pub_is_valid == False:
-        pub_ref_in_slot = random_bytes(64)
 
     # Populate slot
     if test_vec.slot_is_populated == True:
