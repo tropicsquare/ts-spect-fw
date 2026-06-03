@@ -3,6 +3,7 @@ import sys
 import random as rn
 from enum import Enum
 from dataclasses import dataclass
+from typing import Optional
 
 from default_fw import Application
 
@@ -79,8 +80,9 @@ class TEST_VEC:
         CurveType.ED25519, KeyOrigin.GENERATE, SlotMetadataErrType.ORIGIN_ERR,  True,      True
     )
 
-def _get_invalid_pub(curve: CurveType) -> bytes:
+def _get_invalid_pub(curve: CurveType):
     valid = True
+    pub = None
     if curve == CurveType.ED25519:
         while valid:
             pub = EdDSA.KeyGen()
@@ -95,8 +97,7 @@ def _get_invalid_pub(curve: CurveType) -> bytes:
             pub.P.y += rn.randint(0, 2**256)
             valid = secp256r1.from_bytes(pub.PublicBytes()).is_valid()
     else:
-        test_run.critical(f"Invalid CurveType value: {curve}")
-        # critical exits
+        assert False, f"Invalid CurveType value: {curve}"
 
     return pub
 
@@ -147,6 +148,8 @@ def test_run(
 
     if test_vec.pub_is_valid == False:
         pub_ref = _get_invalid_pub(test_vec.curve_type)
+
+    assert pub_ref is not None, "Failed to generate the public key"
 
     pub_ref_in_slot = pub_ref.PublicBytes(encoding="spect")
     pub_ref = pub_ref.PublicBytes() # Get the pub in default encoding
