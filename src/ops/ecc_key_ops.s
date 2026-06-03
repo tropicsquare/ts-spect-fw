@@ -237,23 +237,22 @@ op_ecc_key_erase:
     CALL        ecc_key_parse_input
 
 ; === Erase Private Slot =======================================================
-    LSL         r25, r25                            ; r25 <- physical priv key slot
+    LSL         r26, r25                            ; r25 <- physical priv key slot
 
-    KBO         r25, ecc_kbus_erase
+    KBO         r26, ecc_kbus_erase
     BRE         op_key_fail
-    KBO         r25, ecc_kbus_verify_erase
+    KBO         r26, ecc_kbus_verify_erase
     BRE         op_key_fail
-    KBO         r25, ecc_kbus_flush
-
+    KBO         r26, ecc_kbus_flush
 
 ; === Erase Public Slot ========================================================
-    ADDI        r25, r25, 1                         ; r25 <- physical pub key slot
+    ADDI        r26, r26, 1                         ; r25 <- physical pub key slot
 
-    KBO         r25, ecc_kbus_erase
+    KBO         r26, ecc_kbus_erase
     BRE         op_key_fail
-    KBO         r25, ecc_kbus_verify_erase
+    KBO         r26, ecc_kbus_verify_erase
     BRE         op_key_fail
-    KBO         r25, ecc_kbus_flush
+    KBO         r26, ecc_kbus_flush
 
 ; === Store L3 Response ========================================================
     CALL        get_output_base
