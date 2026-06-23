@@ -33,7 +33,6 @@
 .include   ecc_math/ed25519/point_add_ed25519.s
 .include   ecc_math/ed25519/point_dbl_ed25519.s
 .include   ecc_math/ed25519/spm_ed25519_long.s
-;.include   ecc_math/ed25519/spm_ed25519_long_new.s
 .include   ecc_math/ed25519/spm_ed25519_double.s
 .include   ecc_math/ed25519/spm_ed25519_full_masked.s
 .include   ecc_math/ed25519/point_valid_check_ed25519.s
@@ -44,7 +43,6 @@
 .include   ecc_math/p256/point_add_p256.s
 .include   ecc_math/p256/point_dbl_p256.s
 .include   ecc_math/p256/spm_p256_long.s
-;.include   ecc_math/p256/spm_p256_long_new.s
 .include   ecc_math/p256/spm_p256_double.s
 .include   ecc_math/p256/spm_p256_full_masked.s
 .include   ecc_math/p256/point_check_p256.s
