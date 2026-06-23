@@ -65,8 +65,10 @@ spm_ed25519_long:
 
     MOVI        r17, 0x100                              ; scalar bit mask
 
-    MOVI        r15, 2
+    TMAC_RD     r19                                     ; fetch pseudorandom data
+
 ; === MAIN LOOP ================================================================
+    MOVI        r15, 2
 spm_ed25519_long_main_loop:
     MOVI        r30, 256                                ; i = 256
     MOVI        r16, 0                                  ; j = 0
@@ -74,13 +76,18 @@ spm_ed25519_long_main_loop:
     ROL8        r29, r29                                ; shift to position
 spm_ed25519_long_loop:
 ; --- INNER LOOP BODY -------
-    ROL         r29, r29
+    ROL         r19, r19                                ; Randomize ALU_IN.A
+    ROL         r29, r29                                ; Shift key
+    ROL         r19, r19                                ; Randomize ALU_IN.A
 
     ; We have to first destroy the content of Q0, Q1 and r18 registers
     ; Otherwise XOR(k[i], k[i-1]) leaks through side-channel
     CALL        spm_ed25519_long_destroy_regs
 
-    AND         r18, r29, r17
+    ROL         r19, r19                                ; Randomize ALU_IN.A
+    AND         r18, r29, r17                           ; Get the scalar bit
+
+    ROL         r19, r19                                ; Randomize ALU_IN.A
     ADDI        r18, r18, ca_spm_internal_Q0
 
     CALL        spm_ed25519_long_load_Q0
