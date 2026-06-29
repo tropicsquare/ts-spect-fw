@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import random as rn
-from enum import Enum
 from dataclasses import dataclass
-from typing import Optional
 
 from default_fw import Application
 
@@ -12,13 +10,11 @@ import_setup()
 
 from spect_models.ECDSA import ECDSA_SECP256R1 as ECDSA
 from spect_models.Curves.secp256r1 import secp256r1
-from spect_models.Fields.Field_secp256r1 import Field
 
 from spect_models.EdDSA import EdDSA
 from spect_models.Curves.Ed25519 import Ed25519
-from spect_models.Fields.Field255 import Field
 
-from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_tester import SpectTester
 from spect_tester.spect_config import (
     SpectOpStatus,
     L3Result,
