@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- ECC_Key_Erase now flushes KBUS with the correct slot when error occurs.
+
+### Added
+
+- Public keys are check for validity upon read.
+
 ## [v1.2.1] 2026-04-14
 
 ### Fixed
