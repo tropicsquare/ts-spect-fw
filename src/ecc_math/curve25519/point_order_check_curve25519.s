@@ -24,7 +24,8 @@
 ;   Curve25519 prime in r31
 ;
 ; Modified registers:
-;   r1,2,3,6,7,8
+;   r1 - r3,
+;   r6 - r8
 ;
 ; Subroutines:
 ;   point_xdbl_curve25519

@@ -28,6 +28,10 @@
 ;   P-256 b*3 parameter in r8
 ;
 ; Modified registers:
+;   r0 - r7,
+;   r9 - r16,
+;   r20, r21,
+;   r26 - r30
 ;
 ; Subroutines:
 ;   point_add_p256

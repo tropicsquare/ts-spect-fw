@@ -31,7 +31,7 @@
 ;   Curve25519 prime in r31
 ;
 ; Modified registers:
-;   r0-6
+;   r0 - r9
 ;
 ; Algorithm:
 ;   C = XQ * ZP

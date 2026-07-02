@@ -29,7 +29,8 @@
 ;   Curve25519 prime in r31
 ;
 ; Modified registers
-;   r0-6
+;   r0 - r6,
+;   r11 - r13
 ;
 ; Algorithm:
 ;   U1 = X1 * Z2

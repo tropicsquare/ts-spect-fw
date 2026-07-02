@@ -24,6 +24,17 @@
 ;                 X    Z    Y
 ;   Point k.P = (r7,  r8,  r9)
 ;
+; Expects:
+;   ---
+;
+; Modified registers:
+;   r0 - r10,
+;   r14 - r16,
+;   r29 - r31
+;
+; Subroutines:
+;   y_recovery_curve25519
+;
 ; ==============================================================================
 
 spm_curve25519:

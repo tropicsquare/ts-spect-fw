@@ -21,11 +21,20 @@
 ;   Point Q = (r7,  r8,  r9,  r10)
 ;   Final invariant check: r0
 ;
+; Expects:
+;   ---
+;
 ; Modified registers:
 ;   r0-r4 -> intermediate values for point addition/doubling
 ;   r6 -> parameter d
 ;   (r7,  r8,  r9,  r10) -> Q0
-;   r30 -> counter
+;   r15, r16, r30 -> counters
+;   r29
+;
+;   r0 - r4,
+;   r6 - r16,
+;   r29 - r31
+;   !!! Destroys the masked scalar in (r28, r29) !!!
 ;
 ; Subroutines:
 ;   point_add_ed25519

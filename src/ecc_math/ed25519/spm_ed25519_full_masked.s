@@ -21,7 +21,9 @@
 ;   k.p in affine coordinates in (r21, r22)
 ;
 ; Modified registers:
-;   r0-4, r6-14, r21-24, r27, r28, r30, r31
+;   r0 - r16,
+;   r21 - r25,
+;   r28 - r31
 ;
 ; Subroutines:
 ;   hash_to_field

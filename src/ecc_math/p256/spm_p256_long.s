@@ -22,13 +22,12 @@
 ;   Final invariant check: r0
 ;
 ; Expects:
-;   P-256 prime in r31
+;   ---
 ;
 ; Modified registers:
-;   r0-r7 -> intermediate values for point addition/doubling
-;   r8 -> parameter b
-;   (r9, r10, r11) -> Q0
-;   r30 -> counter
+;   r0 - r16,
+;   r29 - r31
+;   !!! Destroys the masked scalar in (r28, r29) !!!
 ;
 ; Subroutines:
 ;   point_add_p256
