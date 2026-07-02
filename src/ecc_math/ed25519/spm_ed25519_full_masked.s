@@ -123,7 +123,7 @@ spm_ed25519_full_masked:
     SCB         r28, r25, r30                   ; (r28, r29) <- k2'
 
     ; ==========================================================================
-    ; 6) Re-randomize P
+    ; 6) Re-randomize P (X, Y, Z, T) <- (rX, rY, rZ, rT)
     ; ==========================================================================
     ; Load point P
     LD          r7,  ca_spm_internal_Px
@@ -136,7 +136,7 @@ spm_ed25519_full_masked:
     GRV         r2
     LD          r1,  ca_gfp_gen_dst
     CALL        hash_to_field
-    ORI         r0,  r0,  1                     ; Ensure that Z != 0
+    ORI         r0,  r0,  1                     ; Ensure that r != 0
     MUL25519    r7,  r7,  r0
     MUL25519    r8,  r8,  r0
     MUL25519    r9,  r9,  r0

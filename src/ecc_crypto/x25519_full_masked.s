@@ -142,13 +142,13 @@ x25519_full_masked_scalar_split:
     SCB         r28, r20, r30                   ; (r28, r29) <- k2'
 
     ; ==========================================================================
-    ; 6) Re-randomize P
+    ; 6) Re-randomize P (X, Y, Z) <- (rX, rY, rZ)
     ; ==========================================================================
     LD          r31, ca_p25519
     GRV         r2
     LD          r1,  ca_gfp_gen_dst
     CALL        hash_to_field
-    ORI         r0,  r0,  1                     ; Ensure that Z != 0
+    ORI         r0,  r0,  1                     ; Ensure that r != 0
     MUL25519    r11, r11, r0
     MUL25519    r12, r12, r0
     MUL25519    r13, r13, r0
