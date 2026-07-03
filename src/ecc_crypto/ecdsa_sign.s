@@ -108,23 +108,26 @@ ecdsa_sign_tmac_padding_loop_k2:
     BRZ         ecdsa_sign_fail_k
 
 ; ==============================================================================
-;   Compute r = [k.G]x
+;   Compute r = [k.G]x mod q
 ; ==============================================================================
 
     LD          r22, ca_p256_xG
     LD          r23, ca_p256_yG
 
     CALL        spm_p256_full_masked
+
     ; call check
     LD          r4, ca_call_check_level_2
     CMPI        r4, call_check_level_2_id
     MOVI        r4, 0
     ST          r4, ca_call_check_level_2
     BRNZ        ecdsa_sign_generic_fail
+
     ; spm retcode check
     CMPI        r0,  pass_val
     BRNZ        ecdsa_sign_generic_fail
 
+    ; Reduce r mod q
     LD          r31, ca_q256
     MOVI        r0, 0
     REDP        r22, r0, r22
@@ -173,18 +176,21 @@ ecdsa_sign_final_verify:
     ST          r22, ca_ecdsa_sign_internal_r
 
     CALL        ecdsa_verify
+
     ; Call check
     LD          r4, ca_call_check_level_1
     CMPI        r4, call_check_level_1_id
     MOVI        r4, 0
     ST          r4, ca_call_check_level_1
     BRNZ        ecdsa_fail_verify
+
     ; check retval
     CMPI        r30, pass_val
     BRNZ        ecdsa_fail_verify
 
     MOVI        r3,  ret_op_success
     MOVI        r2,  l3_result_ok
+
 ecdsa_sign_end:
     CALL        get_output_base
 
@@ -200,12 +206,14 @@ ecdsa_sign_end:
     CMPI        r3,  ret_op_success
     BRNZ        ecdsa_sign_end_not_store
 
-    MOVI        r1,  80
+    MOVI        r1,  80         ; size of the output
 
+    ; Store signature part r
     ADDI        r30, r0,  ecdsa_sign_output_signature
     SWE         r22, r22
     STR         r22, r30
 
+    ; Store signature part s
     ADDI        r30, r30, 0x20
     LD          r10, ca_ecdsa_sign_internal_s
     SWE         r10, r10

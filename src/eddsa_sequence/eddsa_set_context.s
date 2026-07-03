@@ -87,7 +87,7 @@ op_eddsa_set_context:
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
-    ; Rerandomize
+    ; Rerandomize s
     LD          r31, ca_q25519
     GRV         r2
     LD          r1, ca_gfp_gen_dst
@@ -95,11 +95,12 @@ op_eddsa_set_context:
     SUBP        r26, r26, r0
     ADDP        r29, r29, r0
 
+.ifdef ECC_KEY_RERANDOMIZE
+    ; Rerandomize prefix
     GRV         r2
     XOR         r23, r23, r2
     XOR         r30, r30, r2
 
-.ifdef ECC_KEY_RERANDOMIZE
     ; Store back to ECC priv key slot
     KBO         r21, ecc_kbus_erase             ; Erase the slot before writing remasked keys
     BRE         eddsa_set_context_kbus_fail

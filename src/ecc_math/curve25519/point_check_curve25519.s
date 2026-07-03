@@ -22,7 +22,7 @@
 ;   Sets Zero flag if P is a valid point
 ;
 ; Modified registers:
-;   r0,1,2
+;   r0 - r2
 ;
 ; ==============================================================================
 

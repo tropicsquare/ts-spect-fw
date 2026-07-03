@@ -25,7 +25,8 @@
 ;   Curve25519 constant a2d4 = (Curve25519.A + 2) / 4 in r6
 ;
 ; Modified registers:
-;   r1,2,3
+;   r1 - r3,
+;   r7, r8
 ;
 ; Algorithm:
 ;   xDBL(XP, ZP):

@@ -24,8 +24,8 @@
 ;   Ed25519 prime in r31
 ;
 ; Modified registers:
-;   r1-4
-;   !!! Destroys the point in r7-r10 !!!
+;   r0 - r4,
+;   r7 - r10 !!! Destroys the point in r7 - r10 !!!
 ;
 ; ==============================================================================
 

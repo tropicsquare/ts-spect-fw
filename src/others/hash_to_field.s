@@ -31,7 +31,7 @@
 ;   p in r31
 ;
 ; Modified registers:
-;   r0-3
+;   r0 - r3
 ;
 ; Subroutines:
 ;   compose_exp_tag

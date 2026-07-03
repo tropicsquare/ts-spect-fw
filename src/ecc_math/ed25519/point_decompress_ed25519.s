@@ -57,7 +57,10 @@
 ;   decompressed point (X, Y) = (r11, r12)
 ;
 ; Modified registers:
-;   r0,1,3,11,12, r16-22, r30
+;   r0 - r5,
+;   r11, r12,
+;   r16 - r22,
+;   r30
 ;
 ; Subroutines:
 ;   inv_p25519_250

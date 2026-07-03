@@ -26,7 +26,7 @@
 ;   p25519 in register r31
 ;
 ; Modified registers:
-;   r0-4
+;   r0 - r5, r30
 ;
 ; Subroutines:
 ;   inv_p25519_250

@@ -27,6 +27,12 @@
 ;   Ed25519 prime in r31
 ;   Ed25519 parameter d in r6
 ;
+; Modified registers:
+;   r0 - r4,
+;   r7 - r16,
+;   r20, r21,
+;   r26 - r31
+;
 ; Subroutines:
 ;   point_add_ed25519
 ;   point_dbl_ed25519

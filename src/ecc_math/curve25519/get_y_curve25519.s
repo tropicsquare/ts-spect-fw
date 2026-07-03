@@ -27,7 +27,8 @@
 ;   Curve25519 prime in R31
 ;
 ; Modified registers:
-;   r0, r1, r2, r17
+;   r0 - r5,
+;   r17, r30
 ;
 ; Subroutines:
 ;   sqrt_p25519

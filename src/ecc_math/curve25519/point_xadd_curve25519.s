@@ -26,7 +26,8 @@
 ;   Curve25519 prime in r31
 ;
 ; Modified registers:
-;   r0-4
+;   r0 - r4,
+;   r9, r10
 ;
 ; Algorithm:
 ;   xADD(XP, ZP, XQ, ZQ, XR, ZR = 1):

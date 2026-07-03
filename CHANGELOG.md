@@ -10,10 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - ECC_Key_Erase now flushes KBUS with the correct slot when error occurs.
+- Load of `ca_p256_b` parameter to the correct GPR (before `r6`, fixed to `r8`).
+- Add missing call-checks in `spm_p256_full_masked` and `spm_ed25519_full_masked` routines.
+- Conversion to affine coordinates in `spm_p256_full_masked` and `spm_ed25519_full_masked` is done using the GPRs on which the point validity check is actually performed.
+
+### Changed
+
+- The order of operations in P-256 and Ed25519 point arithmetic was changed to change their power/EM profile compared to older version.
 
 ### Added
 
-- Public keys are check for validity upon read.
+- Public keys are checked for validity upon ECC_Key_Read.
+- Scalar additive splitting side-channel countermeasure.
+
+### Removed
+
+- Point blinding SCA countermeasure was removed in favor of the scalar splitting.
+- The rerandomization of the second part of the ECDSA/EdDSA private keys (`w`/`prefix`) was removed, as it has to be unmasked anyway later.
 
 ## [v1.2.1] 2026-04-14
 

@@ -34,20 +34,25 @@ op_eddsa_R_part:
     MOVI        r1,  eddsa_R_part_id
     ST          r1,  ca_op_link
 
-    LD          r31, ca_p25519
-    LD          r21, ca_ed25519_xG
-    LD          r22, ca_ed25519_yG
+    ; Load inputs for spm_ed25519_full_masked
+    LD          r21, ca_ed25519_xG              ; r21 <- Gx
+    LD          r22, ca_ed25519_yG              ; r22 <- Gy
+    ; Nonce r is already in r27 from EdDSA context
 
     CALL        spm_ed25519_full_masked
+
     ; spm retcode check
-    CMPI        r0,  ret_op_success
+    CMPI        r0,  pass_val
     BRNZ        eddsa_R_part_fail
+
     ; call check
     LD          r4, ca_call_check_level_2
     CMPI        r4, call_check_level_2_id
     MOVI        r4, 0
     ST          r4, ca_call_check_level_2
     BRNZ        eddsa_R_part_fail
+
+    MOVI        r0,  ret_op_success
 
     ; Encode R
     MOVI        r1,  1
@@ -63,5 +68,6 @@ eddsa_R_part_pass:
     JMP         set_res_word
 
 eddsa_R_part_fail:
-    MOVI        r1,  ret_point_integrity_err
+    MOVI        r0,  ret_point_integrity_err
+    MOVI        r1,  0
     JMP         set_res_word
