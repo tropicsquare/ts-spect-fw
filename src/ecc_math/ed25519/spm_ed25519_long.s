@@ -87,7 +87,8 @@ spm_ed25519_long_loop:
     ROL         r19, r19                                ; Randomize ALU_IN.A
     AND         r18, r29, r17                           ; Get the scalar bit
 
-    ROL         r19, r19                                ; Randomize ALU_IN.A
+    ROL         r1,  r19                                ; Randomize ALU_IN.A
+    XOR         r19, r19, r1                            ; Refresh the precharge mask in r19
     ADDI        r18, r18, ca_spm_internal_Q0
 
     CALL        spm_ed25519_long_load_Q0
