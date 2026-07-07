@@ -110,8 +110,8 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
 
     if curve_type == CurveType.ED25519:
         if op_name == TEST_GENERATE:
-            rng0 = rng[0].to_bytes(32, byteorder='big')
-            rng1 = rng[1].to_bytes(32, byteorder='big')
+            rng0 = rng[1].to_bytes(32, byteorder='big')
+            rng1 = rng[2].to_bytes(32, byteorder='big')
             k_wide = hashlib.sha512(rng0 + rng1).digest()
             k = bytes([a ^ b for a, b in zip(k_wide[:32], k_wide[32:])])[::-1]
         else:
@@ -121,7 +121,7 @@ def test_run(tester: SpectTester, op_name: str, curve_type: CurveType, slot_stat
 
     elif curve_type == CurveType.P256:
         if op_name == TEST_GENERATE:
-            k = int2bytes(((rng[1]<<256) + (rng[0])) % secp256r1.Q, endianity='big')
+            k = int2bytes(((rng[2]<<256) + (rng[1])) % secp256r1.Q, endianity='big')
         else:
             k = int2bytes(rn.randint(1, secp256r1.Q -1))
         priv1_ref, priv2_ref, pub_ref = __get_p256_keys(k)

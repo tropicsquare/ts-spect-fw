@@ -11,7 +11,6 @@
 ; ==============================================================================
 ;
 ; Scalar point multiplication on curve Ed25519 with 512 bit scalar
-; Uses CSWAP Montgomery Ladder method [https://eprint.iacr.org/2017/293]
 ;
 ; Inputs:
 ;   Point P = (ca_spm_internal_Px/y/z/t)
@@ -47,11 +46,17 @@ spm_ed25519_long:
     MOVI        r0,  call_check_level_1_id
     ST          r0,  ca_call_check_level_1
 
+    ; Initialize TMAC DRNG for register precharge
+    CALL    tmac_drng_init
+
     ; Load base point
     LD          r11, ca_spm_internal_Px
     LD          r12, ca_spm_internal_Py
     LD          r13, ca_spm_internal_Pz
-    LD          r14, ca_spm_internal_Pz
+    LD          r14, ca_spm_internal_Pt
+
+    MOVI        r1,  ca_spm_internal_Q1
+    CALL        spm_ed25519_long_store_Q1
 
     ; Load parameter b
     LD          r6,  ca_ed25519_d
@@ -64,29 +69,47 @@ spm_ed25519_long:
     MOVI        r8,  1
     MOVI        r9,  1
     MOVI        r10, 0
+    MOVI        r18, ca_spm_internal_Q0
+    CALL        spm_ed25519_long_store_Q0
 
-    MOVI        r15, 2
+    MOVI        r17, 0x100                              ; scalar bit mask
+
+    TMAC_RD     r19                                     ; fetch pseudorandom data
+
 ; === MAIN LOOP ================================================================
+    MOVI        r15, 2
 spm_ed25519_long_main_loop:
     MOVI        r30, 256                                ; i = 256
     MOVI        r16, 0                                  ; j = 0
 ; --- INNER LOOP ---------------------------------------------------------------
+    ROL8        r29, r29                                ; shift to position
 spm_ed25519_long_loop:
 ; --- INNER LOOP BODY -------
-    ROL         r29, r29
+    ROL         r19, r19                                ; Randomize ALU_IN.A
+    ROL         r29, r29                                ; Shift key
+    ROL         r19, r19                                ; Randomize ALU_IN.A
 
-    CSWAP       r7,  r11
-    CSWAP       r8,  r12
-    CSWAP       r9,  r13
-    CSWAP       r10, r14
+    ; We have to first destroy the content of Q0, Q1 and r18 registers
+    ; Otherwise XOR(k[i], k[i-1]) leaks through side-channel
+    CALL        spm_ed25519_long_destroy_regs
+
+    ROL         r19, r19                                ; Randomize ALU_IN.A
+    AND         r18, r29, r17                           ; Get the scalar bit
+
+    ROL         r1,  r19                                ; Randomize ALU_IN.A
+    XOR         r19, r19, r1                            ; Refresh the precharge mask in r19
+    ADDI        r18, r18, ca_spm_internal_Q0
+
+    CALL        spm_ed25519_long_load_Q0
+    XORI        r1,  r18, 0x100
+    CALL        spm_ed25519_long_load_Q1
 
     CALL        point_add_ed25519
     CALL        point_dbl_ed25519
 
-    CSWAP       r7,  r11
-    CSWAP       r8,  r12
-    CSWAP       r9,  r13
-    CSWAP       r10, r14
+    CALL        spm_ed25519_long_store_Q0
+    XORI        r1,  r18, 0x100
+    CALL        spm_ed25519_long_store_Q1
 ; ---------------------------
 
     ADDI        r16, r16, 1                             ; j++
@@ -102,6 +125,11 @@ spm_ed25519_long_loop:
 ; ==============================================================================
 
     ; === Check Montgomery ladder invariant ===
+    MOVI        r18, ca_spm_internal_Q0
+    CALL        spm_ed25519_long_load_Q0
+    MOVI        r1, ca_spm_internal_Q1
+    CALL        spm_ed25519_long_load_Q1
+
     ; r30 is 0 from the loop
     SUBP        r7,  r30,  r7                           ;
     SUBP        r10, r30,  r10                          ; Q0 -> -Q0
@@ -134,4 +162,62 @@ spm_ed25519_long_loop:
 
 spm_ed25519_long_invariant_failed:
     MOVI        r0,  fail_val
+    RET
+
+spm_ed25519_long_load_Q0:
+    ; Loads point from address in r18 to (r7, r8, r9, r10)
+    LDR         r7,  r18
+    ADDI        r0,  r18, 0x20                          ; Use r0 to preserve r18
+    LDR         r8,  r0
+    ADDI        r0,  r0,  0x20
+    LDR         r9,  r0
+    ADDI        r0,  r0,  0x20
+    LDR         r10, r0
+    RET
+
+spm_ed25519_long_load_Q1:
+    ; Loads point from address in r1 to (r11, r12, r13, r14)
+    LDR         r11, r1
+    ADDI        r1,  r1,  0x20                          ; No need to preserve r1
+    LDR         r12, r1
+    ADDI        r1,  r1,  0x20
+    LDR         r13, r1
+    ADDI        r1,  r1,  0x20
+    LDR         r14, r1
+    RET
+
+spm_ed25519_long_store_Q0:
+    ; Loads point in (r7, r8, r9, r10) to address in r18
+    STR         r7,  r18
+    ADDI        r0,  r18, 0x20                          ; Use r0 to preserve r18
+    STR         r8,  r0
+    ADDI        r0,  r0,  0x20
+    STR         r9,  r0
+    ADDI        r0,  r0,  0x20
+    STR         r10, r0
+    RET
+
+spm_ed25519_long_store_Q1:
+    ; Stores point in (r11, r12, r13, r14) to address in r1
+    STR         r11, r1
+    ADDI        r1,  r1,  0x20                          ; No need to preserve r1
+    STR         r12, r1
+    ADDI        r1,  r1,  0x20
+    STR         r13, r1
+    ADDI        r1,  r1,  0x20
+    STR         r14, r1
+    RET
+
+spm_ed25519_long_destroy_regs:
+    ; Destroys the content of r7-r14 and r18 with pseudorandom data from TMAC DRNG
+    ; We use TMAC DRNG only for r18 and then simple XOR to save time.
+    TMAC_RD     r18
+    XOR         r7,  r7,  r18
+    XOR         r8,  r8,  r7
+    XOR         r9,  r9,  r8
+    XOR         r10, r10, r9
+    XOR         r11, r11, r10
+    XOR         r12, r12, r11
+    XOR         r13, r13, r12
+    XOR         r14, r14, r13
     RET

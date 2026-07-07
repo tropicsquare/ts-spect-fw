@@ -225,7 +225,7 @@ def test_run(tester: SpectTester, test_type: TestType):
     test_run_kpg.cmd_start()
     test_run_kpg.set_op(run_name)
 
-    rng = [int.from_bytes(rng0, 'big')] + [int.from_bytes(rng1, 'big')] + [rn.randint(0, 2**256-1) for _ in range(8)]
+    rng = [rn.randint(0, 2**256-1)] + [int.from_bytes(rng0, 'big')] + [int.from_bytes(rng1, 'big')] + [rn.randint(0, 2**256-1) for _ in range(8)]
     test_run_kpg.set_rng(rng)
 
     test_run_kpg.run()

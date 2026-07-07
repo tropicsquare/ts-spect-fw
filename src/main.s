@@ -73,6 +73,8 @@ op_id_check_clear:
     CMPI    r1, clear_id
     BRZ     op_clear
 
+    CALL    tmac_drng_seed_init
+
 op_id_check_ecc_key:
     CMPI    r4, ecc_key_id
     BRZ     op_ecc_key
