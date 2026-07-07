@@ -55,7 +55,7 @@ map_to_curve_elligator2_curve25519:
                                     ; Nonzero: -1 is square (mod p), tv1 is not
     XORI        r30, r7,  0
     ; If xd == 0, the resulting point is point at infinity ->
-    BRZ         curve25519_point_generate_fail  ; We rater fail, the probability is ~ 2^(-253)
+    BRZ         curve25519_point_generate_fail  ; We rather fail, the probability is ~ 2^(-253)
 
     LD          r8,  ca_curve25519_a
     MOVI        r30, 0x000

@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_point_generation/hash_to_field.s
+;  file    others/hash_to_field.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)

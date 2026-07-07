@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_math/ed25519/spm_ed25519_long.s
+;  file    ecc_math/ed25519/spm_ed25519_long_cswap.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)

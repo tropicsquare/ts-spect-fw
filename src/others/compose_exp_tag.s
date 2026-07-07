@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_point_generation/compose_exp_tag.s
+;  file    others/compose_exp_tag.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)

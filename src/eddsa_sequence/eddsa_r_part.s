@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    src/eddsa_sequence/eddsa_r_part.s
+;  file    eddsa_sequence/eddsa_r_part.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)

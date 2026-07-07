@@ -11,7 +11,7 @@
 ; ==============================================================================
 ;
 ; Prepares for e = SHA512(R, A, M) calculation.
-; Process R, A and first 64 byte of the massage.
+; Process R, A and first 64 byte of the message.
 ;
 ; ==============================================================================
 
@@ -38,7 +38,7 @@ op_eddsa_e_prep:
     HASH_IT
     HASH        r16, r18
 
-    MOVI        r29, 128                        ; byte counter for messsage size
+    MOVI        r29, 128                        ; byte counter for message size
 
     MOVI        r0, ret_op_success
     MOVI        r1,  0
