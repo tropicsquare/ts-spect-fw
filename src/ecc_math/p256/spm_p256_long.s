@@ -155,7 +155,7 @@ spm_p256_long_invariant_failed:
     RET
 
 spm_p256_long_load_Q0:
-    ; Loads point from address in r18 to (r7, r8, r9, r10)
+    ; Loads point from address in r18 to (r9, r10, r11)
     LDR         r9,  r18
     ADDI        r0,  r18, 0x20                          ; Use r0 to preserve r18
     LDR         r10, r0
@@ -164,7 +164,7 @@ spm_p256_long_load_Q0:
     RET
 
 spm_p256_long_load_Q1:
-    ; Loads point from address in r1 to (r11, r12, r13, r14)
+    ; Loads point from address in r1 to (r12, r13, r14)
     LDR         r12, r1
     ADDI        r1,  r1,  0x20                          ; No need to preserve r1
     LDR         r13, r1
@@ -173,7 +173,7 @@ spm_p256_long_load_Q1:
     RET
 
 spm_p256_long_store_Q0:
-    ; Stores point in (r7, r8, r9, r10) to address in r18
+    ; Stores point in (r9, r10, r11) to address in r18
     STR         r9,  r18
     ADDI        r0,  r18, 0x20                          ; Use r0 to preserve r18
     STR         r10, r0
@@ -182,7 +182,7 @@ spm_p256_long_store_Q0:
     RET
 
 spm_p256_long_store_Q1:
-    ; Stores point in (r11, r12, r13, r14) to address in r1
+    ; Stores point in (r12, r13, r14) to address in r1
     STR         r12, r1
     ADDI        r1,  r1,  0x20                          ; No need to preserve r1
     STR         r13, r1
