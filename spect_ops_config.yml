@@ -1,3 +1,32 @@
+################################################################################
+#  file    spect_ops_config.yml
+#  author  vit.masek@tropicsquare.com
+#
+#  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+#  This work is subject to the license terms of the LICENSE file in the root
+#  directory of this source tree.
+#  If a copy of the LICENSE file was not distributed with this work, you can
+#  obtain one at (https://tropicsquare.com/license).
+#
+################################################################################
+#
+# Single source of truth for SPECT operation IDs and the memory addresses of
+# each op's named inputs/outputs (offsets within the runtime-selected input/
+# output base : Data RAM IN/OUT or EMEM).
+#
+# The `make ops_constants` step generates the following from this file; do NOT
+# hand-edit the generated artifacts, edit this file and rebuild:
+#   - src/constants/spect_ops_constants.s  (assembler .eq constants)
+#   - spect_ops_constants.h                (C header exposing the SPECT Op API)
+#
+# Schema (per list entry):
+#   - name    : < op name or op_name prefix >
+#     id      : < 8-bit op ID >
+#     input   : [ { name: <field>, address: <word offset> }, ... ]  # optional
+#     output  : [ { name: <field>, address: <word offset> }, ... ]  # optional
+#
+################################################################################
+
 - name : clear
   id : 0x00
   input :

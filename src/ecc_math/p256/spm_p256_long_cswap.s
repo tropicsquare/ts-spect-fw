@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_math/p256/spm_p256_long.s
+;  file    ecc_math/p256/spm_p256_long_cswap.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)

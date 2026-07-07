@@ -1,6 +1,6 @@
 ; ==============================================================================
-;   file    constants/l3_result_const.s
-;   author  vit.masek@tropicsquare.com
+;  file    constants/l3_result_const.s
+;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
 ;  This work is subject to the license terms of the LICENSE file in the root

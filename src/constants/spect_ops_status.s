@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    constants/spect_op_values.s
+;  file    constants/spect_ops_status.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)

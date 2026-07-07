@@ -137,7 +137,7 @@ ecc_key_read_check_slot_type:
     CMP         r4,  r25
     BRNZ        op_key_read_invalid
 
-; === Read the public key ======================== =============================
+; === Read the public key ======================================================
     ; Get Curve Type from Slot Metadata
     MOVI        r3,  ret_curve_type_err
     AND         r30, r30, r15
@@ -214,7 +214,7 @@ ecc_key_read_continue:
     STR         r7,  r0                             ; First 32B of the Public key
     ADDI        r0,  r0,  0x20
     SWE         r8,  r8
-    STR         r8,  r0                             ; Second 32B of the Public key (0s for Ec25519)
+    STR         r8,  r0                             ; Second 32B of the Public key (0s for Ed25519)
 
     MOVI        r0,  ret_op_success
     JMP         op_ecc_key_clean
@@ -237,7 +237,7 @@ op_ecc_key_erase:
     CALL        ecc_key_parse_input
 
 ; === Erase Private Slot =======================================================
-    LSL         r26, r25                            ; r25 <- physical priv key slot
+    LSL         r26, r25                            ; r26 <- physical priv key slot
 
     KBO         r26, ecc_kbus_erase
     BRE         op_key_fail
@@ -246,7 +246,7 @@ op_ecc_key_erase:
     KBO         r26, ecc_kbus_flush
 
 ; === Erase Public Slot ========================================================
-    ADDI        r26, r26, 1                         ; r25 <- physical pub key slot
+    ADDI        r26, r26, 1                         ; r26 <- physical pub key slot
 
     KBO         r26, ecc_kbus_erase
     BRE         op_key_fail

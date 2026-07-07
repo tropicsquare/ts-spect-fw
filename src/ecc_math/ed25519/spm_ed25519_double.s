@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    src/ecc_math/ed25519/spm_ed25519_double.s
+;  file    ecc_math/ed25519/spm_ed25519_double.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright (c) 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
@@ -143,7 +143,7 @@ spm_ed25519_double_loop:
     CMPI        r16, 256                                ; j == 256 ?
     BRNZ        spm_ed25519_double_fail                 ; If i == 0 and j != 256 => Fail
 
-    ; Move to low part of the scalers and move
+    ; Move to low part of the scalars and move
     ROL8        r27, r26                                ; r27 <- k1 low
     ROL8        r29, r28                                ; r29 <- k2 low
     ROL         r29, r29

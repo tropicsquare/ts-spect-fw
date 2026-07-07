@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    ecc_math/curve25519/spm_curve25519.s
+;  file    ecc_math/curve25519/spm_curve25519_cswap.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)

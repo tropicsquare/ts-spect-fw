@@ -1,5 +1,5 @@
 ; ==============================================================================
-;  file    other/clear_data_buffs.s
+;  file    others/clear_data_buffs.s
 ;  author  vit.masek@tropicsquare.com
 ;
 ;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
