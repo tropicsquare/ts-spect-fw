@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The order of operations in P-256 and Ed25519 point arithmetic was changed to change their power/EM profile compared to older version.
+- The `spm_*_long` routines now do not use either `CSWAP` nor branches to improve SCA resistance.
 
 ### Added
 
@@ -38,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Ed25519 and X25519 uses `get_secure_random` routine in case of GRV provides less then 256 bit of entropy.
+- Ed25519 and X25519 use `get_secure_random` routine in case of GRV provides less than 256 bit of entropy.
 
 ## [v1.1.0] 2024-04-14
 
