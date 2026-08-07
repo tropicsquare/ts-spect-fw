@@ -2,8 +2,8 @@
 ;  file    ecc_math/curve25519/get_y_curve25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -27,7 +27,8 @@
 ;   Curve25519 prime in R31
 ;
 ; Modified registers:
-;   r0, r1, r2, r17
+;   r0 - r5,
+;   r17, r30
 ;
 ; Subroutines:
 ;   sqrt_p25519

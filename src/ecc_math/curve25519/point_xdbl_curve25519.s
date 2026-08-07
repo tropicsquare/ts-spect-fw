@@ -2,8 +2,8 @@
 ;  file    ecc_math/curve25519/point_xdbl_curve25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -25,7 +25,8 @@
 ;   Curve25519 constant a2d4 = (Curve25519.A + 2) / 4 in r6
 ;
 ; Modified registers:
-;   r1,2,3
+;   r1 - r3,
+;   r7, r8
 ;
 ; Algorithm:
 ;   xDBL(XP, ZP):

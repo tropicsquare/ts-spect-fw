@@ -1,9 +1,9 @@
 ; ==============================================================================
-;  file    ecc_point_generation/hash_to_field.s
+;  file    others/tmac_shc_shn.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -21,7 +21,7 @@
 ;   Updated TMAC state with (sch || scn)
 ;
 ; Modified registers:
-;   r0, r1, r16, r30
+;   r0, r1, r16, r17, r30
 ;
 ; ==============================================================================
 

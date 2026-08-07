@@ -2,8 +2,8 @@
 ;  file    routines_includes.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -32,17 +32,18 @@
 .include   ecc_math/ed25519/point_decompress_ed25519.s
 .include   ecc_math/ed25519/point_add_ed25519.s
 .include   ecc_math/ed25519/point_dbl_ed25519.s
-.include   ecc_math/ed25519/spm_ed25519_short.s
 .include   ecc_math/ed25519/spm_ed25519_long.s
+.include   ecc_math/ed25519/spm_ed25519_double.s
 .include   ecc_math/ed25519/spm_ed25519_full_masked.s
-.include   ecc_math/ed25519/point_check_ed25519.s
+.include   ecc_math/ed25519/point_valid_check_ed25519.s
+.include   ecc_math/ed25519/point_check_infinity_ed25519.s
 
 ; .......... P256 ..........
 
 .include   ecc_math/p256/point_add_p256.s
 .include   ecc_math/p256/point_dbl_p256.s
-.include   ecc_math/p256/spm_p256_short.s
 .include   ecc_math/p256/spm_p256_long.s
+.include   ecc_math/p256/spm_p256_double.s
 .include   ecc_math/p256/spm_p256_full_masked.s
 .include   ecc_math/p256/point_check_p256.s
 
@@ -51,9 +52,9 @@
 .include    ecc_math/curve25519/get_y_curve25519.s
 .include    ecc_math/curve25519/point_add_curve25519.s
 .include    ecc_math/curve25519/point_check_curve25519.s
-.include    ecc_math/curve25519/point_xadd_curve25519.s
 .include    ecc_math/curve25519/point_xdbl_curve25519.s
-.include    ecc_math/curve25519/spm_curve25519_long.s
+.include    ecc_math/curve25519/point_order_check_curve25519.s
+.include    ecc_math/curve25519/spm_curve25519.s
 .include    ecc_math/curve25519/y_recovery_curve25519.s
 
 ; ====================================================
@@ -74,18 +75,7 @@
 .include    eddsa_sequence/eddsa_e_update.s
 .include    eddsa_sequence/eddsa_e_finish.s
 .include    eddsa_sequence/eddsa_finish.s
-
-; ====================================================
-; ECC Point Generation
-; ====================================================
-
-.include    ecc_point_generation/map_to_curve_elligator2_curve25519.s
-.include    ecc_point_generation/point_generate_curve25519.s
-.include    ecc_point_generation/point_generate_ed25519.s
-.include    ecc_point_generation/sqrt_ratio_3mod4.s
-.include    ecc_point_generation/map_to_curve_simple_swu.s
-.include    ecc_point_generation/point_generate_p256.s
-
+.include    eddsa_sequence/eddsa_verify_e.s
 
 ; ====================================================
 ; ECC Crypto
@@ -94,6 +84,7 @@
 .include    ecc_crypto/p256_key_setup.s
 .include    ecc_crypto/ed25519_key_setup.s
 .include    ecc_crypto/ecdsa_sign.s
+.include    ecc_crypto/ecdsa_verify.s
 .include    ecc_crypto/x25519_full_masked.s
 
 ; ====================================================
@@ -116,6 +107,9 @@
 ; Others
 ; ====================================================
 .include    others/tmac_shc_shn.s
+.include    others/tmac_drng.s
 .include    others/compose_exp_tag.s
 .include    others/hash_to_field.s
 .include    others/clear_data_buffs.s
+.include    others/extend_tmac_mask.s
+.include    others/get_secure_random.s

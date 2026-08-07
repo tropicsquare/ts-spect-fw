@@ -2,8 +2,8 @@
 ;  file    ecc_math/curve25519/point_xadd_curve25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -26,7 +26,8 @@
 ;   Curve25519 prime in r31
 ;
 ; Modified registers:
-;   r0-4
+;   r0 - r4,
+;   r9, r10
 ;
 ; Algorithm:
 ;   xADD(XP, ZP, XQ, ZQ, XR, ZR = 1):
@@ -53,7 +54,7 @@ point_xadd_curve25519:
     ADDP        r2,  r9,  r10                   ;   V2 = XQ + ZQ
     MUL25519    r2,  r2,  r0                    ;   V2 = V2 * V0
     ADDP        r3,  r1,  r2                    ;   V3 = V1 + V2
-    MUL25519    r3,  r3,  r3                    ;   XQ = V3 ** 2
+    MUL25519    r3,  r3,  r3                    ;   V3 = V3 ** 2
     SUBP        r4,  r1,  r2                    ;   V4 = V1 - V2
     MUL25519    r4,  r4,  r4                    ;   V4 = V4 ** 2
     MUL25519    r9,  r3,  r12                   ;   XQ = ZR * V3

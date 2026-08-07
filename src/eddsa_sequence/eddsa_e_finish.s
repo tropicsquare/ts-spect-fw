@@ -2,8 +2,8 @@
 ;  file    eddsa_sequence/eddsa_e_finish.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -13,8 +13,30 @@
 ; Finishes computation of e = SHA512(R, A, M) mod q
 ;
 ; ==============================================================================
+;
+; Overall EdDSA sequence context
+;   Public key 'A' --------------> ca_eddsa_sign_internal_A
+;   Private key part 's' --------> r26
+;   Private key part 'prefix' ---> r20
+;   Secure Channel Hash ---------> r16
+;   Secure Channel Nonce --------> r17
+;   Nonce 'r' -------------------> r27
+;   Signature part 'R' ----------> ca_eddsa_sign_internal_R
+;   E = SHA512(R, A, M) ---------> r25
+;
+; ==============================================================================
 
 op_eddsa_e_finish:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_e_prep_id
+    BRZ         eddsa_e_finish_ctx_ok
+    CMPI        r1,  eddsa_e_update_id
+    BRNZ        eddsa_ctx_fail
+eddsa_e_finish_ctx_ok:
+    MOVI        r1,  eddsa_e_finish_id
+    ST          r1,  ca_op_link
+
     CALL        get_data_in_size
     MOV         r11, r0                         ; number of bytes in the last chunk of message
     ADD         r29, r29, r11

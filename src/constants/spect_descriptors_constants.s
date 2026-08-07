@@ -2,8 +2,8 @@
 ;  file    constants/spect_descriptors_constants.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -54,9 +54,20 @@ ecc_kbus_verify_erase .eq 0x404
 tmac_dst_ecdsa_key_setup .eq 0xA
 tmac_dst_ecdsa_sign .eq 0xB
 tmac_dst_eddsa_sign .eq 0xC
+tmac_dst_drng .eq 0xF
 
 ; GF(p) gen DSTs
 gfp_gen_dst_ecdsa .eq 0xF1
 gfp_gen_dst_eddsa .eq 0xF2
 gfp_gen_dst_x25519 .eq 0xF3
 gfp_gen_dst_ecc_key .eq 0xF4
+
+; Call check
+call_check_level_1_id .eq 0xCC1
+call_check_level_2_id .eq 0xCC2
+call_check_level_3_id .eq 0xCC3
+call_check_level_4_id .eq 0xCC4
+
+; PASS/FAIL
+pass_val .eq 0x0F0
+fail_val .eq 0xF0F

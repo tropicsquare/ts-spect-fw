@@ -1,9 +1,9 @@
 ; ==============================================================================
-;  file    ecc_math/point_decompress_ed25519.s
+;  file    ecc_math/ed25519/point_decompress_ed25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -57,7 +57,10 @@
 ;   decompressed point (X, Y) = (r11, r12)
 ;
 ; Modified registers:
-;   r0,1,3,11,12, r16-22, r30
+;   r0 - r5,
+;   r11, r12,
+;   r16 - r22,
+;   r30
 ;
 ; Subroutines:
 ;   inv_p25519_250
@@ -193,9 +196,9 @@ point_decompress_ed25519_x_is_p_minus_x:
     JMP         point_decompress_ed25519_success
 
 point_decompress_ed25519_success:
-    MOVI        r1, 0
+    MOVI        r1, pass_val
     RET
 
 point_decompress_ed25519_fail:
-    MOVI        r1, 0xFFF
+    MOVI        r1, fail_val
     RET

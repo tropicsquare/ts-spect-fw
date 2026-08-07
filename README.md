@@ -1,57 +1,70 @@
-# TS SPECT Firmware
+# TS SPECT Application Firmware
 
-This repository contains the Makefile and associated scripts necessary to build firmware for a specific project.
+The primary function of the SPECT Application is to handle all Elliptic Curve Cryptography related
+functionality of the TROPIC01 chip.
 
-The primary Makefile, named `Makefile`, orchestrates the build process and provides various targets for compiling,
-releasing, and managing the firmware.
+We have one FW for the main RISCV32 CPU and a second for the SPECT coprocessor. This repository
+contains all code and tests for SPECT Application firmware. 
 
-[**SPECT Firmware API**](doc/spect_fw_api/spect_fw_api.pdf)
+## Licensing
+
+See [LICENSE](LICENSE) file.
+
+---
 
 ## Table of Contents
 
-- [TS SPECT Firmware](#ts-spect-firmware)
-  - [Table of Contents](#table-of-contents)
-  - [Licensing ](#licensing-)
-  - [Repository structure ](#repository-structure-)
-  - [Prerequisites ](#prerequisites-)
-  - [Build firmware ](#build-firmware-)
-  - [Release ](#release-)
-  - [Test/Simulate firmware ](#testsimulate-firmware-)
-    - [Test Vectors ](#test-vectors-)
+[Repository Structure ](#repository-structure)
 
+[Prerequisites ](#prerequisites)
 
-## Licensing <a name="license"></a>
+[Build ](#build)
+
+[Release ](#release)
+
+[Tests and FWFE ](#tests-and-fwfe)
+
+## Repository Structure
+
+```
+├─ spect_ops_config.yml    # Configuration of SPECT Ops
+├─ src                     # Source files
+├─ tests                   # Python scripts for verification
+├─ doc                     # API documentation and support markdowns
+├─ scripts                 # Support scripts
+├─ modules                 # Repository submodules
+│  └─ ts-spect-sdk         # SPECT SDK (test env. + Const ROM content)
+├─ build                   # Automatically created build destination
+├─ release                 # Automatically created release destination
+├─ LICENSE                 # LICENSE file
+├─ CHANGELOG.md            # CHANGELOG file
+└─ Makefile                # Makefile for building and release
+```
+
+## Prerequisites
 ---
-See [LICENSE file](LICENSE),
-
-
-## Repository structure <a name="repostruct"></a>
-
-- [`data`](data/) : configuration files for constants used by the firmware (primes, curve parameters, etc.)
-- [`doc`](doc/) : firmware and algorithms documentation
-- [`fit`](fit/) : directory dedicated to evaluation done by FIT, CTU in Prague
-- [`muni`](muni/) : (_obsolete_) directory dedicated to evaluation done by MUNI in Brno
-- [`release`](release/) : compiled application and debug firmware
-- [`release_boot`](release_boot/) : compiled firmware for EdDSA signature verification needed during TROPIC01 boot phase
-- [`scripts`](scripts/) : scripts needed to generate constants, memory layouts etc. from configuration files
-- [`src`](src/) : all firmware source files
-- [`tests`](tests/) : all python tests, models and custom test vectors
-
-
-## Prerequisites <a name="prereq"></a>
----
-1. Cloning repository and setting the environment variable `TS_REPO_ROOT` to the repository root.
+1. Cloning the repository
 
    ```bash
-   # clone the spect firmware repository
+   # clone the SPECT FW repository
    git clone https://github.com/tropicsquare/ts-spect-fw.git --recurse-submodules
-
-   # set env var TS_REPO_ROOT from root of repository
    cd ts-spect-fw
-   export TS_REPO_ROOT=`pwd`
    ```
 
-2. Ensure you have the `spect_compiler` and `spect_iss` binaries in the environment path. These are part
+2. Setting necessary environment variables
+
+   ```bash
+   # Set repository root
+   export TS_REPO_ROOT=`pwd`
+
+   # Set default revision of Const ROM <revA, revB, devel>
+   export DEFAULT_CONST_ROM="revB"
+   ```
+
+> [!TIP]
+> See available versions in [ts-spect-sdk](modules/ts-spect-sdk/data)
+
+3. Ensure you have the `spect_compiler` and `spect_iss` binaries in the environment path. These are part
 of the [`ts-spect-compiler`](https://github.com/tropicsquare/ts-spect-compiler)
 repository.
 
@@ -60,97 +73,92 @@ repository.
    spect_iss --help
    ```
 
-3. Ensure that Python and certain Python packages are installed on your system or python environment:
-   ```bash
-   pip install -r requirements.txt
-   ```
+4. Ensure your version of `spect_compiler` and `spect_iss` is >= v0.10:
 
-## Build firmware <a name="fwbuild"></a>
+    ```bash
+    spect_compiler --version
+    spect_iss --version
+    ```
+
+## Build
 ---
 The primary [`Makefile`](Makefile) orchestrates the build process and provides
 various targets for compiling, releasing and managing the firmware. Run the desired build target using `make`.
 
-
-1. To compile application firmware to `build` directory, use:
-
-   ```bash
-   make compile
-   ```
-
-2. To release application and boot firmware to `release` directory, use:
-
-   ```bash
-   make release
-   ```
-
-3. To compile MPW1 version of the firmware to `build_mpw` and `build_mpw1_boot` directory, use:
-
-   ```bash
-   make compile_mpw1 && make compile_boot_mpw1
-   ```
-
-2. To restore the state of the repository, use:
+1. To restore the state of the repository, use:
 
    ```bash
    make clear
    ```
 
-5. For a complete list of targets, consult the Makefile or run:
+2. To compile firmware to `build` directory, use:
+
    ```bash
-   grep : Makefile | awk -F: '/^[^.]/ {print $1;}'
+   make compile
    ```
 
-## Release <a name="release"></a>
+3. To set a Const ROM version specifically for this build, set the `ROM_VERSION` variable:
 
-Release application and boot firmware with
+   ```bash
+   make compile ROM_VERSION=<version>
+   ```
 
-```bash
-make release
-```
+## Release
+---
+Release application firmware with
 
-This creates `release` directory with following structure:
+   ```bash
+   make clear
+   make release
+   ```
+
+This creates `release` directory with the following structure:
+
+- `FW_VERSION` = `git describe --dirty`
+- `ROM_VERSION` = `$DEFAULT_CONST_ROM` by default. Can be changed with the `ROM_VERSION` variable when doing the release.
 
 | Name | Type | Description |
 | - | - | - |
-| `spect_app.hex` | File | Compiled application firmware |
-| `spect_boot.hex` | File | Compiled boot firware |
-| `spect_const_rom_code.hex` | File | Constants ROM code |
-| `dump` | Directory |  Program and symbols dump files for both firmwares |
-| `log` | Directory | Compilation log files for both firmwares |
+| `spect_app-<FW_VERSION>.hex32` | File | Compiled firmware |
+| `spect_app-<FW_VERSION>.hex` | Soft link | Link to `spect_app-<FW_VERSION>.hex32` |
+| `spect_const_rom_code-<ROM_VERSION>.hex32` | File | Constants ROM code |
+| `spect_const_rom_code-<ROM_VERSION>.hex` | Soft link | Link to `spect_const_rom_code-<ROM_VERSION>.hex32` |
+| `compile.log` | File | Compilation log |
+| `spect_ops_constants.h` | File | C header file with SPECT API defines |
+| `dump` | Directory | Program and symbols dump files |
 
-## Test/Simulate firmware <a name="fwtestsim"></a>
+## Tests and FWFE
 ---
-Python scrips for firmware testing and simulation are located in [`tests`](tests) directory. The scripts generates or read test vector, preload SPECTs input buffers and key slots, setup configuration files for `spect_iss` and run it.
+Python scripts for firmware testing and simulation are located in [`tests`](tests) directory. The tests use `models` and `spect_tester` from `ts-spect-sdk` submodule.
 
-Python tests expects firmware to be build before using `make`. Besides python tests, there are 3 scripts to run certain set of tests.
+To be able to run the tests, make sure you have the repository set up properly as described in [Prerequisites ](#prerequisites-). To run a single test, ensure you have the FW you want to test built in the `build` directory.
 
-| Name | Description |
-| - | - |
-| [`run_tests.sh`](tests/run_tests.sh) | Compiles and tests application firmware |
-| [`run_tests_mpw1.sh`](tests/run_tests_mpw1.sh) | Compiles and tests MPW1 firmware (app + boot) |
-| [`run_tests_release.sh`](tests/run_tests_release.sh) | Tests released firmware (app + boot), previously compiled to `release` directory |
+### Run regression
 
-### Test Vectors <a name="testvec"></a>
+```bash
+cd tests
+./regression.sh
+```
 
-Tests are randomized by default. Test vectors are generated for each run using python models in [`models`](tests/models).
+### Run regression on release target
 
-Test vectors can be also specified using YAML file and `--testvec` option to define parameters of test (private, public key, z coordinate, randomization).
+```bash
+cd tests
+make -C .. release
+./regression_release.sh
+```
 
-See [`testvec`](tests/testvec) for test vector examples.
+### Test Code Coverage
 
-> **_NOTE:_** Only [`test_x25519_dbg.py`](tests/test_x25519_dbg.py) and [`test_ecdsa_dbg.py`](tests/test_ecdsa_dbg.py) currently supports custom test vectors.
+After you run the tests, you can collect the test code coverage:
 
+```bash
+./collect_code_coverage.py
+```
 
-   ```bash
-   cd tests
-   ```
+This outputs the coverage in percent and number of not executed instructions. It also creates a `program_dump_coverage.s` file, with the not executed instructions marked with `>>>`.
 
-   ```bash
-   ./test_x25519_dbg.py --testvec testvec/x25519_dbg_testvec.yml
-   ```
+### FWFE
 
-   ```bash
-   ./test_ecdsa_dbg.py --testvec testvec/ecdsa_dbg_testvec.yml
-   ```
-
-   The `test_*.py` file controls test execution, output logs generate in `tests/<test_name_directory>`
+> [!NOTE]
+> Currently, there is no Firmware Fault Emulation test.

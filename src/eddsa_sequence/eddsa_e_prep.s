@@ -2,8 +2,8 @@
 ;  file    eddsa_sequence/eddsa_e_prep.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -11,11 +11,18 @@
 ; ==============================================================================
 ;
 ; Prepares for e = SHA512(R, A, M) calculation.
-; Process R, A and first 64 byte of the massage.
+; Process R, A and first 64 byte of the message.
 ;
 ; ==============================================================================
 
 op_eddsa_e_prep:
+    ; Check and update OP Link context
+    LD          r1,  ca_op_link
+    CMPI        r1,  eddsa_R_part_id
+    BRNZ        eddsa_ctx_fail
+    MOVI        r1,  eddsa_e_prep_id
+    ST          r1,  ca_op_link
+
     CALL        get_input_base
     ADDI        r30, r0,  eddsa_input_message
     LDR         r19, r30
@@ -31,7 +38,7 @@ op_eddsa_e_prep:
     HASH_IT
     HASH        r16, r18
 
-    MOVI        r29, 128                        ; byte counter for messsage size
+    MOVI        r29, 128                        ; byte counter for message size
 
     MOVI        r0, ret_op_success
     MOVI        r1,  0

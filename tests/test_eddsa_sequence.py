@@ -1,440 +1,645 @@
 #!/usr/bin/env python3
 import sys
-import random as rn
 import os
+import random as rn
+from enum import Enum
 
-import test_common as tc
+from default_fw import Application
 
-import models.ed25519 as ed25519
+from import_setup import import_setup
+import_setup()
 
-defines_set = tc.get_main_defines()
+from spect_models.EdDSA import EdDSA, KeyPair, Signature
+from spect_models.Curves.Ed25519 import Ed25519
+from spect_models.Fields.Field255 import Field
 
-def eddsa_sequence(s, prefix, A, slot, sch, scn, message, run_name_suffix):
+from spect_tester.spect_tester import SpectTester, SpectTestRun
+from spect_tester.spect_memory import SpectMem
+from spect_tester.spect_config import (
+    SpectOpStatus,
+    L3Result,
+    KeyTypes,
+    CurveType,
+    KeyOrigin,
+    EccSlot,
+)
+from spect_tester.key_memory import KeyMem
+from spect_tester.helpers import (
+    SlotMetadataErrType,
+    random_bytes,
+    get_main_defines,
+    int2bytes,
+    bytes2int,
+    get_input_source,
+    get_output_source,
+    create_metadata,
+)
 
-    insrc = 0x4
-    if "IN_SRC_EN" in defines_set:
-        insrc = tc.insrc_arr[rn.randint(0,1)]
+SPECT_FW = Application
+defines_set = get_main_defines(SPECT_FW.s_file)
 
-    outsrc = 0x5
-    if "OUT_SRC_EN" in defines_set:
-        outsrc = tc.outsrc_arr[rn.randint(0,1)]
+class TestType(Enum):
+    OK = 0
+    EMPTY_SLOT = 1
+    INVALID_CURVE = 2
+    INVALID_SLOT_NUMBER = 3
 
-    smodq = s % ed25519.q
+####################################################################################################
+####################################################################################################
+#   Key Memory Generator
+####################################################################################################
+####################################################################################################
+def create_key_mem(test_type: TestType, Key: KeyPair, slot: int) -> KeyMem:
+    keymem = KeyMem()
+    if test_type == TestType.EMPTY_SLOT:
+        return keymem
 
-    sign_ref = ed25519.sign(s, prefix, A, sch, scn, message)
+    priv_slot = slot<<1
+    pub_slot = priv_slot+1
 
-    ########################################################################################################
-    #   Set Context
-    ########################################################################################################
-    run_name = "eddsa_set_context" + run_name_suffix
-    tc.print_run_name(run_name)
+    s2 = rn.randint(1, Ed25519.Q-1)
+    s1 = (Key.s - s2) % Ed25519.Q
 
-    rng = [rn.randint(0, 2**256-1) for _ in range(10)]
-    tc.set_rng(test_dir, rng)
+    prefix_mask = rn.randint(0, 2**256 - 1)
+    prefix_masked = Key.prefix ^ prefix_mask
 
-    cmd_file = tc.get_cmd_file(test_dir)
-    tc.start(cmd_file)
+    pub_bytes = Key.PublicBytes(encoding="spect")
 
-    if run_name_suffix != "_empty_slot":
-        smask = rn.randint(0, ed25519.q-1)
-        s1 = smask
-        s2 = (smodq - smask) % ed25519.q
+    keymem.write(int2bytes(s1),            KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k1'])
+    keymem.write(int2bytes(prefix_masked), KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k2'])
+    keymem.write(int2bytes(s2),            KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k3'])
+    keymem.write(int2bytes(prefix_mask),   KeyTypes.ECC, priv_slot, EccSlot.PRIV_SLOT_LAYOUT['k4'])
 
-        prefix_mask = rn.randint(0, 2**256-1)
-        prefix_masked = prefix ^ prefix_mask
+    keymem.write(pub_bytes,                KeyTypes.ECC, pub_slot,  EccSlot.PUB_OFFSET)
 
-        tc.set_key(cmd_file, key=s1,            ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
-        tc.set_key(cmd_file, key=prefix_masked, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
-        tc.set_key(cmd_file, key=s2,            ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
-        tc.set_key(cmd_file, key=prefix_mask,   ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
+    if test_type == TestType.INVALID_CURVE:
+        curve = CurveType.P256
+    else:
+        curve = CurveType.ED25519
 
-        if run_name_suffix == "_invalid_curve":
-            invalid_metadata = "curve"
-        else:
-            invalid_metadata = None
+    if test_type == TestType.INVALID_SLOT_NUMBER:
+        slot = slot+1
 
-        _, _ = tc.gen_and_set_metadata(
-            curve=tc.Ed25519_ID,
-            slot=slot,
-            origin=0x01,
-            cmd_file=cmd_file,
-            invalid_metadata=invalid_metadata
+    pub_metadata, priv_metadata = create_metadata(
+        curve            = curve,
+        slot             = slot,
+        origin           = KeyOrigin.STORE,
+        invalid_metadata = SlotMetadataErrType.NO_ERR
+    )
+
+    keymem.write(priv_metadata, KeyTypes.ECC, priv_slot, EccSlot.METADATA_OFFSET)
+    keymem.write(pub_metadata,  KeyTypes.ECC, pub_slot,  EccSlot.METADATA_OFFSET)
+
+    return keymem
+
+####################################################################################################
+####################################################################################################
+#   Common Routines
+####################################################################################################
+####################################################################################################
+def __get_and_set_inout_src(test_run: SpectTestRun):
+    input_mem = get_input_source(defines_set)
+    output_mem = get_output_source(defines_set)
+
+    test_run.set_input_source(input_mem.src)
+    test_run.set_output_source(output_mem.src)
+
+    return input_mem, output_mem
+
+def __check_spect_status(test_run: SpectTestRun) -> bool:
+    status, data_out_size = test_run.get_res_word()
+    test_run.info(f"SPECT Status: 0x{status:02x}")
+    test_run.info(f"SPECT OutSize: {data_out_size}")
+
+    if status != SpectOpStatus.RET_OP_SUCCESS:
+        test_run.error(
+            f"Invalid SPECT Op Status\n"+
+            f"\tExpected {SpectOpStatus.RET_OP_SUCCESS:02x}\n"+
+            f"\tObserved {status:02x}"
+        )
+        return False
+
+    return True
+
+####################################################################################################
+####################################################################################################
+#   EdDSA Sign - Atomic Calls
+####################################################################################################
+####################################################################################################
+def eddsa_set_context(test_run: SpectTestRun, slot: int, scn: bytes, sch: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_set_context")
+
+    test_run.write_bytes(SpectMem.DataRamIn.base+0xA0, sch)
+    test_run.write_bytes(SpectMem.DataRamIn.base+0xC0, scn)
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    l3_input_word = (slot<<8) + test_run.op_dict.get('id', 0xFF)
+    test_run.write_word(input_mem.base, l3_input_word)
+
+    test_run.set_input_size(4)
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_nonce_init(test_run: SpectTestRun) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_nonce_init")
+
+    _, _ = __get_and_set_inout_src(test_run)
+
+    test_run.set_input_size(0)
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_nonce_update(test_run: SpectTestRun, block: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_nonce_update")
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    test_run.write_bytes(input_mem.base, block)
+    test_run.set_input_size(len(block))
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_nonce_finish(test_run: SpectTestRun, block: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_nonce_finish")
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    test_run.write_bytes(input_mem.base, block)
+    test_run.set_input_size(len(block))
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_r_part(test_run: SpectTestRun) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_R_part")
+
+    _, _ = __get_and_set_inout_src(test_run)
+
+    test_run.set_input_size(0)
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_e_at_once(test_run: SpectTestRun, block: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_e_at_once")
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    test_run.write_bytes(input_mem.base, block)
+    test_run.set_input_size(len(block))
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_e_prep(test_run: SpectTestRun, block: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_e_prep")
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    test_run.write_bytes(input_mem.base, block)
+    test_run.set_input_size(len(block))
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_e_update(test_run: SpectTestRun, block: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_e_update")
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    test_run.write_bytes(input_mem.base, block)
+    test_run.set_input_size(len(block))
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_e_finish(test_run: SpectTestRun, block: bytes) -> bool:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_e_finish")
+
+    input_mem, _ = __get_and_set_inout_src(test_run)
+
+    test_run.write_bytes(input_mem.base, block)
+    test_run.set_input_size(len(block))
+
+    test_run.run()
+
+    return __check_spect_status(test_run)
+
+def eddsa_finish(test_run: SpectTestRun) -> bytes:
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_finish")
+
+    _, output_mem = __get_and_set_inout_src(test_run)
+
+    test_run.set_input_size(0)
+
+    test_run.run()
+
+    status, data_out_size = test_run.get_res_word()
+    test_run.info(f"SPECT Status: 0x{status:02x}")
+    test_run.info(f"SPECT OutSize: {data_out_size}")
+
+    if status != SpectOpStatus.RET_OP_SUCCESS:
+        test_run.error(
+            f"Invalid SPECT Op Status\n"+
+            f"\tExpected {SpectOpStatus.RET_OP_SUCCESS:02x}\n"+
+            f"\tObserved {status:02x}"
         )
 
-        A_int = int.from_bytes(A, 'big')
-        tc.set_key(cmd_file, key=A_int,     ktype=0x04, slot=(slot<<1)+1, offset=tc.PUB_SLOT_LAYOUT["x"])
+    l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
+    l3_result = l3_result_word & 0xFF
 
-    input_word = (slot << 8) + tc.find_in_list("eddsa_set_context", ops_cfg)["id"]
+    if l3_result != L3Result.L3_RESULT_OK:
+        test_run.error(
+            f"Invalid L3 Result\n"+
+            f"\tExpected {L3Result.L3_RESULT_OK:02x}\n"+
+            f"\tObserved {l3_result:02x}"
+        )
 
-    tc.write_int32(cmd_file, input_word, (insrc<<12))
+    if data_out_size != 80:
+        test_run.error("Invalid output size")
 
-    tc.write_bytes(cmd_file, sch, 0x00A0)
-    tc.write_bytes(cmd_file, scn, 0x00C0)
+    signature = test_run.read_bytes(output_mem.base+0x10, 64)
 
-    ctx = tc.run_op(cmd_file, "eddsa_set_context", insrc, outsrc, 36, ops_cfg, test_dir, run_name=run_name)
+    return signature
 
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+####################################################################################################
+####################################################################################################
+#   EdDSA Sign - Sequence
+####################################################################################################
+####################################################################################################
+def eddsa_sign(
+    tester: SpectTester,
+    init_keymem_file: str,
+    message: bytes,
+    scn: bytes,
+    sch: bytes,
+    slot: int
+):
 
-    if (run_name_suffix == "_empty_slot"):
-        if (SPECT_OP_STATUS != 0xF2):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
-        if (SPECT_OP_DATA_OUT_SIZE != 1):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
-        l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-        if (l3_result != 0x12):
-            print("L3 RESULT:", hex(l3_result))
-            return 0
+    def __pass_test_run_context(tester: SpectTester, prev_name: str, new_name: str) -> SpectTestRun:
+        new_run = tester.create_test_run(new_name)
 
-        return 1
-    elif (run_name_suffix == "_invalid_curve"):
-        if (SPECT_OP_STATUS != 0xF4):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
-        if (SPECT_OP_DATA_OUT_SIZE != 1):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
-        l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
-        if (l3_result != 0x12):
-            print("L3 RESULT:", hex(l3_result))
-            return 0
-        return 1
-    else:
-        if (SPECT_OP_STATUS != 0x00):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
-        if (SPECT_OP_DATA_OUT_SIZE != 0):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
+        new_run.set_input_context_file(tester.get_test_run(prev_name).context_file)
+        new_run.set_input_keymem_file(tester.get_test_run(prev_name).keymem_file)
 
-        if "ECC_KEY_RERANDOMIZE" in defines_set:
-            kmem_data, _ = tc.parse_key_mem(test_dir, run_name)
+        return new_run
 
-            remasked_s1         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k1"])
-            remasked_prefix     = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k2"])
-            remasked_s2         = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k3"])
-            remasked_prefixmask = tc.get_key(kmem_data, ktype=0x04, slot=(slot<<1), offset=tc.PRIV_SLOT_LAYOUT["k4"])
+    ################################################################################################
+    #   Set Context
+    ################################################################################################
+    curr_run_name = "set_context"
+    tester.create_test_run(curr_run_name)
+    curr_run = tester.get_test_run(curr_run_name)
 
-            b1 = ((remasked_s1 + remasked_s2) % ed25519.q) == ((s1 + s2) % ed25519.q)
-            b2 = (remasked_s1 != s1) and (remasked_s2 != s2)
-            b3 = (remasked_prefix ^ remasked_prefixmask) == (prefix ^ prefix_mask)
-            b4 = (remasked_prefix != prefix) and (remasked_prefixmask != prefix_mask)
+    curr_run.set_input_keymem_file(init_keymem_file)
 
-            if not(b1 and b2):
-                print("Remasking of s failed.")
-                return 0
+    tester.info(f"Running {curr_run_name}")
 
-            if not(b3 and b4):
-                print("Remasking of prefix failed.")
-                return 0
+    if not eddsa_set_context(curr_run, slot, scn, sch):
+        return None
 
-    ########################################################################################################
-    #   Nonce Init
-    ########################################################################################################
-    run_name = "eddsa_nonce_init" + run_name_suffix
-    tc.print_run_name(run_name)
+    prev_run_name = curr_run_name
+    ################################################################################################
+    #   Compute Nonce
+    ################################################################################################
+    # Init
+    curr_run_name = "nonce_init"
+    curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-    rng = [rn.randint(0, 2**256-1) for i in range(10)]
-    tc.set_rng(test_dir, rng)
+    tester.info(f"Running {curr_run_name}")
 
-    cmd_file = tc.get_cmd_file(test_dir)
-    tc.start(cmd_file)
+    if not eddsa_nonce_init(curr_run):
+        return None
 
-    ctx = tc.run_op(cmd_file, "eddsa_nonce_init", insrc, outsrc, 36, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
+    prev_run_name = curr_run_name
 
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 0
-
-    if (SPECT_OP_DATA_OUT_SIZE != 0):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        return 0
-
-    ########################################################################################################
-    #   Nonce Update
-    ########################################################################################################
+    # Update
     updates_cnt = len(message) // 144
+
+    # If the message size is a multiple of 144 bytes, flip a coin if last
+    # block will be processed by 'update' or 'finish' command
+    if (len(message) % 144 == 0) and (rn.randint(0,1) == 1):
+        updates_cnt -= 1
+
     for i in range(0, updates_cnt):
-        block = message[i*144:i*144+144]
-        run_name = f"eddsa_nonce_update_{i}" + run_name_suffix
-        tc.print_run_name(run_name)
+        curr_run_name = f"nonce_update_{i}"
+        curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-        cmd_file = tc.get_cmd_file(test_dir)
-        tc.start(cmd_file)
+        block = message[(i*144) : (i*144)+144]
+        tester.info(f"Running {curr_run_name}, block size: {len(block)}")
 
-        tc.write_bytes(cmd_file, block, (insrc<<12))
-        ctx = tc.run_op(cmd_file, "eddsa_nonce_update", insrc, outsrc, 144, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
+        if not eddsa_nonce_update(curr_run, block):
+            return None
 
-        SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+        prev_run_name = curr_run_name
 
-        if (SPECT_OP_STATUS):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
+    # Finish
+    curr_run_name = f"nonce_finish"
+    curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-        if (SPECT_OP_DATA_OUT_SIZE != 0):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
+    last_block = message[updates_cnt*144:]
+    tester.info(f"Running {curr_run_name}, block size: {len(last_block)}")
 
-    ########################################################################################################
-    #   Nonce Finish
-    ########################################################################################################
-    last_block_tmac = message[updates_cnt*144:]
+    if not eddsa_nonce_finish(curr_run, last_block):
+        return None
 
-    run_name = "eddsa_nonce_finish" + run_name_suffix
-    tc.print_run_name(run_name)
+    prev_run_name = curr_run_name
+    ################################################################################################
+    #   Compute R Part
+    ################################################################################################
+    curr_run_name = f"r_part"
+    curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-    cmd_file = tc.get_cmd_file(test_dir)
-    tc.start(cmd_file)
+    tester.info(f"Running {curr_run_name}")
 
-    tc.write_bytes(cmd_file, last_block_tmac, (insrc<<12))
+    if not eddsa_r_part(curr_run):
+        return None
 
-    ctx = tc.run_op(cmd_file, "eddsa_nonce_finish", insrc, outsrc, len(last_block_tmac), ops_cfg, test_dir, run_name=run_name, old_context=ctx)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 0
-
-    if (SPECT_OP_DATA_OUT_SIZE != 0):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        return 0
-
-    ########################################################################################################
-    #   R Part
-    ########################################################################################################
-    run_name = "eddsa_R_part" + run_name_suffix
-    tc.print_run_name(run_name)
-
-    rng = [rn.randint(0, 2**256-1) for _ in range(10)]
-    tc.set_rng(test_dir, rng)
-
-    cmd_file = tc.get_cmd_file(test_dir)
-    tc.start(cmd_file)
-
-    ctx = tc.run_op(cmd_file, "eddsa_R_part", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
-
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-    if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 0
-
-    if (SPECT_OP_DATA_OUT_SIZE != 0):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        return 0
-
+    prev_run_name = curr_run_name
+    ################################################################################################
+    #   Compute E
+    ################################################################################################
     if len(message) < 64:
-        ########################################################################################################
-        #   E at once
-        ########################################################################################################
-        run_name = "eddsa_e_at_once" + run_name_suffix
-        tc.print_run_name(run_name)
+        # E At Once
+        curr_run_name = f"e_at_once"
+        curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-        cmd_file = tc.get_cmd_file(test_dir)
-        tc.start(cmd_file)
+        tester.info(f"Running {curr_run_name}, block size: {len(message)}")
 
-        tc.write_bytes(cmd_file, message, (insrc<<12))
+        if not eddsa_e_at_once(curr_run, message):
+            return None
 
-        ctx = tc.run_op(cmd_file, "eddsa_e_at_once", insrc, outsrc, len(message), ops_cfg, test_dir, run_name=run_name, old_context=ctx)
-
-        SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-        if (SPECT_OP_STATUS):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
-
-        if (SPECT_OP_DATA_OUT_SIZE != 0):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
+        prev_run_name = curr_run_name
     else:
-        ########################################################################################################
-        #   E Prep
-        ########################################################################################################
-        m_block_prep = message[:64]
+        # E Prepare
+        curr_run_name = f"e_prepare"
+        curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-        run_name = "eddsa_e_prep" + run_name_suffix
-        tc.print_run_name(run_name)
+        block = message[:64]
+        tester.info(f"Running {curr_run_name}, block size: {len(block)}")
 
-        cmd_file = tc.get_cmd_file(test_dir)
-        tc.start(cmd_file)
+        if not eddsa_e_prep(curr_run, block):
+            return None
 
-        tc.write_bytes(cmd_file, m_block_prep, (insrc<<12))
+        prev_run_name = curr_run_name
 
-        ctx = tc.run_op(cmd_file, "eddsa_e_prep", insrc, outsrc, 64, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
-
-        SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-        if (SPECT_OP_STATUS):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
-
-        if (SPECT_OP_DATA_OUT_SIZE != 0):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
-
-        ########################################################################################################
-        #   E Update
-        ########################################################################################################
+        # E Update
         message_tmp = message[64:]
         updates_cnt = len(message_tmp) // 128
 
+        # If the rest of message size is a multiple of 128 bytes, flip a coin if last
+        # block will be processed by 'update' or 'finish' command
+        if (len(message_tmp) % 128 == 0) and (rn.randint(0,1) == 1):
+            updates_cnt -= 1
+
         for i in range(0, updates_cnt):
-            block = message_tmp[i*128:i*128+128]
-            run_name = f"eddsa_e_update_{i}" + run_name_suffix
-            tc.print_run_name(run_name)
+            curr_run_name = f"e_update_{i}"
+            curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-            cmd_file = tc.get_cmd_file(test_dir)
-            tc.start(cmd_file)
+            block = message_tmp[(i*128) : (i*128)+128]
+            tester.info(f"Running {curr_run_name}, block size: {len(block)}")
 
-            tc.write_bytes(cmd_file, block, (insrc<<12))
-            ctx = tc.run_op(cmd_file, "eddsa_e_update", insrc, outsrc, 128, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
+            if not eddsa_e_update(curr_run, block):
+                return None
 
-            SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+            prev_run_name = curr_run_name
 
-            if (SPECT_OP_STATUS):
-                print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-                return 0
-
-            if (SPECT_OP_DATA_OUT_SIZE != 0):
-                print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-                return 0
-
-        ########################################################################################################
-        #   E Finish
-        ########################################################################################################
-        run_name = "eddsa_e_finish" + run_name_suffix
-        tc.print_run_name(run_name)
+        # E Finish
+        curr_run_name = f"e_finish"
+        curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
         last_block = message_tmp[updates_cnt*128:]
+        tester.info(f"Running {curr_run_name}, block size: {len(last_block)}")
 
-        cmd_file = tc.get_cmd_file(test_dir)
-        tc.start(cmd_file)
+        if not eddsa_e_finish(curr_run, last_block):
+            return None
 
-        tc.write_bytes(cmd_file, last_block, (insrc<<12))
+        prev_run_name = curr_run_name
 
-        ctx = tc.run_op(cmd_file, "eddsa_e_finish", insrc, outsrc, len(last_block), ops_cfg, test_dir, run_name=run_name, old_context=ctx)
-
-        SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
-
-        if (SPECT_OP_STATUS):
-            print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-            return 0
-
-        if (SPECT_OP_DATA_OUT_SIZE != 0):
-            print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-            return 0
-
-    ########################################################################################################
+    ################################################################################################
     #   Finish
-    ########################################################################################################
-    run_name = "eddsa_finish" + run_name_suffix
-    tc.print_run_name(run_name)
+    ################################################################################################
+    curr_run_name = f"finish"
+    curr_run = __pass_test_run_context(tester, prev_run_name, curr_run_name)
 
-    cmd_file = tc.get_cmd_file(test_dir)
-    tc.start(cmd_file)
+    tester.info(f"Running {curr_run_name}")
 
-    ctx = tc.run_op(cmd_file, "eddsa_finish", insrc, outsrc, 0, ops_cfg, test_dir, run_name=run_name, old_context=ctx)
+    signature = eddsa_finish(curr_run)
 
-    SPECT_OP_STATUS, SPECT_OP_DATA_OUT_SIZE = tc.get_res_word(test_dir, run_name)
+    return signature
 
-    if (SPECT_OP_STATUS):
-        print("SPECT_OP_STATUS:", hex(SPECT_OP_STATUS))
-        return 0
+####################################################################################################
+####################################################################################################
+#   Tests
+####################################################################################################
+####################################################################################################
+def test_ok(msg_len: int):
+    test_name = f"eddsa_sign_ok_{msg_len}"
+    tester = SpectTester(test_name, spect_fw=Application)
+    init_keymem_file = os.path.join(tester.test_dir, "init_keymem")
 
-    if (SPECT_OP_DATA_OUT_SIZE != 80):
-        print("SPECT_OP_DATA_OUT_SIZE:", SPECT_OP_DATA_OUT_SIZE)
-        return 0
+    ################################################################################################
+    #   Generate Test Vector
+    ################################################################################################
+    slot = rn.randint(0,31)
 
-    ########################################################################################################
-    #   Read and Check
-    ########################################################################################################
+    k = random_bytes(32)
+    Key = EdDSA.KeyGen(k)
 
-    l3_result = tc.read_output(test_dir, run_name, (outsrc<<12), 1)
+    create_key_mem(TestType.OK, Key, slot).dump(init_keymem_file)
 
-    if (l3_result != 0xc3):
-        print("L3 RESULT:", hex(l3_result))
-        return 0
+    message = random_bytes(msg_len)
+    sch = random_bytes(32)
+    scn = random_bytes(4)
 
-    signature = tc.read_output(test_dir, run_name, (outsrc<<12)+0x10, (SPECT_OP_DATA_OUT_SIZE-16)//4, string=True)
+    tester.info(
+        "Test Vector:\n"+
+        f"    slot:     {slot}\n"+
+        f"    k:        {k.hex()}\n"+
+        f"    msg:      {message.hex()}\n"+
+        f"    msg len:  {msg_len}\n"+
+        f"    sch:      {sch}\n"+
+        f"    scn:      {scn}\n"
+    )
 
-    return sign_ref == signature
+    signature_ref = EdDSA.Sign(message, Key, sch, scn).to_bytes()
+    tester.info(f"Signature ref: {signature_ref.hex()}")
 
+    ################################################################################################
+    #   Run and Check
+    ################################################################################################
+    signature = eddsa_sign(
+        tester,
+        init_keymem_file    = init_keymem_file,
+        message             = message,
+        scn                 = scn,
+        sch                 = sch,
+        slot                = slot
+    )
+
+    if signature is not None:
+        tester.info(f"Signature: {signature.hex()}")
+        if signature != signature_ref:
+            tester.error("Signature mismatch")
+    else:
+        tester.error("Signature is None")
+
+    ################################################################################################
+    #   END Test
+    ################################################################################################
+    err_cnt = tester.count_errors()
+
+    if err_cnt == 0:
+        SpectTester.print_passed()
+    else:
+        SpectTester.print_failed()
+
+    return err_cnt
+
+def test_err(test_type: TestType):
+    test_name = f"eddsa_sign_err_{test_type.name.lower()}"
+    tester = SpectTester(test_name, spect_fw=Application)
+    init_keymem_file = os.path.join(tester.test_dir, "init_keymem")
+
+    ################################################################################################
+    #   Generate Test Vector
+    ################################################################################################
+    slot = rn.randint(0,31)
+
+    k = random_bytes(32)
+    Key = EdDSA.KeyGen(k)
+
+    create_key_mem(test_type, Key, slot).dump(init_keymem_file)
+
+    sch = random_bytes(32)
+    scn = random_bytes(4)
+
+    ################################################################################################
+    #   Run Test
+    ################################################################################################
+    test_run = tester.create_test_run(f"eddsa_{test_type.name.lower()}")
+    test_run.cmd_start()
+    test_run.set_rng()
+    test_run.set_op("eddsa_set_context")
+
+    test_run.set_input_keymem_file(init_keymem_file)
+
+    test_run.write_bytes(SpectMem.DataRamIn.base+0xA0, sch)
+    test_run.write_bytes(SpectMem.DataRamIn.base+0xC0, scn)
+
+    input_mem, output_mem = __get_and_set_inout_src(test_run)
+
+    l3_input_word = (slot<<8) + test_run.op_dict.get('id', 0xFF)
+    test_run.write_word(input_mem.base, l3_input_word)
+
+    test_run.set_input_size(4)
+
+    test_run.run()
+
+    status, data_out_size = test_run.get_res_word()
+    test_run.info(f"SPECT Status: 0x{status:02x}")
+    test_run.info(f"SPECT OutSize: {data_out_size}")
+
+    if test_type == TestType.EMPTY_SLOT:
+        expected_status = SpectOpStatus.RET_KEY_ERR
+    elif test_type == TestType.INVALID_CURVE:
+        expected_status = SpectOpStatus.RET_CURVE_TYPE_ERR
+    elif test_type == TestType.INVALID_SLOT_NUMBER:
+        expected_status = SpectOpStatus.RET_SLOT_METADATA_ERR
+    else:
+        expected_status = None
+        test_run.critical("Invalid test type for error run!")
+
+    if status != expected_status:
+        test_run.error(
+            f"Invalid SPECT Op Status\n"+
+            f"\tExpected {expected_status:02x}\n"+
+            f"\tObserved {status:02x}"
+        )
+
+    l3_result_word = test_run.read_word(output_mem.base)
+    assert l3_result_word is not None
+
+    l3_result = l3_result_word & 0xFF
+    if l3_result != L3Result.L3_RESULT_INVALID_KEY:
+        test_run.error(
+            f"Invalid L3 Result\n"+
+            f"\tExpected {L3Result.L3_RESULT_INVALID_KEY:02x}\n"+
+            f"\tObserved {l3_result:02x}"
+        )
+
+    if data_out_size != 1:
+        test_run.error("Invalid output size")
+
+    ################################################################################################
+    #   END Test
+    ################################################################################################
+    err_cnt = tester.count_errors()
+
+    if err_cnt == 0:
+        SpectTester.print_passed()
+    else:
+        SpectTester.print_failed()
+
+    return err_cnt
+
+####################################################################################################
+####################################################################################################
+#   Main
+####################################################################################################
+####################################################################################################
 if __name__ == "__main__":
-
-    args = tc.parser.parse_args()
-    seed = tc.set_seed(args)
-    rn.seed(seed)
-    print("seed:", seed)
-
     ret = 0
 
-    ops_cfg = tc.get_ops_config()
-    test_name = "eddsa_sequence"
+    # Randomized message size
+    ret += test_ok(msg_len=rn.randint(1, 63))
+    ret += test_ok(msg_len=rn.randint(65, 127))
+    ret += test_ok(msg_len=rn.randint(128, 142))
+    ret += test_ok(msg_len=rn.randint(145, 600))
 
-    test_dir = tc.make_test_dir(test_name)
+    # Edge case message size
+    ret += test_ok(msg_len=0)
+    ret += test_ok(msg_len=64)
+    ret += test_ok(msg_len=143)
+    ret += test_ok(msg_len=144)
+    ret += test_ok(msg_len=320)
 
-    k = rn.randint(0, 2**256-1).to_bytes(32, 'little')
-    s, prefix, A = ed25519.key_gen(k)
-
-    sch = tc.random_bytes(32)
-    scn = tc.random_bytes(4)
-
-    slot = rn.randint(0, 7)
-
-    ########################################################################################################
-    #   Test message len >= 64
-    ########################################################################################################
-
-    msg_bitlen = rn.randint(64, 200)*8
-    message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
-
-    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_big"):
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    ########################################################################################################
-    #   Test message len < 64
-    ########################################################################################################
-
-    msg_bitlen = rn.randint(1, 63)*8
-    message = int.to_bytes(rn.getrandbits(msg_bitlen), msg_bitlen//8, 'big')
-
-    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_small"):
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_empty_slot"):
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_invalid_curve"):
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    ########################################################################################################
-    #   Test message len = 0
-    ########################################################################################################
-
-    message = b''
-    if not eddsa_sequence(s, prefix, A, slot, sch, scn, message, "_null_message"):
-        tc.print_failed()
-        ret = 1
-    else:
-        tc.print_passed()
-
-    if "TS_SPECT_FW_TEST_DONT_DUMP" in os.environ.keys():
-        os.system(f"rm -r {test_dir}")
+    # Error
+    ret += test_err(TestType.EMPTY_SLOT)
+    ret += test_err(TestType.INVALID_CURVE)
+    ret += test_err(TestType.INVALID_SLOT_NUMBER)
 
     sys.exit(ret)

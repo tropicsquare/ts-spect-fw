@@ -1,0 +1,3 @@
+[submodule "modules/ts-spect-sdk"]
+	path = modules/ts-spect-sdk
+	url = ../ts-spect-sdk.git

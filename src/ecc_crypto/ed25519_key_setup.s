@@ -2,8 +2,8 @@
 ;  file    ecc_crypto/ed25519_key_setup.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -44,7 +44,8 @@ ed25519_key_setup:
     JMP         ed25519_key_setup_start
 
 ed25519_key_setup_generate_k:
-    GRV         r19
+    CALL        get_secure_random
+
 ed25519_key_setup_start:
     ; Add padding to k
     MOVI        r18, 1
@@ -73,38 +74,40 @@ ed25519_key_setup_start:
     ST          r29, ca_ed25519_key_setup_internal_s
     ST          r28, ca_ed25519_key_setup_internal_prefix
     GRV         r30
-    LD          r31, ca_q25519
+    LD          r31, ca_q25519_8
     SCB         r28, r29, r30
 
-    ; Load base point G, mask it and check its validity
+    ; Load base point G
     LD          r31, ca_p25519
-    LD          r11, ca_ed25519_xG
-    LD          r12, ca_ed25519_yG
+    LD          r7,  ca_ed25519_xG
+    LD          r8,  ca_ed25519_yG
 
+    ; Load parameter d
+    LD          r6,  ca_ed25519_d
+
+    ; Randomize the base point G
     GRV         r2
     LD          r1, ca_gfp_gen_dst
     CALL        hash_to_field
+    ORI         r9,  r0,  1         ; Ensure that Z != 0
+    MUL25519    r7,  r7,  r9        ; X = x * Z
+    MUL25519    r10, r7,  r8        ; T = x * y * Z = X * y
+    MUL25519    r8,  r8,  r9        ; Y = y * Z
 
-    ORI         r13, r0,  1         ; Ensure that Z != 0
-    MUL25519    r11, r11, r13       ; X = x * Z
-    MUL25519    r14, r11, r12       ; T = x * y * Z = X * y
-    MUL25519    r12, r12, r13       ; Y = y * Z
-
-    LD          r6,  ca_ed25519_d
-
-    MOV         r7,  r11
-    MOV         r8,  r12
-    MOV         r9,  r13
-    MOV         r10, r14
-
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
+
+    ; Store the randomized G
+    ST          r7,  ca_spm_internal_Px
+    ST          r8,  ca_spm_internal_Py
+    ST          r9,  ca_spm_internal_Pz
+    ST          r10, ca_spm_internal_Pt
 
     ; Calculate A = s.G and check validity of the result
     CALL        spm_ed25519_long
-    CMPI        r0,  0
+    CMPI        r0,  pass_val
     BRNZ        ed25519_key_setup_spm_fail
-    CALL        point_check_ed25519
+    CALL        point_valid_check_ed25519
     BRNZ        ed25519_key_setup_spm_fail
 
     ; Transform A back to affine coordinates
@@ -188,7 +191,7 @@ ed25519_key_setup_origin_continue:
     BRE         ed25519_key_setup_kbus_fail
 
     ; Return success
-    MOVI        r3,  0
+    MOVI        r3,  ret_op_success
     RET
 
 ed25519_key_setup_spm_fail:

@@ -4,16 +4,13 @@ variables:
 
 stages:
   - build_doc
-  - test
-  - test_tag
+  - merge_regression
+  - tag_regression
   - publish
-
-
 
 ###################################################################################################
 # Build documentation
 ###################################################################################################
-
 build_documentation:
   stage: build_doc
   tags:
@@ -29,21 +26,22 @@ build_documentation:
     paths:
       - doc/spect_fw_api/build/pdf/spect_fw_doc.pdf
 
-
 ###################################################################################################
-# Run tests
+# regression
 ###################################################################################################
-run_test:
-  stage: test
+merge_regression:
+  stage: merge_regression
   tags:
     - shell
+  only:
+    - merge_requests
   script:
     - source ./setup_env
     - cd tests
-    - ./run_tests.sh
+    - ./regression.sh
 
-run_test_tag:
-  stage: test_tag
+tag_regression:
+  stage: tag_regression
   tags:
     - shell
   only:
@@ -51,13 +49,13 @@ run_test_tag:
   when: always
   script:
     - source ./setup_env
+    - make release
     - cd tests
-    - ./run_tests.sh
+    - ./regression_release.sh
 
 ###################################################################################################
 # Publish doc to pages
 ###################################################################################################
-
 pages:
     tags:
         - shell

@@ -2,8 +2,8 @@
 ;  file    ecc_crypto/p256_key_setup.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -68,12 +68,10 @@ p256_key_setup_generate_k:
 ;   Compute w = TMAC(d, "", 0xA)
 ; ==============================================================================
 p256_key_setup_start:
-    GRV     r0
-    GRV     r1
-    GRV     r2
-    GRV     r3
+    GRV     r7
+    CALL    extend_tmac_mask
+    TMAC_IT r7
 
-    TMAC_IT r0
     TMAC_IS r28, tmac_dst_ecdsa_key_setup
 
     MOVI    r2,  0x04
@@ -88,6 +86,7 @@ p256_key_setup_tmac_padding_loop:
 
     TMAC_UP r2
     TMAC_RD r29
+    TMAC_IT r7      ; Destroy the TMAC state
 
     ST      r28, ca_p256_key_setup_internal_d
     ST      r29, ca_p256_key_setup_internal_w
@@ -104,32 +103,28 @@ p256_key_setup_tmac_padding_loop:
     LD      r31, ca_p256
 
     ; Load the ECDSA base point
-    LD      r12, ca_p256_xG
-    LD      r13, ca_p256_yG
-
-    MOVI    r14, 1
+    LD      r9,  ca_p256_xG
+    LD      r10, ca_p256_yG
 
     ; Randomize the base points Z-coordinate
     GRV     r2
     LD      r1, ca_gfp_gen_dst
     CALL    hash_to_field
 
-    ORI     r14, r0,  1         ; Ensure that Z != 0
-    MUL256  r12, r12, r14
-    MUL256  r13, r13, r14
-
-    MOV     r9,  r12
-    MOV     r10, r13
-    MOV     r11, r14
+    ORI     r11, r0,  1         ; Ensure that Z != 0
+    MUL256  r9,  r9,  r11
+    MUL256  r10, r10, r11
 
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail
 
-    ; Compute the scalar point multiple
-    LD      r8,  ca_p256_b
+    ; Store the randomized point G
+    ST      r9,  ca_spm_internal_Px
+    ST      r10, ca_spm_internal_Py
+    ST      r11, ca_spm_internal_Pz
 
     CALL    spm_p256_long
-    CMPI    r0,  0
+    CMPI    r0,  pass_val
     BRNZ    p256_key_setup_spm_fail
     CALL    point_check_p256
     BRNZ    p256_key_setup_spm_fail

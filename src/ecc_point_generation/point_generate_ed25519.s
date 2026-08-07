@@ -2,8 +2,8 @@
 ;  file    ecc_point_generation/point_generate_ed25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -35,8 +35,8 @@ ed25519_point_generate:
 
     CALL        map_to_curve_elligator2_curve25519
     ; (r3, r7, r11, r8) = (xMn, xMd, yMn, 1)
-    XORI        r30, r7, 0
-    BRZ         ed25519_point_generate
+    CMPI        r0, pass_val
+    BRNZ        ed25519_point_generate
 
     ; r0    tv1
     ; r10   xn, x

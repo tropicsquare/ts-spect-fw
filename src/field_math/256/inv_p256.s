@@ -2,8 +2,8 @@
 ;  file    field_math/256/inv_p256.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -23,7 +23,7 @@
 ;   P-256 prime in r31
 ;
 ; Modified registers:
-;   r1-5, r30
+;   r1 - r5, r30
 ;
 ; ==============================================================================
 

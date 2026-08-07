@@ -2,8 +2,8 @@
 ;  file    ops/ecdsa_ops.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -77,12 +77,12 @@ op_ecdsa_sign:
     SUBP    r26, r26, r0
     ADDP    r21, r21, r0
 
+.ifdef ECC_KEY_RERANDOMIZE
     ; Rerandomize w part
     GRV     r10
     XOR     r22, r22, r10
     XOR     r23, r23, r10
 
-.ifdef ECC_KEY_RERANDOMIZE
     ; Store the rerandomized priv keys back to flash slot
     KBO     r25, ecc_kbus_erase             ; Erase the slot before writing remasked keys
     BRE     eddsa_set_context_kbus_fail
@@ -131,9 +131,7 @@ ecdsa_sign_invalid_key_fail:
     STR     r2,  r30
     MOV     r0,  r3
     MOVI    r1,  1
-    MOVI    r20, 0
-    MOVI    r21, 0
-    MOVI    r22, 0
-    MOVI    r26, 0
-    MOVI    r23, 0
+    MOVI    r31, 0
+    CALL    clear_data_in
+    CALL    clear_regs_before_return
     JMP     set_res_word

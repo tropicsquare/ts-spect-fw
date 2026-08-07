@@ -2,8 +2,8 @@
 ;  file    main.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -56,18 +56,24 @@ _start:
     MOVI    r31, 0
     CALL    clear_data_out
 
-    LD      r0, ca_spect_cfg_word
-    ADDI    r0, r0, 0                           ; force bits [255:32] to 0
-    MOVI    r4, 0xFF
-    AND     r1, r0, r4                          ; mask SPECT_OP_ID to r1[7:0]
-    ANDI    r4, r1, 0xF0                        ; get only op type id
+    LD      r0,  ca_spect_cfg_word
+    ADDI    r0,  r0, 0                           ; force bits [255:32] to 0
+    MOVI    r4,  0xFF
+    AND     r1,  r0, r4                          ; mask SPECT_OP_ID to r1[7:0]
+    ANDI    r4,  r1, 0xF0                        ; get only op type id
 
     ; Load DST template
-    LD      r5, ca_dst_template
+    LD      r5,  ca_dst_template
 
+    ; Clear call check
+    MOVI    r0,  0
+    ST      r0,  ca_call_check_level_1
+    ST      r0,  ca_call_check_level_2
 op_id_check_clear:
     CMPI    r1, clear_id
     BRZ     op_clear
+
+    CALL    tmac_drng_seed_init
 
 op_id_check_ecc_key:
     CMPI    r4, ecc_key_id
@@ -101,9 +107,6 @@ od_id_check_dbg:
 
 ; ==============================================================================
 op_ecc_key:
-    ; Clear CPB Result Buffer
-    CALL    clear_emem_out
-
     ; Compose DST for ecc_key ops
     ORI     r5,  r5, gfp_gen_dst_ecc_key
     ROL8    r5,  r5
@@ -148,9 +151,6 @@ op_x25519:
 
 ; ==============================================================================
 op_eddsa:
-    ; Clear CPB Result Buffer
-    CALL    clear_emem_out
-
     ; Compose GF(p) gen DST for eddsa ops
     ORI     r5,  r5, gfp_gen_dst_eddsa
     ROL8    r5,  r5
@@ -191,9 +191,6 @@ op_eddsa:
 
 ; ==============================================================================
 op_ecdsa:
-    ; Clear CPB Result Buffer
-    CALL    clear_emem_out
-
     ; Compose GF(p) gen DST for ecdsa ops
     ORI     r5,  r5, gfp_gen_dst_ecdsa
     ROL8    r5,  r5
@@ -265,6 +262,7 @@ get_output_base_app:
     ROL8    r0,  r0
 .endif
     RET
+
 get_data_in_size:
     LD      r0,  ca_spect_cfg_word
     ROR8    r0,  r0

@@ -2,8 +2,8 @@
 ;  file    eddsa_sequence/eddsa_set_context.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can
 ;  obtain one at (https://tropicsquare.com/license).
@@ -15,13 +15,11 @@
 ; Loads keys from slot, loads Secure Chanel Hash and Nonce.
 ;
 ;   Public key A ----------------> ca_eddsa_sign_internal_A
-;   Private key part 's1' --------> ca_eddsa_sign_internal_s1
-;   Private key part 's2' --------> ca_eddsa_sign_internal_s2
+;   Private key part 's1' -------> ca_eddsa_sign_internal_s1
+;   Private key part 's2' -------> ca_eddsa_sign_internal_s2
 ;   Private key part 'prefix' ---> r20
 ;   Secure Channel Hash ---------> r16
 ;   Secure Channel Nonce --------> r17
-;
-;   Rerandomize private keys and store them back to flash slot
 ;
 ; ==============================================================================
 ;
@@ -33,11 +31,15 @@
 ;   Secure Channel Nonce --------> r17
 ;   Nonce 'r' -------------------> r27
 ;   Signature part 'R' ----------> ca_eddsa_sign_internal_R
-;   SHA512(R, A, M) -------------> r25
+;   E = SHA512(R, A, M) ---------> r25
 ;
 ; ==============================================================================
 
 op_eddsa_set_context:
+    ; Store OP Link, nothing to check
+    MOVI    r1,  eddsa_set_context_id
+    ST      r1,  ca_op_link
+
     CALL    get_input_base
     ADDI    r4,  r0,  eddsa_set_context_input_slot
     LDR     r2,  r4
@@ -85,7 +87,7 @@ op_eddsa_set_context:
     KBO     r21, ecc_kbus_flush
     BRE     eddsa_set_context_kbus_fail
 
-    ; Rerandomize
+    ; Rerandomize s
     LD          r31, ca_q25519
     GRV         r2
     LD          r1, ca_gfp_gen_dst
@@ -93,11 +95,12 @@ op_eddsa_set_context:
     SUBP        r26, r26, r0
     ADDP        r29, r29, r0
 
+.ifdef ECC_KEY_RERANDOMIZE
+    ; Rerandomize prefix
     GRV         r2
     XOR         r23, r23, r2
     XOR         r30, r30, r2
 
-.ifdef ECC_KEY_RERANDOMIZE
     ; Store back to ECC priv key slot
     KBO         r21, ecc_kbus_erase             ; Erase the slot before writing remasked keys
     BRE         eddsa_set_context_kbus_fail

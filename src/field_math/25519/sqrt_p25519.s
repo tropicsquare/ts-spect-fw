@@ -2,8 +2,8 @@
 ;  file    field_math/25519/sqrt_p25519.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -26,7 +26,7 @@
 ;   p25519 in register r31
 ;
 ; Modified registers:
-;   r0-4
+;   r0 - r5, r30
 ;
 ; Subroutines:
 ;   inv_p25519_250

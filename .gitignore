@@ -1,7 +1,7 @@
 **/__pycache__
 build*
 release*
-tests/test_*/
+tests/test_results/
 data/*.hex
 **/logs/
 *.swp
@@ -9,3 +9,5 @@ data/*.hex
 spect_ops_constants.h
 spect_ops_constants.s
 constants_*layout.s
+.*
+tests/program_dump_coverage.s

@@ -1,9 +1,9 @@
 ; ==============================================================================
-;  file    constants/spect_op_values.s
+;  file    constants/spect_ops_status.s
 ;  author  vit.masek@tropicsquare.com
 ;
-;  Copyright © 2023 Tropic Square s.r.o. (https://tropicsquare.com/)
-;  This work is subject to the license terms of the LICENSE.txt file in the root
+;  Copyright © 2023-2026 Tropic Square s.r.o. (https://tropicsquare.com/)
+;  This work is subject to the license terms of the LICENSE file in the root
 ;  directory of this source tree.
 ;  If a copy of the LICENSE file was not distributed with this work, you can 
 ;  obtain one at (https://tropicsquare.com/license).
@@ -23,10 +23,12 @@ ret_grv_err .eq 0xf5
 ret_slot_metadata_err .eq 0xf6
 ret_x25519_err_inv_priv_key .eq 0x11
 ret_x25519_err_inv_pub_key .eq 0x12
+ret_ecdsa_err_generic .eq 0x20
 ret_ecdsa_err_inv_nonce .eq 0x21
 ret_ecdsa_err_inv_r .eq 0x22
 ret_ecdsa_err_inv_s .eq 0x23
 ret_ecdsa_err_final_verify .eq 0x24
+ret_eddsa_err_generic .eq 0x30
 ret_eddsa_err_inv_priv_key .eq 0x34
 ret_eddsa_err_inv_pub_key .eq 0x35
 ret_eddsa_err_final_verify .eq 0x36
